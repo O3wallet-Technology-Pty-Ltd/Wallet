@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.9" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <Properties>
+    <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+      <Connection code="Colors.NAV_MENU_BG_COLOR" type="code"/>
+    </Property>
+    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+      <Border info="org.netbeans.modules.form.compat2.border.MatteColorBorderInfo">
+        <MatteColorBorder bottom="0" left="0" right="1" top="0">
+          <Connection PropertyName="color" code="Colors.NAV_MENU_RIGHT_BORDER_COLOR" type="code"/>
+        </MatteColorBorder>
+      </Border>
+    </Property>
+  </Properties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,46,0,0,0,-58"/>
+  </AuxValues>
+
+  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+  <SubComponents>
+    <Container class="javax.swing.JPanel" name="pnlMain">
+      <Properties>
+        <Property name="opaque" type="boolean" value="false"/>
+      </Properties>
+      <Constraints>
+        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+          <BorderConstraints direction="North"/>
+        </Constraint>
+      </Constraints>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout">
+        <Property name="axis" type="int" value="3"/>
+      </Layout>
+      <SubComponents>
+        <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="mnuItemDashboard">
+          <Properties>
+            <Property name="caption" type="java.lang.String" value="DASHBOARD"/>
+            <Property name="edgeColor" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Colors.NAV_MENU_DASHBOARD_COLOR" type="code"/>
+            </Property>
+            <Property name="iconKey" type="java.lang.String" value="o3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="mnuItemDashboardMousePressed"/>
+          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;DASHBOARD&quot;, &quot;o3&quot;, Colors.NAV_MENU_DASHBOARD_COLOR)"/>
+          </AuxValues>
+        </Component>
+        <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="mnuItemWallet">
+          <Properties>
+            <Property name="caption" type="java.lang.String" value="ACCOUNT"/>
+            <Property name="edgeColor" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Colors.NAV_MENU_WALLET_COLOR" type="code"/>
+            </Property>
+            <Property name="iconKey" type="java.lang.String" value="wallet"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="mnuItemWalletMousePressed"/>
+          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;ACCOUNT&quot;, &quot;wallet&quot;, Colors.NAV_MENU_WALLET_COLOR)"/>
+          </AuxValues>
+        </Component>
+        <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="pnlLeftNavMenuItem3">
+          <Properties>
+            <Property name="caption" type="java.lang.String" value="CONTACTS"/>
+            <Property name="edgeColor" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Colors.NAV_MENU_CONTACTS_COLOR" type="code"/>
+            </Property>
+            <Property name="iconKey" type="java.lang.String" value="contacts"/>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;CONTACTS&quot;, &quot;contacts&quot;, Colors.NAV_MENU_CONTACTS_COLOR)"/>
+          </AuxValues>
+        </Component>
+        <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="pnlLeftNavMenuItem4">
+          <Properties>
+            <Property name="caption" type="java.lang.String" value="EXCHANGE"/>
+            <Property name="edgeColor" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Colors.NAV_MENU_EXCHANGE_COLOR" type="code"/>
+            </Property>
+            <Property name="iconKey" type="java.lang.String" value="exchange"/>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;EXCHANGE&quot;, &quot;exchange&quot;, Colors.NAV_MENU_EXCHANGE_COLOR)"/>
+          </AuxValues>
+        </Component>
+        <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="pnlLeftNavMenuItem5">
+          <Properties>
+            <Property name="caption" type="java.lang.String" value="SETTINGS"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="pnlLeftNavMenuItem5MousePressed"/>
+          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;SETTINGS&quot;, &quot;settings&quot;, Colors.NAV_MENU_SETTINGS_COLOR)"/>
+          </AuxValues>
+        </Component>
+        <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="pnlLeftNavMenuItem6">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;ABOUT&quot;, &quot;info&quot;, Colors.NAV_MENU_ABOUT_COLOR)"/>
+          </AuxValues>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPanel" name="pnlSpacer">
+      <Properties>
+        <Property name="opaque" type="boolean" value="false"/>
+      </Properties>
+      <Constraints>
+        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+          <BorderConstraints direction="Center"/>
+        </Constraint>
+      </Constraints>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+    </Container>
+  </SubComponents>
+</Form>
