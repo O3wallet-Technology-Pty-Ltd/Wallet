@@ -60,6 +60,10 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
     private static final Logger logger = LoggerFactory.getLogger(PnlSettingsScreen.class);
     //private final DefaultComboBoxModel<WalletService> model = new DefaultComboBoxModel<>();
     private final DefaultComboBoxModel<HDAccount> model = new DefaultComboBoxModel<>();
+    
+    private boolean loading = true;
+    private final DefaultComboBoxModel<String> currencyModel = new DefaultComboBoxModel<>();
+    private List<String> currencies = ResourcesProvider.DEFAULT_CURRENCIES;
 
     /**
      * Creates new form PnlSettingsScreen
@@ -110,6 +114,27 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         Object child = cmbWallets.getAccessibleContext().getAccessibleChild(0);
         BasicComboPopup popup = (BasicComboPopup) child;
         popup.setBorder(BorderFactory.createLineBorder(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR));
+        
+        
+        cmbCurrencies.setRenderer(new BasicComboBoxRenderer() {
+
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                list.setSelectionBackground(ResourcesProvider.Colors.APP_BG_COLOR);
+                list.setSelectionForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+                JComponent component = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus); //To change body of generated methods, choose Tools | Templates.
+                if (isSelected) {
+                    component.setForeground(Color.WHITE);
+                    component.setBackground(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR);
+                }
+                component.setPreferredSize(new Dimension(component.getPreferredSize().height, 30));
+                return component;
+            }
+        });
+
+        Object child1 = cmbCurrencies.getAccessibleContext().getAccessibleChild(0);
+        BasicComboPopup popup1 = (BasicComboPopup) child1;
+        popup1.setBorder(BorderFactory.createLineBorder(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR));
 
         themeWalletPropertyHeader(lblAccountName);
         themeWalletPropertyHeader(lblWalletName);
@@ -178,6 +203,16 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
             renderServiceProperties(wService);
         }
         
+        
+        for (String currency : currencies) {
+            currencyModel.addElement(currency.toUpperCase());
+        }
+        String currency = ConfigManager.config().getSelectedCurrency();
+        if (currency != null) {
+            currencyModel.setSelectedItem(currency.toUpperCase());
+        }
+        ConfigManager.config().setCurrencies(currencies);
+        loading = false;
     }
 
     public void renderServiceProperties(WalletService service) {
@@ -336,6 +371,9 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         cmbWallets = new javax.swing.JComboBox();
         btnRestoreWallet = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
+        pnlCurrency = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        cmbCurrencies = new javax.swing.JComboBox();
         pnlTop = new javax.swing.JPanel();
         pnlTitle = new javax.swing.JPanel();
         lblTitle = new javax.swing.JLabel();
@@ -674,13 +712,45 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         jPanel1.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(jPanel1, gridBagConstraints);
+
+        pnlCurrency.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Preferred Currency", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, ResourcesProvider.Fonts.BOLD_LARGE_FONT, ResourcesProvider.Colors.DEFAULT_HEADING_COLOR));
+        pnlCurrency.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 5));
+
+        jLabel1.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
+        jLabel1.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        jLabel1.setText("Currency:");
+        pnlCurrency.add(jLabel1);
+
+        cmbCurrencies.setBackground(ResourcesProvider.Colors.SCREEN_TOP_PANEL_BG_COLOR);
+        cmbCurrencies.setFont(ResourcesProvider.Fonts.BOLD_LARGE_FONT);
+        cmbCurrencies.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        cmbCurrencies.setModel(currencyModel);
+        cmbCurrencies.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        cmbCurrencies.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbCurrencies.setPreferredSize(new java.awt.Dimension(100, 20));
+        cmbCurrencies.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmbCurrenciesItemStateChanged(evt);
+            }
+        });
+        pnlCurrency.add(cmbCurrencies);
+        cmbCurrencies.setUI((ComboBoxUI) WalletComboBoxUI.createUI(cmbCurrencies, ResourcesProvider.Colors.APP_BG_COLOR));
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        pnlMain.add(pnlCurrency, gridBagConstraints);
 
         add(pnlMain, java.awt.BorderLayout.CENTER);
 
@@ -785,6 +855,25 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         }
     }//GEN-LAST:event_btnReplayChainActionPerformed
 
+    private void cmbCurrenciesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbCurrenciesItemStateChanged
+        // TODO add your handling code here:
+        if (loading) {
+            return;
+        }
+        if (evt.getStateChange() == ItemEvent.SELECTED && cmbCurrencies.getSelectedItem() != null) {
+            String currency = (String) currencyModel.getSelectedItem();
+            try {
+                ConfigManager.config().setSelectedCurrency(currency);
+                ConfigManager.get().save();
+                ApplicationUI.get().getDashboardScreen().getDashboardGraph().loadPriceGraph();
+                //loadPriceGraph();
+            } catch (Exception e) {
+                e.printStackTrace();
+                ApplicationUI.get().showError(e);
+            }
+        }
+    }//GEN-LAST:event_cmbCurrenciesItemStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDeleteWallet;
@@ -793,7 +882,9 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
     private javax.swing.JButton btnRestoreWallet;
     private javax.swing.JButton btnWalletSeed;
     private javax.swing.JCheckBox chkUseTor;
+    private javax.swing.JComboBox cmbCurrencies;
     private javax.swing.JComboBox cmbWallets;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblAccountName;
     private javax.swing.JLabel lblCreationDate;
@@ -809,6 +900,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
     private javax.swing.JLabel lblWalletPassphraseValue;
     private javax.swing.JLabel lblWalletStatus;
     private javax.swing.JLabel lblWalletStatusValue;
+    private javax.swing.JPanel pnlCurrency;
     private javax.swing.JPanel pnlGeneralSettings;
     private javax.swing.JPanel pnlMain;
     private javax.swing.JPanel pnlNetwork;

@@ -21,10 +21,14 @@ import javax.swing.ImageIcon;
 public class ResourcesProvider {
 
     public static final String APP_TITLE = "o3Wallet";
-    public static final String APP_VERSION = "1.0.1";
+    public static final String APP_VERSION = "1.0.1 Beta";
+    public static final int APP_MAJOR = 1;
+    public static final int APP_MINOR = 0;
+    public static final int APP_MINOR_MINOR = 1;
     public static final String APP_TITLE_VERSION = APP_TITLE + " - " + APP_VERSION;
 
-    public static final List<String> DEFAULT_CURRENCIES = Arrays.asList(new String[]{"USD", "AUD", "EUR"});
+    //public static final List<String> DEFAULT_CURRENCIES = Arrays.asList(new String[]{"USD", "AUD", "EUR"});
+    public static final List<String> DEFAULT_CURRENCIES = Arrays.asList(new String[]{"AUD", "BRL", "CAD", "CNY", "EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"});
     public static final String DEFAULT_CURRENCY = "USD";
     private static Map<String, Image> images = new HashMap();
     private static Map<String, ImageIcon> icons = new HashMap();

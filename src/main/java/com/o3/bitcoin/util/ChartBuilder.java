@@ -127,8 +127,11 @@ public class ChartBuilder {
 
         rangeAxis.setAxisLineVisible(false);
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-        rangeAxis.setRange(history.getMinimumValue() - 10, history.getMaximumValue() + 10);
-        rangeAxis.setTickUnit(new NumberTickUnit(25));
+        double percent = 0.15;
+        double diff = (history.getMaximumValue()-history.getMinimumValue());
+        double margin = diff * percent;
+        rangeAxis.setRange(history.getMinimumValue() - margin, history.getMaximumValue() + margin);
+        rangeAxis.setTickUnit(new NumberTickUnit((history.getMaximumValue()-history.getMinimumValue())/5));
         rangeAxis.setTickLabelFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
         rangeAxis.setTickLabelPaint(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
 
@@ -169,8 +172,9 @@ public class ChartBuilder {
         if( acctList == null )
             return null;
         for( HDAccount acct : acctList ){
-            Double balance = (double)acct.balance();
-            dataset.setValue(acct.toString(), balance);
+            String strBalance = WalletUtil.satoshiToBTC(acct.balance()).toPlainString();
+            Double balance = Double.parseDouble(strBalance);
+            dataset.setValue(strBalance, balance);
         }
         
        
@@ -201,9 +205,10 @@ public class ChartBuilder {
         }*/
         int i = 0;
         for( HDAccount acct : acctList ){
-            Double balance = (double)acct.balance();
-            dataset.setValue(acct.toString(), balance);
-            plot.setSectionPaint(acct.toString(), walletColors.get(i));
+            String strBalance = WalletUtil.satoshiToBTC(acct.balance()).toPlainString();
+            Double balance = Double.parseDouble(strBalance);
+            dataset.setValue(strBalance, balance);
+            plot.setSectionPaint(strBalance, walletColors.get(i));
             plot.setSectionDepth(0.4);
             i++;
         }

@@ -30,6 +30,7 @@ public class YesNoDialog extends BasicDialog {
     private String message;
     private String heading = "Confirmation Required";
     private JLabel lblMessage = null;
+    private boolean showCancelButton = true;
 
     public YesNoDialog(String message) {
         this(null, message);
@@ -39,6 +40,13 @@ public class YesNoDialog extends BasicDialog {
         super(true);
         this.message = message;
         this.heading = heading;
+    }
+    
+    public YesNoDialog(String heading, String message, boolean showCancelButton) {
+        super(true);
+        this.message = message;
+        this.heading = heading;
+        this.showCancelButton = showCancelButton;
     }
 
     public void start() {
@@ -76,6 +84,8 @@ public class YesNoDialog extends BasicDialog {
     @Override
     protected List<JButton> getControls() {
         List<JButton> controls = super.getControls();
+        if( !showCancelButton)
+            controls.get(0).setVisible(false);
         controls.add(0, getOkButton());
         return controls;
     }

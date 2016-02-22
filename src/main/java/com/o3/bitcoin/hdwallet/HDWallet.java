@@ -488,6 +488,13 @@ public class HDWallet {
     }
     
     /**
+     * function to add account in HD Wallet
+    */
+    public void addAccount(int acctNum, String acctName) {
+        mAccounts.add(new HDAccount(mParams, mWalletRoot, acctName, acctNum));
+    }
+    
+    /**
      * function to add account with name in HD Wallet 
      * @param accountName name of account
     */
@@ -564,7 +571,12 @@ public class HDWallet {
      * @return account
     */
     public HDAccount getAccount(int acctId) {
-        return mAccounts.get(acctId);
+        for (HDAccount hda : mAccounts){
+            if( hda.getAccountId() == acctId )
+                return hda;
+        }
+        return null;
+        //return mAccounts.get(acctId);
     }
     
     /**
@@ -613,4 +625,12 @@ public class HDWallet {
         }
         return "";
     }
+    
+    public DeterministicKey getAccount0PublicKey() {
+        for (HDAccount hda : mAccounts){
+            if( hda.getAccountId() == 0 )
+                return hda.getPublicKey();
+        }
+        return null;
+    } 
 }

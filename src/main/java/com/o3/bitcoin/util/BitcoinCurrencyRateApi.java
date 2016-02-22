@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class BitcoinCurrencyRateApi {
     private static final Logger logger = LoggerFactory.getLogger(BitcoinCurrencyRateApi.class);
     private static BitcoinCurrencyRateHistory historyCache = null;
     private static BitcoinCurrencyRateApi api;
-    private static Rate currentRate = null;
+    public static Rate currentRate = null;
 
     private BitcoinCurrencyRateApi() {
 
@@ -92,8 +93,9 @@ public class BitcoinCurrencyRateApi {
         List<String> lines = new ArrayList<String>();
         try {
         URL url = new URL("https://api.bitcoinaverage.com/history/"+currency+"/per_hour_monthly_sliding_window.csv");
-        BufferedReader in = new BufferedReader(
-        new InputStreamReader(url.openStream()));
+        URLConnection conn = url.openConnection();
+        conn.setConnectTimeout(60000);
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         String inputLine;
         int count = 0;
         while ((inputLine = in.readLine()) != null) {

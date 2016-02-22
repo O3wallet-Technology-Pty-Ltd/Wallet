@@ -96,7 +96,7 @@ public class PnlWalletGraphs extends javax.swing.JPanel {
                 try {
                     TransactionsChart chartData = ChartBuilder.get().getWalletTransactionsChart(config, days, type);
                     if (chartData.isDebitAndCredit() || chartData.isDebit()) {
-                        lblTotalDebit.setText("-" + String.format("%.4f", chartData.getTotalDebit()));
+                        lblTotalDebit.setText(String.format("%.4f", chartData.getTotalDebit()));
                     }
                     if (chartData.isDebitAndCredit() || !chartData.isDebit()) {
                         lblTotalCredit.setText(" " + String.format("%.4f", chartData.getTotalCredit()));

@@ -23,6 +23,7 @@ import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.Wallet;
@@ -149,6 +150,8 @@ public class WalletUtil {
         boolean found = false;
         List<Transaction> transactionList = wallet.getTransactionsByTime();
         for (Transaction trx : transactionList) {
+            if( trx.getConfidence().equals(TransactionConfidence.ConfidenceType.DEAD) )
+                continue;
             found = false;
             List<TransactionOutput> lto = trx.getOutputs();
             for (TransactionOutput txo : lto) {

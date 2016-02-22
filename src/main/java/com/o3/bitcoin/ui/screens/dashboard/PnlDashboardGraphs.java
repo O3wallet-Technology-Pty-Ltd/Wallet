@@ -5,6 +5,7 @@
  */
 package com.o3.bitcoin.ui.screens.dashboard;
 
+import com.o3.bitcoin.Application;
 import com.o3.bitcoin.hdwallet.HDAccount;
 import com.o3.bitcoin.model.WalletConfig;
 import com.o3.bitcoin.model.manager.ConfigManager;
@@ -55,11 +56,11 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerFactory.getLogger(PnlDashboardGraphs.class);
     private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
-    private boolean loading = true;
+    //private boolean loading = true;
     private Date priceGraphLastRenderedAt = null;
     private Date balancesGraphLastRenderedAt = null;
-
-    private final int PRICE_GRAPH_REFRESH_INTERVAL = 60 * 1000; // 1 minute
+    private List<String> currencies = ResourcesProvider.DEFAULT_CURRENCIES;
+    private final int PRICE_GRAPH_REFRESH_INTERVAL = 60 * 1000 * 30; // 30 minute
     private final int BALANCES_GRAPH_REFRESH_INTERVAL = 5 * 1000; //5 seconds
     
     private List<JLabel> walletLabels = new ArrayList<>();
@@ -70,8 +71,11 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
      */
     public PnlDashboardGraphs() {
         initComponents();
-        customizeUI();
+        //customizeUI();
         loadData();
+        loadBalancesGraph();
+        priceGraphLastRenderedAt = new Date();
+        loadPriceGraph();
         startTimer();
     }
 
@@ -79,17 +83,20 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
      * function that loads graphs after a specific time interval
      */
     private void startTimer() {
-        Timer timer = new Timer(1000, new ActionListener() {
+        Timer timer = new Timer(10000, new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (priceGraphLastRenderedAt == null) {
-                    loadPriceGraph();
-                    priceGraphLastRenderedAt = new Date();
-                } else {
-                    if (new Date().getTime() - priceGraphLastRenderedAt.getTime() >= PRICE_GRAPH_REFRESH_INTERVAL) {
-                        loadPriceGraph();
+                if( Application.appLoaded) {
+                    if (priceGraphLastRenderedAt == null) {
                         priceGraphLastRenderedAt = new Date();
+                        loadPriceGraph();
+
+                    } else {
+                        if (new Date().getTime() - priceGraphLastRenderedAt.getTime() >= PRICE_GRAPH_REFRESH_INTERVAL) {
+                            priceGraphLastRenderedAt = new Date();
+                            loadPriceGraph();
+                        }
                     }
                 }
                 if (balancesGraphLastRenderedAt == null) {
@@ -127,18 +134,19 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
         for(JPanel panel: walletPanels) {
             panel.setVisible(false);
         }
-        for (String currency : ConfigManager.config().getCurrencies()) {
+        /*for (String currency : currencies) {
             model.addElement(currency.toUpperCase());
         }
         String currency = ConfigManager.config().getSelectedCurrency();
         if (currency != null) {
             model.setSelectedItem(currency.toUpperCase());
         }
-        loading = false;
+        ConfigManager.config().setCurrencies(currencies);
+        loading = false;*/
     }
 
     private void customizeUI() {
-        cmbCurrencies.setRenderer(new BasicComboBoxRenderer() {
+/*        cmbCurrencies.setRenderer(new BasicComboBoxRenderer() {
 
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -156,34 +164,40 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
 
         Object child = cmbCurrencies.getAccessibleContext().getAccessibleChild(0);
         BasicComboPopup popup = (BasicComboPopup) child;
-        popup.setBorder(BorderFactory.createLineBorder(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR));
+        popup.setBorder(BorderFactory.createLineBorder(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR));*/
     }
 
     /**
      * function that shows price history graph
      */
-    synchronized private void loadPriceGraph() {
-        String error = null;
-        try {
-            JFreeChart chart = ChartBuilder.get().getCurrencyConversionRateChart();
-            ChartPanel panel = new ChartPanel(chart);
-            panel.setPopupMenu(null);
-            panel.setMouseZoomable(false);
-            panel.setDomainZoomable(false);
-            panel.setRangeZoomable(false);
-            panel.setPreferredSize(new Dimension(450, 200));
-            pnlPriceGraphView.removeAll();
-            pnlPriceGraphView.add(panel, BorderLayout.CENTER);
-        } catch (Exception e) {
-            error = e.toString();
-            logger.error("Unable to load Price Graph: ", e);
-        } finally {
-            if (error != null) {
-                showError(pnlPriceGraphView, error);
+    synchronized public void loadPriceGraph() {
+        
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String error = null;
+                try {
+                    JFreeChart chart = ChartBuilder.get().getCurrencyConversionRateChart();
+                    ChartPanel panel = new ChartPanel(chart);
+                    panel.setPopupMenu(null);
+                    panel.setMouseZoomable(false);
+                    panel.setDomainZoomable(false);
+                    panel.setRangeZoomable(false);
+                    panel.setPreferredSize(new Dimension(450, 200));
+                    pnlPriceGraphView.removeAll();
+                    pnlPriceGraphView.add(panel, BorderLayout.CENTER);
+                } catch (Exception e) {
+                    error = e.toString();
+                    logger.error("Unable to load Price Graph: ", e);
+                } finally {
+                    if (error != null) {
+                        showError(pnlPriceGraphView, error);
+                    }
+                }
+                pnlPriceGraphContainer.validate();
+                pnlPriceGraphContainer.repaint();
             }
-        }
-        pnlPriceGraphContainer.validate();
-        pnlPriceGraphContainer.repaint();
+        }).start();
     }
 
     /**
@@ -280,10 +294,6 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
         pnlSpacer = new javax.swing.JPanel();
         pnlPriceGraphContainer = new javax.swing.JPanel();
         pnlPriceGraphView = new javax.swing.JPanel();
-        pnlGraphControlsContainer = new javax.swing.JPanel();
-        pnlGraphControls = new javax.swing.JPanel();
-        lblGraphTitle = new javax.swing.JLabel();
-        cmbCurrencies = new javax.swing.JComboBox();
 
         setOpaque(false);
         setLayout(new java.awt.BorderLayout());
@@ -399,7 +409,7 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
         pnlWallet4.setOpaque(false);
         pnlWallet4.setLayout(new java.awt.BorderLayout(10, 0));
 
-        pnlBullet4.setBackground(ResourcesProvider.Colors.NAV_MENU_EXCHANGE_COLOR);
+        pnlBullet4.setBackground(ResourcesProvider.Colors.NAV_MENU_SETTINGS_COLOR);
         pnlBullet4.setPreferredSize(new java.awt.Dimension(16, 16));
 
         javax.swing.GroupLayout pnlBullet4Layout = new javax.swing.GroupLayout(pnlBullet4);
@@ -431,7 +441,7 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
         pnlWallet5.setOpaque(false);
         pnlWallet5.setLayout(new java.awt.BorderLayout(10, 0));
 
-        pnlBullet5.setBackground(ResourcesProvider.Colors.NAV_MENU_SETTINGS_COLOR);
+        pnlBullet5.setBackground(ResourcesProvider.Colors.NAV_MENU_EXCHANGE_COLOR);
         pnlBullet5.setPreferredSize(new java.awt.Dimension(16, 16));
 
         javax.swing.GroupLayout pnlBullet5Layout = new javax.swing.GroupLayout(pnlBullet5);
@@ -496,57 +506,11 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
         pnlPriceGraphView.setLayout(new java.awt.BorderLayout());
         pnlPriceGraphContainer.add(pnlPriceGraphView, java.awt.BorderLayout.CENTER);
 
-        pnlGraphControlsContainer.setOpaque(false);
-
-        pnlGraphControls.setBackground(ResourcesProvider.Colors.SCREEN_TOP_PANEL_BG_COLOR);
-
-        lblGraphTitle.setFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
-        lblGraphTitle.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
-        lblGraphTitle.setText("Weekly Bitcoin currency conversion rates in : ");
-        pnlGraphControls.add(lblGraphTitle);
-
-        cmbCurrencies.setBackground(ResourcesProvider.Colors.APP_BG_COLOR);
-        cmbCurrencies.setFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
-        cmbCurrencies.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
-        cmbCurrencies.setModel(model);
-        cmbCurrencies.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 5, 1, 1));
-        cmbCurrencies.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        cmbCurrencies.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbCurrenciesItemStateChanged(evt);
-            }
-        });
-        pnlGraphControls.add(cmbCurrencies);
-        cmbCurrencies.setUI((ComboBoxUI) WalletComboBoxUI.createUI(cmbCurrencies, ResourcesProvider.Colors.APP_BG_COLOR));
-
-        pnlGraphControlsContainer.add(pnlGraphControls);
-
-        pnlPriceGraphContainer.add(pnlGraphControlsContainer, java.awt.BorderLayout.SOUTH);
-
         add(pnlPriceGraphContainer, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void cmbCurrenciesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbCurrenciesItemStateChanged
-        if (loading) {
-            return;
-        }
-        if (evt.getStateChange() == ItemEvent.SELECTED && cmbCurrencies.getSelectedItem() != null) {
-            String currency = (String) model.getSelectedItem();
-            try {
-                ConfigManager.config().setSelectedCurrency(currency);
-                ConfigManager.get().save();
-                loadPriceGraph();
-            } catch (Exception e) {
-                e.printStackTrace();
-                ApplicationUI.get().showError(e);
-            }
-        }
-    }//GEN-LAST:event_cmbCurrenciesItemStateChanged
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox cmbCurrencies;
-    private javax.swing.JLabel lblGraphTitle;
     private com.o3.bitcoin.ui.component.XScalableLabel lblWallet1;
     private com.o3.bitcoin.ui.component.XScalableLabel lblWallet2;
     private com.o3.bitcoin.ui.component.XScalableLabel lblWallet3;
@@ -558,8 +522,6 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
     private javax.swing.JPanel pnlBullet3;
     private javax.swing.JPanel pnlBullet4;
     private javax.swing.JPanel pnlBullet5;
-    private javax.swing.JPanel pnlGraphControls;
-    private javax.swing.JPanel pnlGraphControlsContainer;
     private javax.swing.JPanel pnlOtherGraphs;
     private javax.swing.JPanel pnlPriceGraphContainer;
     private javax.swing.JPanel pnlPriceGraphView;

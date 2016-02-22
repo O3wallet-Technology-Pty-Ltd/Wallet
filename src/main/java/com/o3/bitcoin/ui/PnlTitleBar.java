@@ -9,8 +9,13 @@ import com.o3.bitcoin.util.ResourcesProvider;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Dimensions;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
+import com.o3.bitcoin.util.http.HttpGetClient;
+import com.o3.bitcoin.util.http.HttpPostClient;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +41,48 @@ public class PnlTitleBar extends javax.swing.JPanel {
         lblSupport.setText(" ");
         lblSupport.setVisible(true);
         lblUser.setVisible(false);
+        pnlNotification.setVisible(false);
+        getVersionNotification();
+    }
+    
+    private void getVersionNotification() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(60000);
+                    String version = HttpGetClient.getVersion("https://o3wallet.com/version.html");
+                    if( version != null && !version.isEmpty()) {
+                        System.out.println("version="+version);
+                        JSONObject json = new JSONObject(version);
+                        if( json.has("major") && json.has("minor") && json.has("minor_minor") && !pnlNotification.isVisible()) {
+                            int major = json.getInt("major");
+                            int minor = json.getInt("minor");
+                            int minorMinor = json.getInt("minor_minor");
+                            String notification = "New application version "+major+"."+minor+"."+minorMinor+" is available for download";
+                            if( major > ResourcesProvider.APP_MAJOR ) {
+                                lblNotification.setText(notification);
+                                pnlNotification.setVisible(true);
+                            }
+                            else if( minor > ResourcesProvider.APP_MINOR ) {
+                                lblNotification.setText(notification);
+                                pnlNotification.setVisible(true);
+                            }
+                            else if( minorMinor > ResourcesProvider.APP_MINOR_MINOR ) {
+                                lblNotification.setText(notification);
+                                pnlNotification.setVisible(true);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Exception="+e.getMessage());
+                }
+            }
+        }).start();
+    }
+    
+    public Component getUserLbl() {
+        return lblUser;
     }
 
     /**
@@ -55,6 +102,9 @@ public class PnlTitleBar extends javax.swing.JPanel {
         pnlTitle = new javax.swing.JPanel();
         lblTitle = new javax.swing.JLabel();
         pnlTopNav = new javax.swing.JPanel();
+        pnlNotification = new javax.swing.JPanel();
+        lblNotificationClose = new javax.swing.JLabel();
+        lblNotification = new javax.swing.JLabel();
         lblSupport = new javax.swing.JLabel();
         lblUser = new javax.swing.JLabel();
 
@@ -129,6 +179,21 @@ public class PnlTitleBar extends javax.swing.JPanel {
         pnlTopNav.setBackground(Colors.TITLE_BAR_NAV_BG_COLOR);
         pnlTopNav.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0));
 
+        pnlNotification.setPreferredSize(new java.awt.Dimension(500, 40));
+        pnlNotification.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        lblNotificationClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/close.png"))); // NOI18N
+        lblNotificationClose.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblNotificationClose.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblNotificationCloseMouseClicked(evt);
+            }
+        });
+        pnlNotification.add(lblNotificationClose);
+        pnlNotification.add(lblNotification);
+
+        pnlTopNav.add(pnlNotification);
+
         lblSupport.setFont(Fonts.BOLD_MEDIUM_FONT);
         lblSupport.setForeground(Colors.TITLE_BAR_NAV_BUTTON_COLOR);
         lblSupport.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -142,8 +207,7 @@ public class PnlTitleBar extends javax.swing.JPanel {
         lblUser.setForeground(Colors.TITLE_BAR_NAV_BUTTON_COLOR);
         lblUser.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblUser.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/default_user_dp.png"))); // NOI18N
-        lblUser.setText("Username");
-        lblUser.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        lblUser.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lblUser.setIconTextGap(10);
         lblUser.setOpaque(true);
         lblUser.setPreferredSize(new java.awt.Dimension(115, 45));
@@ -179,15 +243,23 @@ public class PnlTitleBar extends javax.swing.JPanel {
         ApplicationUI.get().setLocation(evt.getXOnScreen() - x, evt.getYOnScreen() - y);
     }//GEN-LAST:event_pnlTopMouseDragged
 
+    private void lblNotificationCloseMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNotificationCloseMouseClicked
+        // TODO add your handling code here:
+        pnlNotification.setVisible(false);
+    }//GEN-LAST:event_lblNotificationCloseMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel lblClose;
     private javax.swing.JLabel lblMaximize;
     private javax.swing.JLabel lblMinimize;
+    private javax.swing.JLabel lblNotification;
+    private javax.swing.JLabel lblNotificationClose;
     private javax.swing.JLabel lblSupport;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblUser;
     private javax.swing.JPanel pnlControls;
+    private javax.swing.JPanel pnlNotification;
     private javax.swing.JPanel pnlTitle;
     private javax.swing.JPanel pnlTop;
     private javax.swing.JPanel pnlTopNav;

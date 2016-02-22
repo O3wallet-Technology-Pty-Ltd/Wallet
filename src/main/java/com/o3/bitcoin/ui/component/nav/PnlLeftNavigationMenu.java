@@ -8,11 +8,13 @@ package com.o3.bitcoin.ui.component.nav;
 import com.o3.bitcoin.ui.ApplicationUI;
 import com.o3.bitcoin.ui.DirectionRatio;
 import com.o3.bitcoin.ui.ScaleDescriptor;
+import com.o3.bitcoin.ui.dialogs.YesNoDialog;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Dimensions;
 import com.o3.bitcoin.util.Utils;
 import java.awt.Color;
 import java.awt.Dimension;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -97,6 +99,11 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
         pnlLeftNavMenuItem3.setCaption("CONTACTS");
         pnlLeftNavMenuItem3.setEdgeColor(Colors.NAV_MENU_CONTACTS_COLOR);
         pnlLeftNavMenuItem3.setIconKey("contacts");
+        pnlLeftNavMenuItem3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlLeftNavMenuItem3MouseClicked(evt);
+            }
+        });
         pnlMain.add(pnlLeftNavMenuItem3);
 
         pnlLeftNavMenuItem4.setCaption("EXCHANGE");
@@ -111,6 +118,12 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
             }
         });
         pnlMain.add(pnlLeftNavMenuItem5);
+
+        pnlLeftNavMenuItem6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlLeftNavMenuItem6MouseClicked(evt);
+            }
+        });
         pnlMain.add(pnlLeftNavMenuItem6);
 
         add(pnlMain, java.awt.BorderLayout.NORTH);
@@ -131,6 +144,17 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
     private void pnlLeftNavMenuItem5MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlLeftNavMenuItem5MousePressed
         ApplicationUI.get().showScreen(ApplicationUI.SCREEN_SETTINGS);
     }//GEN-LAST:event_pnlLeftNavMenuItem5MousePressed
+
+    private void pnlLeftNavMenuItem3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlLeftNavMenuItem3MouseClicked
+        // TODO add your handling code here:
+        YesNoDialog dialog = new YesNoDialog("Info","Contacts is still under Development", false);
+        dialog.start();
+    }//GEN-LAST:event_pnlLeftNavMenuItem3MouseClicked
+
+    private void pnlLeftNavMenuItem6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlLeftNavMenuItem6MouseClicked
+        // TODO add your handling code here:
+        ApplicationUI.get().showScreen(ApplicationUI.SCREEN_ABOUT);
+    }//GEN-LAST:event_pnlLeftNavMenuItem6MouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -52,6 +52,7 @@ public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
     public static final String SUN_JAVA_COMMAND = "sun.java.command";
     private static boolean loggedIn = false;
+    public static boolean appLoaded = false;
     private static String args[];
     private static WalletService  mWalletService = null;
     
@@ -126,6 +127,7 @@ public class Application {
                     ui.showError("Error loading wallet : " + e.getMessage());
                     System.exit(1);
                 }
+                appLoaded = true;
                 ApplicationUI.get().restore();
                 ApplicationUI.get().setLocationRelativeTo(null);
                 ApplicationUI.get().setVisible(true);

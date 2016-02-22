@@ -7,6 +7,7 @@ package com.o3.bitcoin.model;
 
 import com.o3.bitcoin.util.ResourcesProvider;
 import com.o3.bitcoin.util.Utils;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;

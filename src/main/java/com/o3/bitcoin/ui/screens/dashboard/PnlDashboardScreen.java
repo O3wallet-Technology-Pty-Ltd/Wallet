@@ -32,6 +32,7 @@ import javax.swing.table.TableColumn;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.Wallet;
 import org.bitcoinj.utils.MonetaryFormat;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
      * function that creates History table
      */
     private void prepareUI() {
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             TableColumn column = tblTransactions.getColumnModel().getColumn(i);
             column.setHeaderRenderer(new PlainTableHeaderRenderer());
             if (i == 1 || i == 2) {
@@ -121,7 +122,7 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
     }
 
     /**
-     * function that updates debit/credit/balance/price in fiat and Transaction History talbe 
+     * function that updates debit/credit/balance/price in fiat and Transaction History table 
      * @param services 
      */
     private void updateWalletsSummary(List<WalletService> services) {
@@ -129,6 +130,7 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
         Coin totalCredit = Coin.ZERO;
         Coin totalBalance = Coin.ZERO;
         double priceInFiat = 0.00d;
+        String confidence = "";
         // update debit/credit/balance and price in fiat 
         List<TransactionWrapper> transactions = new ArrayList<>();
         for (WalletService service : services) {
@@ -136,6 +138,8 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
                 Wallet wallet = service.getWallet();
                 totalBalance = totalBalance.add(wallet.getBalance());
                 for (Transaction trx : wallet.getTransactionsByTime()) {
+                    if( trx.getConfidence().equals(TransactionConfidence.ConfidenceType.DEAD) )
+                        continue;
                     Coin amount = trx.getValue(wallet);
                     if (amount.isPositive()) {
                         totalCredit = totalCredit.add(amount);
@@ -153,7 +157,7 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
         pnlDashboardStats.setTotalCredit(MonetaryFormat.BTC.noCode().format(totalCredit).toString());
         priceInFiat = Double.valueOf(MonetaryFormat.BTC.noCode().format(totalBalance).toString());
         priceInFiat *= BitcoinCurrencyRateApi.get().getCurrentRateValue();
-        pnlDashboardStats.setPriceInFiat(String.format("%.4f", priceInFiat), "$", ConfigManager.config().getSelectedCurrency());
+        pnlDashboardStats.setPriceInFiat(String.format("%.4f", priceInFiat), "", ConfigManager.config().getSelectedCurrency());
         Collections.sort(transactions, new Comparator<TransactionWrapper>() {
             @Override
             public int compare(TransactionWrapper o1, TransactionWrapper o2) {
@@ -165,6 +169,10 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
         model.setRowCount(0);
         for (TransactionWrapper wrapper : transactions) {
             Transaction transaction = wrapper.getTransaction();
+            if( transaction.getConfidence().getDepthInBlocks() > 6 )
+                confidence = "> 6";
+            else
+                confidence = transaction.getConfidence().getDepthInBlocks() + "";
             Coin amount = wrapper.getAmount();
             Coin fee = transaction.getFee();
             String amountString = MonetaryFormat.BTC.noCode().format(amount).toString();
@@ -172,7 +180,7 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
             Address from = transaction.getInput(0).getFromAddress();
             Address to = transaction.getOutput(0).getAddressFromP2PKHScript(wrapper.getWallet().getNetworkParameters());
             boolean credit = amount.isPositive();
-
+            
             model.addRow(new Object[]{
                 Utils.formatTransactionDate(transaction.getUpdateTime()),
                 from,
@@ -180,13 +188,22 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
                 credit ? "Credit" : "Debit",
                 amountString,
                 feeString,
-                ""});
+                "",
+                confidence});
         }
         Coin balanceAfter = Coin.ZERO;
         for (int index = transactions.size() - 1; index >= 0; index--) {
             balanceAfter = balanceAfter.add(Coin.parseCoin((String) model.getValueAt(index, 4)));
             model.setValueAt(MonetaryFormat.BTC.noCode().format(balanceAfter).toString(), index, 6);
         }
+    }
+    
+    /**
+     * function to get reference to dashboard graph
+     * @return PnlDashboardGraphs
+     */
+    public PnlDashboardGraphs getDashboardGraph() {
+        return pnlDashboardGraphs1;
     }
 
     /**
@@ -287,11 +304,11 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
 
             },
             new String [] {
-                "Date", "To", "From", "Credit/Debit", "Amount", "Fee", "Total Balance"
+                "Date", "From", "To", "Credit/Debit", "Amount", "Fee", "Total Balance", "Confidence"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {

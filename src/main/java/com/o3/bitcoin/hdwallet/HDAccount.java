@@ -186,7 +186,7 @@ public class HDAccount {
     }
     
     /**
-     * function to get account balance
+     * function to get account balance in Satoshi
      * @return account balance
     */
     public long balance() {
@@ -217,6 +217,15 @@ public class HDAccount {
     */
     public String getAccountPath() {
         return mAccountKey.getPathAsString();
+    }
+    
+    /**
+     * function to get public part of the account key
+     * @return public part of account key
+    */    
+    public DeterministicKey getPublicKey() {
+        return mAccountKey.dropPrivateBytes();
+        //return mAccountKey.getPubOnly();
     }
     
     /**

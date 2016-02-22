@@ -74,7 +74,7 @@ public class HDKey {
         mPrvBytes = dk.getPrivKeyBytes();
         mPubBytes = dk.getPubKey(); // Expensive, save.
         mECKey = new ECKey(mPrvBytes, mPubBytes);
-
+        
         // Set creation time to now.
         long now = Utils.now().getTime() / 1000;
         mECKey.setCreationTimeSeconds(now);

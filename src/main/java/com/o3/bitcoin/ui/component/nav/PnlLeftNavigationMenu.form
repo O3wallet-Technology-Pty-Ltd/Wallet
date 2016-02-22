@@ -80,6 +80,9 @@
             </Property>
             <Property name="iconKey" type="java.lang.String" value="contacts"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="pnlLeftNavMenuItem3MouseClicked"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;CONTACTS&quot;, &quot;contacts&quot;, Colors.NAV_MENU_CONTACTS_COLOR)"/>
           </AuxValues>
@@ -108,6 +111,9 @@
           </AuxValues>
         </Component>
         <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="pnlLeftNavMenuItem6">
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="pnlLeftNavMenuItem6MouseClicked"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;ABOUT&quot;, &quot;info&quot;, Colors.NAV_MENU_ABOUT_COLOR)"/>
           </AuxValues>

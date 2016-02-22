@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingUtilities;
 import org.bitcoinj.core.AbstractPeerEventListener;
 import org.bitcoinj.core.Block;
+import org.bitcoinj.core.FilteredBlock;
 import org.bitcoinj.core.Peer;
 import org.bitcoinj.core.Utils;
 
@@ -50,9 +51,9 @@ public class DownloadProgressTracker extends AbstractPeerEventListener {
             future.set(peer.getBestHeight());
         }
     }
-
-    @Override
-    public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft) {
+    
+    @Override 
+    public void onBlocksDownloaded(Peer peer, Block block, FilteredBlock filteredBlock, int blocksLeft) {
         if (caughtUp) {
             return;
         }
@@ -73,6 +74,8 @@ public class DownloadProgressTracker extends AbstractPeerEventListener {
             lastPercent = (int) pct;
         }
     }
+    
+    
 
 //    @Override
 //    public void onBlocksDownloaded(Peer peer, Block block, FilteredBlock filteredBlock, int blocksLeft) {

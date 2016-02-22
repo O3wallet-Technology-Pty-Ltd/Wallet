@@ -45,6 +45,7 @@ import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.core.PeerGroup;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.core.Wallet;
 import org.bitcoinj.core.WrongNetworkException;
@@ -164,7 +165,7 @@ public class WalletService {
                             protected Wallet createWallet() {
                                 if (walletConfig.getWatchingKey() != null) {
                                     DeterministicKey watchingKey = walletConfig.getWatchingKey();
-                                    DeterministicKey key = DeterministicKey.deserializeB58(null, watchingKey.serializePubB58());
+                                    DeterministicKey key = DeterministicKey.deserializeB58( watchingKey.serializePubB58(ConfigManager.getActiveNetworkParams()),ConfigManager.getActiveNetworkParams());
                                     long creationTime = watchingKey.getCreationTimeSeconds();
                                     return Wallet.fromWatchingKey(params, key, creationTime);
                                 } else if (walletConfig.getMnemonicCodes() == null) {
@@ -208,7 +209,7 @@ public class WalletService {
                                 wallet().importKeysAndEncrypt(keys,WalletManager.walletPassword);
                                 //peerGroup().setFastCatchupTimeSecs(now);// marker
                                 peerGroup().setFastCatchupTimeSecs(HDKey.EPOCH);
-                                appKit.wallet().allowSpendingUnconfirmedTransactions();// marker
+                                //appKit.wallet().allowSpendingUnconfirmedTransactions();// marker
                                 initBitcoinNetwork();
                             }
                         };
@@ -320,16 +321,19 @@ public class WalletService {
             final String torMsg = "Initialising Tor";
             torClient.addInitializationListener(new TorInitializationListener() {
                 @Override
-                public void initializationProgress(final String message, final int percent) {
-                    fireProgressEvent(percent / 100.0, torMsg + " : " + message);
+                public void initializationProgress( String message, int percent) {
+                    fireProgressEvent((percent-20) / 100.0, torMsg + " : " + message);
                 }
 
                 @Override
                 public void initializationCompleted() {
-                    fireProgressEvent(1.0, torMsg);
+                    networkSyncPct = 0.1;
+                    syncMode = BITCOIN_NETWROK_SYNC_MODE;
+                    fireProgressEvent(networkSyncPct, "Synchorinzing with bitcoin network");
+                    /*fireProgressEvent(1.0, torMsg);
                     networkSyncPct = -1;
                     syncMode = BITCOIN_NETWROK_SYNC_MODE;
-                    updateNetworkSyncPct(networkSyncPct);
+                    updateNetworkSyncPct(networkSyncPct);*/
                 }
             });
         } else {
@@ -592,6 +596,10 @@ public class WalletService {
     public int getNumberOfConnectedPeers() {
         return appKit.peerGroup().numConnectedPeers();
     }
+    
+    public PeerGroup getPeerGroup() {
+        return appKit.peerGroup();
+    }
 
     public boolean isTerminating() {
         return this.terminating;
@@ -678,6 +686,19 @@ public class WalletService {
     */
     public void addAccount() {
         mHDWallet.addAccount();
+        mHDWallet.ensureMargins(appKit.wallet());
+        long now = Utils.now().getTime() / 1000;
+        ArrayList<ECKey> keys = new ArrayList<ECKey>();
+        mHDWallet.gatherAllKeys(now, keys);// marker
+        appKit.wallet().importKeysAndEncrypt(keys, WalletManager.walletPassword);
+        mHDWallet.persist();
+    }
+    
+     /**
+     * function to add an account in HD Wallet   
+    */
+    public void addAccount(int acctNum, String acctName) {
+        mHDWallet.addAccount(acctNum,acctName);
         mHDWallet.ensureMargins(appKit.wallet());
         long now = Utils.now().getTime() / 1000;
         ArrayList<ECKey> keys = new ArrayList<ECKey>();
@@ -790,5 +811,9 @@ public class WalletService {
      */
     public String getAddressAcountName(Address address) {
         return mHDWallet.getAddressAccountName(address);
+    }
+    
+    public DeterministicKey getAccount0PublicKey() {
+        return mHDWallet.getAccount0PublicKey();
     }
 }

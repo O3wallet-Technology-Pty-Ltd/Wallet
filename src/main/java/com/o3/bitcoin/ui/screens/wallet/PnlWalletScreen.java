@@ -54,6 +54,7 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.Wallet;
@@ -524,6 +525,7 @@ public class PnlWalletScreen extends javax.swing.JPanel implements ActionListene
         int skipped = 0;
         String sameWalletTransMarker = "";
         boolean sameWalletTrans = false;
+        boolean isDead = false;
         long outputValue = 0;
         long connectedOutputValue = 0;
         
@@ -551,6 +553,10 @@ public class PnlWalletScreen extends javax.swing.JPanel implements ActionListene
             });
             skipped = 0;
             for (Transaction transaction : transactions) {
+                
+                isDead = false;
+                if( transaction.getConfidence().equals(TransactionConfidence.ConfidenceType.DEAD) )
+                    isDead = true;
                 
                 
                 fromAccount = "";
@@ -639,10 +645,15 @@ public class PnlWalletScreen extends javax.swing.JPanel implements ActionListene
                             break;
                     }
                 }
-                if( !found )
-                {
+                if( !found ) {
                     skipped++;// skip transaction
                     continue;
+                }
+                else {
+                    if( isDead ) { // dead transaction
+                        skipped++;
+                        continue;
+                    }
                 }
                 boolean credit = amount.isPositive();
                 if (credit) {
