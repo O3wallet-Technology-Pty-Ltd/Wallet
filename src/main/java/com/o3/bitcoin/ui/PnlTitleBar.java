@@ -15,6 +15,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import javax.net.ssl.HttpsURLConnection;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,9 +55,19 @@ public class PnlTitleBar extends javax.swing.JPanel {
             public void run() {
                 try {
                     Thread.sleep(60000);
-                    String version = HttpGetClient.getVersion("https://o3wallet.com/version.html");
+                    String versionURL = "https://o3wallet.com/version.html";
+                    URL url;
+                    url = new URL(versionURL);
+                    HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+                    BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                   String version = null;
+                   String line = null; 			
+                   while ((line = br.readLine()) != null){
+                       version = line;
+                   }
+                   br.close();
+                   version = version.substring(version.indexOf('{'),version.indexOf('}')+1);// get rid of any garbge character
                     if( version != null && !version.isEmpty()) {
-                        System.out.println("version="+version);
                         JSONObject json = new JSONObject(version);
                         if( json.has("major") && json.has("minor") && json.has("minor_minor") && !pnlNotification.isVisible()) {
                             int major = json.getInt("major");
@@ -75,7 +89,7 @@ public class PnlTitleBar extends javax.swing.JPanel {
                         }
                     }
                 } catch (Exception e) {
-                    System.out.println("Exception="+e.getMessage());
+                    logger.error("Version Exception="+e.getMessage());
                 }
             }
         }).start();

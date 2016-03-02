@@ -14,11 +14,16 @@ import com.o3.bitcoin.util.ResourcesProvider;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +49,18 @@ public class DlgLogin extends BasicDialog {
         super(false);
         this.noWallet = noWallet;
         setupUI();
+        // set binding for enter key
+        int condition = JPanel.WHEN_IN_FOCUSED_WINDOW;
+        InputMap inputMap = ((JPanel) getContentPane()).getInputMap(condition);
+        ActionMap actionMap = ((JPanel) getContentPane()).getActionMap();
+        String enter = "enter";
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), enter);
+        actionMap.put(enter, new AbstractAction() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+                handleLoginButtonClickEvent(e);
+           }
+        });
     }
     
     @Override
