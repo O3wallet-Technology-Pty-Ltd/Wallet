@@ -617,10 +617,11 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
 
         lblfeeLabel.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
         lblfeeLabel.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
-        lblfeeLabel.setText("Default Fee Per KB:");
+        lblfeeLabel.setText("Network Fee:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(lblfeeLabel, gridBagConstraints);
 

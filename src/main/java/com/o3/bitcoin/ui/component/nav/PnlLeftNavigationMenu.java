@@ -32,6 +32,7 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
     public PnlLeftNavigationMenu() {
         initComponents();
         pnlLeftNavMenuItem4.setVisible(false);
+        pnlLeftNavMenuItem3.setVisible(false);
     }
     
     @Override

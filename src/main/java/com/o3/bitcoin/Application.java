@@ -12,6 +12,7 @@ import com.o3.bitcoin.ui.ApplicationUI;
 import com.o3.bitcoin.ui.dialogs.DlgCreateWallet;
 import com.o3.bitcoin.ui.dialogs.DlgWalletLoadingProgress;
 import com.o3.bitcoin.model.manager.ConfigManager;
+import com.o3.bitcoin.ui.dialogs.DlgEula;
 import com.o3.bitcoin.ui.dialogs.DlgLogin;
 import java.util.ArrayList;
 import com.o3.bitcoin.util.seed.SeedGeneratorUtils;
@@ -83,6 +84,7 @@ public class Application {
                 ui.setIconImages(icons);
                 ui.setTitle("o3Wallet");
                 try {
+                    eula();
                     login();
                     WalletConfig wallet = manager.getFirstWallet();
                     if (wallet == null) {
@@ -142,6 +144,27 @@ public class Application {
      */
     public static void setLoggedIn(boolean loggedIn) {
         Application.loggedIn = loggedIn;
+    }
+    
+    /**
+     * function to show eula dialog to user
+     */
+    private static void eula() {
+        if(!ConfigManager.config().isEulaAccepted()) {
+            DlgEula dlgEula = new DlgEula();
+            dlgEula.centerOnScreen();
+            dlgEula.setVisible(true);
+            if( !DlgEula.eulaAccepted )
+                System.exit(1);
+            else {
+                ConfigManager.config().setEulaAccepted(true);
+                try {
+                    ConfigManager.get().save();
+                }catch(Exception e) {
+                    logger.debug("Exception="+e.getMessage());
+                }
+            }
+        }
     }
     
     /**

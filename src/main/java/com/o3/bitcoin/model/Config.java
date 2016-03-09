@@ -30,6 +30,7 @@ public class Config {
 
     private String defaultNetwork = "MAINNET";
     private boolean useTor = false;
+    private boolean eulaAccepted = false;
     private List<WalletConfig> wallets = new ArrayList<>();
     private List<String> deleted = new ArrayList<>();
     private List<String> currencies = ResourcesProvider.DEFAULT_CURRENCIES;
@@ -199,6 +200,22 @@ public class Config {
     public void setUseTor(boolean useTor) {
         this.useTor = useTor;
     }
+    
+    /**
+     * function to get if eula is accepted by client
+     * @return whether eula accepted or not  
+     */ 
+    public boolean isEulaAccepted() {
+        return this.eulaAccepted;
+    }
+    
+    /**
+     * function to set eula acceptance
+     * @param eulaAccepted 
+     */
+    public void setEulaAccepted( boolean eulaAccepted) {
+        this.eulaAccepted = eulaAccepted;
+    }
 
     /**
      * function to get currency list
@@ -210,7 +227,7 @@ public class Config {
         }
         return currencies;
     }
-
+    
     /**
      * function to set currency list
      * @param currencies list of currency
