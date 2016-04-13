@@ -35,7 +35,8 @@ public class Config {
     private List<String> deleted = new ArrayList<>();
     private List<String> currencies = ResourcesProvider.DEFAULT_CURRENCIES;
     private String selectedCurrency = ResourcesProvider.DEFAULT_CURRENCY;
-
+    private String selectedFeePref = ResourcesProvider.DEFAULT_FEE_PREF;
+    
     private String encp = null;
 
     public Config() {
@@ -259,6 +260,28 @@ public class Config {
             selectedCurrency = ResourcesProvider.DEFAULT_CURRENCY;
         }
         this.selectedCurrency = selectedCurrency;
+    }
+    
+    /**
+     * function to set selected fee pref site
+     * @return selected fee pref
+     */
+    public String getSelectedFeePref() {
+        if (selectedFeePref == null || selectedFeePref.isEmpty()) {
+            selectedFeePref = ResourcesProvider.DEFAULT_FEE_PREF;
+        }
+        return selectedFeePref;
+    }
+
+    /**
+     * function to set selected fee pref
+     * @param selectedFeePref fee pref to set as selected
+     */
+    public void setSelectedFeePref(String selectedFeePref) {
+        if (selectedFeePref == null || selectedFeePref.isEmpty()) {
+            selectedFeePref = ResourcesProvider.DEFAULT_FEE_PREF;
+        }
+        this.selectedFeePref = selectedFeePref;
     }
 
     public boolean verifyApplicationPassword(String password) {

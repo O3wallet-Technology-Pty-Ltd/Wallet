@@ -27,10 +27,10 @@ public class PlainTabelCellRenderer extends JLabel implements TableCellRenderer 
             setBackground(Color.WHITE);
         } else {
             if (row % 2 == 0) {
-                setForeground(Colors.TABLE_CELL_TEXT_COLOR);
+                setForeground(Colors.TABLE_CELL_TEXT_COLOR1);
                 setBackground(Colors.TABLE_EVEN_ROW_BG_COLOR);
             } else {
-                setForeground(Colors.TABLE_CELL_TEXT_COLOR);
+                setForeground(Colors.TABLE_CELL_TEXT_COLOR1);
                 setBackground(Colors.TABLE_EVEN_ODD_BG_COLOR);
             }
         }

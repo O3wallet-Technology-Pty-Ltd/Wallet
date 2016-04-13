@@ -329,7 +329,7 @@ public class WalletService {
                 public void initializationCompleted() {
                     networkSyncPct = 0.1;
                     syncMode = BITCOIN_NETWROK_SYNC_MODE;
-                    fireProgressEvent(networkSyncPct, "Synchorinzing with bitcoin network");
+                    fireProgressEvent(networkSyncPct, "Synchronizing with bitcoin network");
                     /*fireProgressEvent(1.0, torMsg);
                     networkSyncPct = -1;
                     syncMode = BITCOIN_NETWROK_SYNC_MODE;
@@ -339,7 +339,7 @@ public class WalletService {
         } else {
             networkSyncPct = -1;
             syncMode = BITCOIN_NETWROK_SYNC_MODE;
-            fireProgressEvent(networkSyncPct, "Synchorinzing with bitcoin network");
+            fireProgressEvent(networkSyncPct, "Synchronizing with bitcoin network");
         }
 
     }

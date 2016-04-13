@@ -23,34 +23,34 @@ public class PnlDashboardStats extends javax.swing.JPanel {
      */
     public PnlDashboardStats() {
         initComponents();
-        lblBitCoinIcon.setVisible(false);
-        lblBitCoinIcon1.setVisible(false);
-        lblBitCoinIcon2.setVisible(false);
     }
 
-    public void setTotalDebit(String totalDebit) {
+    /*public void setTotalDebit(String totalDebit) {
         if( totalDebit.contains("-"))
             lblTotalDebit.setText(totalDebit.substring(1));
         else
             lblTotalDebit.setText(totalDebit);
-    }
+    }*/
 
-    public void setTotalCredit(String totalCredit) {
+    /*public void setTotalCredit(String totalCredit) {
         lblTotalCredit.setText(totalCredit);
-    }
+    }*/
 
     public void setTotalBalance(String totalBalance) {
-        lblTotalBalance.setText(totalBalance);
+        lblTotalBalance.setText("BTC   -   "+totalBalance);
     }
 
     public void setPriceInFiat(String priceInFiat, String prefixSymbol, String currencySymbol) {
-        lblPriceInFiat.setText(prefixSymbol != null ? prefixSymbol + priceInFiat : priceInFiat);
-        lblCurrencySymbol.setText(currencySymbol != null ? currencySymbol : "");
+        lblPriceInFiat.setText(currencySymbol + "   -   "+  priceInFiat);
+    }
+    
+    public void setExchangeRate(String currencySymbol, String exchangeRate) {
+        lblConversionRate.setText(currencySymbol+"/BTC   -   "+exchangeRate);
     }
 
     public void reset() {
-        setTotalDebit("0.0000");
-        setTotalCredit("0.0000");
+        //setTotalDebit("0.0000");
+        //setTotalCredit("0.0000");
         setTotalBalance("0.0000");
         setPriceInFiat("0.0000", "", "");
     }
@@ -63,153 +63,125 @@ public class PnlDashboardStats extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        pnlTotalDebit = new javax.swing.JPanel();
-        pnlContents = new javax.swing.JPanel();
-        lblTotalDebit = new com.o3.bitcoin.ui.component.XScalableLabel();
-        lblBitCoinIcon = new com.o3.bitcoin.ui.component.XScalableLabel();
-        lblTitle = new com.o3.bitcoin.ui.component.XScalableLabel();
-        pnlTotalDebit1 = new javax.swing.JPanel();
-        pnlContents1 = new javax.swing.JPanel();
-        lblTotalCredit = new com.o3.bitcoin.ui.component.XScalableLabel();
-        lblBitCoinIcon1 = new com.o3.bitcoin.ui.component.XScalableLabel();
-        lblTitle1 = new com.o3.bitcoin.ui.component.XScalableLabel();
-        pnlTotalCredit = new javax.swing.JPanel();
+        pnlControls = new javax.swing.JPanel();
+        pnlBalance = new javax.swing.JPanel();
         pnlContents2 = new javax.swing.JPanel();
         lblTotalBalance = new com.o3.bitcoin.ui.component.XScalableLabel();
-        lblBitCoinIcon2 = new com.o3.bitcoin.ui.component.XScalableLabel();
-        lblTitle2 = new com.o3.bitcoin.ui.component.XScalableLabel();
-        pnlTotalDebit3 = new javax.swing.JPanel();
-        pnlContents3 = new javax.swing.JPanel();
         lblPriceInFiat = new com.o3.bitcoin.ui.component.XScalableLabel();
-        lblCurrencySymbol = new com.o3.bitcoin.ui.component.XScalableLabel();
+        lblTitle2 = new com.o3.bitcoin.ui.component.XScalableLabel();
+        pnlSpacer = new javax.swing.JPanel();
+        xScalableLabel1 = new com.o3.bitcoin.ui.component.XScalableLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        pnlExchangeRate = new javax.swing.JPanel();
+        pnlContents3 = new javax.swing.JPanel();
+        lblConversionRate = new com.o3.bitcoin.ui.component.XScalableLabel();
         lblTitle3 = new com.o3.bitcoin.ui.component.XScalableLabel();
 
         setOpaque(false);
-        setLayout(new java.awt.GridLayout(1, 0));
 
-        pnlTotalDebit.setOpaque(false);
-        pnlTotalDebit.setLayout(new java.awt.BorderLayout());
+        pnlControls.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(225, 95, 104), 2, true));
+        pnlControls.setOpaque(false);
+        pnlControls.setLayout(new java.awt.GridLayout(1, 0));
 
-        pnlContents.setOpaque(false);
-        pnlContents.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 5));
-
-        lblTotalDebit.setText("0.0000");
-        lblTotalDebit.setFont(Fonts.DASHBOARD_WALLENT_BALANCE_FONT);
-        pnlContents.add(lblTotalDebit);
-
-        lblBitCoinIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/bitcoin-debit-32X32.png"))); // NOI18N
-        pnlContents.add(lblBitCoinIcon);
-
-        pnlTotalDebit.add(pnlContents, java.awt.BorderLayout.CENTER);
-
-        lblTitle.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 1, 30, 1));
-        lblTitle.setForeground(Colors.DEFAULT_HEADING_COLOR);
-        lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTitle.setText("Total Debit");
-        lblTitle.setFont(Fonts.DEFAULT_HEADING_FONT
-        );
-        pnlTotalDebit.add(lblTitle, java.awt.BorderLayout.PAGE_START);
-
-        add(pnlTotalDebit);
-
-        pnlTotalDebit1.setOpaque(false);
-        pnlTotalDebit1.setLayout(new java.awt.BorderLayout());
-
-        pnlContents1.setOpaque(false);
-        pnlContents1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 5));
-
-        lblTotalCredit.setText("0.0000");
-        lblTotalCredit.setFont(Fonts.DASHBOARD_WALLENT_BALANCE_FONT);
-        pnlContents1.add(lblTotalCredit);
-
-        lblBitCoinIcon1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/bitcoin-credit32X32.png"))); // NOI18N
-        pnlContents1.add(lblBitCoinIcon1);
-
-        pnlTotalDebit1.add(pnlContents1, java.awt.BorderLayout.CENTER);
-
-        lblTitle1.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 1, 30, 1));
-        lblTitle1.setForeground(Colors.DEFAULT_HEADING_COLOR);
-        lblTitle1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTitle1.setText("Total Credit");
-        lblTitle1.setFont(Fonts.DEFAULT_HEADING_FONT
-        );
-        pnlTotalDebit1.add(lblTitle1, java.awt.BorderLayout.PAGE_START);
-
-        add(pnlTotalDebit1);
-
-        pnlTotalCredit.setOpaque(false);
-        pnlTotalCredit.setLayout(new java.awt.BorderLayout());
+        pnlBalance.setOpaque(false);
+        pnlBalance.setLayout(new java.awt.BorderLayout());
 
         pnlContents2.setOpaque(false);
-        pnlContents2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 5));
+        pnlContents2.setLayout(new java.awt.GridBagLayout());
 
         lblTotalBalance.setText("0.0000");
-        lblTotalBalance.setFont(Fonts.DASHBOARD_WALLENT_BALANCE_FONT);
-        pnlContents2.add(lblTotalBalance);
+        lblTotalBalance.setFont(Fonts.DEFAULT_HEADING_FONT);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 10);
+        pnlContents2.add(lblTotalBalance, gridBagConstraints);
 
-        lblBitCoinIcon2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/bitcoin-balance-32X32.png"))); // NOI18N
-        pnlContents2.add(lblBitCoinIcon2);
+        lblPriceInFiat.setText("0.0000");
+        lblPriceInFiat.setFont(Fonts.DEFAULT_HEADING_FONT);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(1, 10, 5, 10);
+        pnlContents2.add(lblPriceInFiat, gridBagConstraints);
 
-        pnlTotalCredit.add(pnlContents2, java.awt.BorderLayout.CENTER);
+        pnlBalance.add(pnlContents2, java.awt.BorderLayout.CENTER);
 
-        lblTitle2.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 1, 30, 1));
-        lblTitle2.setForeground(Colors.DEFAULT_HEADING_COLOR);
+        lblTitle2.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 1, 5, 1));
+        lblTitle2.setForeground(Colors.DEFAULT_HEADING_COLOR1);
         lblTitle2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTitle2.setText("Total Balance");
-        lblTitle2.setFont(Fonts.DEFAULT_HEADING_FONT
-        );
-        pnlTotalCredit.add(lblTitle2, java.awt.BorderLayout.PAGE_START);
+        lblTitle2.setText("Available Balance");
+        lblTitle2.setFont(Fonts.DEFAULT_HEADING_FONT);
+        pnlBalance.add(lblTitle2, java.awt.BorderLayout.PAGE_START);
 
-        add(pnlTotalCredit);
+        pnlControls.add(pnlBalance);
 
-        pnlTotalDebit3.setOpaque(false);
-        pnlTotalDebit3.setLayout(new java.awt.BorderLayout());
+        pnlSpacer.setOpaque(false);
+        pnlSpacer.setLayout(new java.awt.BorderLayout());
+
+        xScalableLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 1, 5, 1));
+        xScalableLabel1.setText("  ");
+        pnlSpacer.add(xScalableLabel1, java.awt.BorderLayout.PAGE_START);
+
+        jPanel1.setOpaque(false);
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
+        jPanel2.setBackground(new java.awt.Color(153, 153, 153));
+        jPanel2.setPreferredSize(new java.awt.Dimension(2, 10));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 0);
+        jPanel1.add(jPanel2, gridBagConstraints);
+
+        pnlSpacer.add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        pnlControls.add(pnlSpacer);
+
+        pnlExchangeRate.setOpaque(false);
+        pnlExchangeRate.setLayout(new java.awt.BorderLayout());
 
         pnlContents3.setOpaque(false);
         pnlContents3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 5));
 
-        lblPriceInFiat.setText("0.0000");
-        lblPriceInFiat.setFont(Fonts.DASHBOARD_WALLENT_BALANCE_FONT);
-        pnlContents3.add(lblPriceInFiat);
+        lblConversionRate.setText("0.0000");
+        lblConversionRate.setFont(Fonts.DEFAULT_HEADING_FONT);
+        pnlContents3.add(lblConversionRate);
 
-        lblCurrencySymbol.setFont(Fonts.DASHBOARD_WALLENT_BALANCE_FONT);
-        pnlContents3.add(lblCurrencySymbol);
+        pnlExchangeRate.add(pnlContents3, java.awt.BorderLayout.CENTER);
 
-        pnlTotalDebit3.add(pnlContents3, java.awt.BorderLayout.CENTER);
-
-        lblTitle3.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 1, 30, 1));
-        lblTitle3.setForeground(Colors.DEFAULT_HEADING_COLOR);
+        lblTitle3.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 1, 5, 1));
+        lblTitle3.setForeground(Colors.DEFAULT_HEADING_COLOR1);
         lblTitle3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTitle3.setText("Price in Fiat");
-        lblTitle3.setFont(Fonts.DEFAULT_HEADING_FONT
-        );
-        pnlTotalDebit3.add(lblTitle3, java.awt.BorderLayout.PAGE_START);
+        lblTitle3.setText("Exchange Rate");
+        lblTitle3.setFont(Fonts.DEFAULT_HEADING_FONT);
+        pnlExchangeRate.add(lblTitle3, java.awt.BorderLayout.PAGE_START);
 
-        add(pnlTotalDebit3);
+        pnlControls.add(pnlExchangeRate);
+
+        add(pnlControls);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private com.o3.bitcoin.ui.component.XScalableLabel lblBitCoinIcon;
-    private com.o3.bitcoin.ui.component.XScalableLabel lblBitCoinIcon1;
-    private com.o3.bitcoin.ui.component.XScalableLabel lblBitCoinIcon2;
-    private com.o3.bitcoin.ui.component.XScalableLabel lblCurrencySymbol;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private com.o3.bitcoin.ui.component.XScalableLabel lblConversionRate;
     private com.o3.bitcoin.ui.component.XScalableLabel lblPriceInFiat;
-    private com.o3.bitcoin.ui.component.XScalableLabel lblTitle;
-    private com.o3.bitcoin.ui.component.XScalableLabel lblTitle1;
     private com.o3.bitcoin.ui.component.XScalableLabel lblTitle2;
     private com.o3.bitcoin.ui.component.XScalableLabel lblTitle3;
     private com.o3.bitcoin.ui.component.XScalableLabel lblTotalBalance;
-    private com.o3.bitcoin.ui.component.XScalableLabel lblTotalCredit;
-    private com.o3.bitcoin.ui.component.XScalableLabel lblTotalDebit;
-    private javax.swing.JPanel pnlContents;
-    private javax.swing.JPanel pnlContents1;
+    private javax.swing.JPanel pnlBalance;
     private javax.swing.JPanel pnlContents2;
     private javax.swing.JPanel pnlContents3;
-    private javax.swing.JPanel pnlTotalCredit;
-    private javax.swing.JPanel pnlTotalDebit;
-    private javax.swing.JPanel pnlTotalDebit1;
-    private javax.swing.JPanel pnlTotalDebit3;
+    private javax.swing.JPanel pnlControls;
+    private javax.swing.JPanel pnlExchangeRate;
+    private javax.swing.JPanel pnlSpacer;
+    private com.o3.bitcoin.ui.component.XScalableLabel xScalableLabel1;
     // End of variables declaration//GEN-END:variables
 }

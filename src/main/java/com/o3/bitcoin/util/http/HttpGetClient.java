@@ -19,7 +19,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
  */
 public class HttpGetClient {
     
-    public static String getVersion(String url) throws IOException {
+    public static String getFee(String url) throws IOException {
         String result = "";
         HttpClient client = new DefaultHttpClient();
         HttpGet request = new HttpGet(url);

@@ -58,12 +58,14 @@ import org.slf4j.LoggerFactory;
 public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen {
 
     private static final Logger logger = LoggerFactory.getLogger(PnlSettingsScreen.class);
-    //private final DefaultComboBoxModel<WalletService> model = new DefaultComboBoxModel<>();
     private final DefaultComboBoxModel<HDAccount> model = new DefaultComboBoxModel<>();
     
     private boolean loading = true;
     private final DefaultComboBoxModel<String> currencyModel = new DefaultComboBoxModel<>();
     private List<String> currencies = ResourcesProvider.DEFAULT_CURRENCIES;
+    
+    private final DefaultComboBoxModel<String> feeModel = new DefaultComboBoxModel<>();
+    private List<String> feePref = ResourcesProvider.FEE_PREF;
 
     /**
      * Creates new form PnlSettingsScreen
@@ -135,6 +137,29 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         Object child1 = cmbCurrencies.getAccessibleContext().getAccessibleChild(0);
         BasicComboPopup popup1 = (BasicComboPopup) child1;
         popup1.setBorder(BorderFactory.createLineBorder(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR));
+        
+        
+        // fee pref combo box
+        cmbFeePref.setRenderer(new BasicComboBoxRenderer() {
+
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                list.setSelectionBackground(ResourcesProvider.Colors.APP_BG_COLOR);
+                list.setSelectionForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+                JComponent component = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus); //To change body of generated methods, choose Tools | Templates.
+                if (isSelected) {
+                    component.setForeground(Color.WHITE);
+                    component.setBackground(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR);
+                }
+                component.setPreferredSize(new Dimension(component.getPreferredSize().height, 30));
+                return component;
+            }
+        });
+
+        Object feePrefChild = cmbFeePref.getAccessibleContext().getAccessibleChild(0);
+        BasicComboPopup feePrefPopup = (BasicComboPopup) feePrefChild;
+        feePrefPopup.setBorder(BorderFactory.createLineBorder(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR));
+        
 
         themeWalletPropertyHeader(lblAccountName);
         themeWalletPropertyHeader(lblWalletName);
@@ -212,6 +237,18 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
             currencyModel.setSelectedItem(currency.toUpperCase());
         }
         ConfigManager.config().setCurrencies(currencies);
+        
+        // fee pref combobox
+        if(feeModel.getSize() == 0 )
+        {
+            for (String fee : feePref) {
+                feeModel.addElement(fee);
+            }
+        }
+        String feePref = ConfigManager.config().getSelectedFeePref();
+        if (feePref != null) {
+            feeModel.setSelectedItem(feePref);
+        }
         loading = false;
     }
 
@@ -374,6 +411,8 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         pnlCurrency = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         cmbCurrencies = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
+        cmbFeePref = new javax.swing.JComboBox();
         pnlTop = new javax.swing.JPanel();
         pnlTitle = new javax.swing.JPanel();
         lblTitle = new javax.swing.JLabel();
@@ -720,7 +759,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(jPanel1, gridBagConstraints);
 
-        pnlCurrency.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Preferred Currency", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, ResourcesProvider.Fonts.BOLD_LARGE_FONT, ResourcesProvider.Colors.DEFAULT_HEADING_COLOR));
+        pnlCurrency.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Preferences ", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, ResourcesProvider.Fonts.BOLD_LARGE_FONT, ResourcesProvider.Colors.DEFAULT_HEADING_COLOR));
         pnlCurrency.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 5));
 
         jLabel1.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
@@ -743,6 +782,27 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         pnlCurrency.add(cmbCurrencies);
         cmbCurrencies.setUI((ComboBoxUI) WalletComboBoxUI.createUI(cmbCurrencies, ResourcesProvider.Colors.APP_BG_COLOR));
 
+        jLabel2.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
+        jLabel2.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        jLabel2.setText("Fee:");
+        jLabel2.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 1));
+        pnlCurrency.add(jLabel2);
+
+        cmbFeePref.setBackground(ResourcesProvider.Colors.SCREEN_TOP_PANEL_BG_COLOR);
+        cmbFeePref.setFont(ResourcesProvider.Fonts.BOLD_LARGE_FONT);
+        cmbFeePref.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        cmbFeePref.setModel(feeModel);
+        cmbFeePref.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        cmbFeePref.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbFeePref.setPreferredSize(new java.awt.Dimension(175, 20));
+        cmbFeePref.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmbFeePrefItemStateChanged(evt);
+            }
+        });
+        pnlCurrency.add(cmbFeePref);
+        cmbFeePref.setUI((ComboBoxUI) WalletComboBoxUI.createUI(cmbFeePref, ResourcesProvider.Colors.APP_BG_COLOR));
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -763,7 +823,6 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         pnlTitle.setLayout(new java.awt.GridBagLayout());
 
         lblTitle.setFont(Fonts.BOLD_SMALL_FONT);
-        lblTitle.setForeground(Colors.LIGHT_HEADING_COLOR);
         lblTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/settings_16x16.png"))); // NOI18N
         lblTitle.setText("SETTINGS");
         lblTitle.setToolTipText("");
@@ -874,6 +933,23 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         }
     }//GEN-LAST:event_cmbCurrenciesItemStateChanged
 
+    private void cmbFeePrefItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbFeePrefItemStateChanged
+        // TODO add your handling code here:
+        if (loading) {
+            return;
+        }
+        if (evt.getStateChange() == ItemEvent.SELECTED && cmbFeePref.getSelectedItem() != null) {
+            String feePref = (String) feeModel.getSelectedItem();
+            try {
+                ConfigManager.config().setSelectedFeePref(feePref);
+                ConfigManager.get().save();
+            } catch (Exception e) {
+                e.printStackTrace();
+                ApplicationUI.get().showError(e);
+            }
+        }
+    }//GEN-LAST:event_cmbFeePrefItemStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDeleteWallet;
@@ -883,8 +959,10 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
     private javax.swing.JButton btnWalletSeed;
     private javax.swing.JCheckBox chkUseTor;
     private javax.swing.JComboBox cmbCurrencies;
+    private javax.swing.JComboBox cmbFeePref;
     private javax.swing.JComboBox cmbWallets;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblAccountName;
     private javax.swing.JLabel lblCreationDate;

@@ -43,6 +43,7 @@ public class ApplicationUI extends javax.swing.JFrame {
     public static final String SCREEN_WALLET = "SCREEN_WALLET";
     public static final String SCREEN_SETTINGS = "SCREEN_SETTINGS";
     public static final String SCREEN_ABOUT = "SCREEN_ABOUT";
+    public static final String SCREEN_STORES = "SCREEN_STORES";
 
     private static ApplicationUI instance = null;
     private Dimension minimumDimension = new Dimension(BASE_UI_DIMENSION.width, BASE_UI_DIMENSION.height);
@@ -67,6 +68,7 @@ public class ApplicationUI extends javax.swing.JFrame {
         screens.put(SCREEN_WALLET, pnlWalletScreen);
         screens.put(SCREEN_SETTINGS, pnlSettingsScreen);
         screens.put(SCREEN_ABOUT, pnlAboutScreen);
+        screens.put(SCREEN_STORES, pnlStoresScreen);
     }
 
     public static ApplicationUI get() {
@@ -213,6 +215,7 @@ public class ApplicationUI extends javax.swing.JFrame {
         pnlWalletScreen = new com.o3.bitcoin.ui.screens.wallet.PnlWalletScreen();
         pnlSettingsScreen = new com.o3.bitcoin.ui.screens.settings.PnlSettingsScreen();
         pnlAboutScreen = new com.o3.bitcoin.ui.screens.about.PnlAboutScreen();
+        pnlStoresScreen = new com.o3.bitcoin.ui.screens.stores.PnlStoresScreen();
         pnlLeftNavigationMenu1 = new com.o3.bitcoin.ui.component.nav.PnlLeftNavigationMenu();
         pnlTitleBar1 = new com.o3.bitcoin.ui.PnlTitleBar();
 
@@ -230,6 +233,7 @@ public class ApplicationUI extends javax.swing.JFrame {
         pnlContents.add(pnlWalletScreen, "SCREEN_WALLET");
         pnlContents.add(pnlSettingsScreen, "SCREEN_SETTINGS");
         pnlContents.add(pnlAboutScreen, "SCREEN_ABOUT");
+        pnlContents.add(pnlStoresScreen, "SCREEN_STORES");
 
         getContentPane().add(pnlContents, java.awt.BorderLayout.CENTER);
         getContentPane().add(pnlLeftNavigationMenu1, java.awt.BorderLayout.WEST);
@@ -248,6 +252,7 @@ public class ApplicationUI extends javax.swing.JFrame {
     private com.o3.bitcoin.ui.screens.dashboard.PnlDashboardScreen pnlDashboardScreen;
     private com.o3.bitcoin.ui.component.nav.PnlLeftNavigationMenu pnlLeftNavigationMenu1;
     private com.o3.bitcoin.ui.screens.settings.PnlSettingsScreen pnlSettingsScreen;
+    private com.o3.bitcoin.ui.screens.stores.PnlStoresScreen pnlStoresScreen;
     private com.o3.bitcoin.ui.PnlTitleBar pnlTitleBar1;
     private com.o3.bitcoin.ui.screens.wallet.PnlWalletScreen pnlWalletScreen;
     // End of variables declaration//GEN-END:variables

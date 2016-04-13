@@ -69,6 +69,13 @@
             </Constraint>
           </Constraints>
         </Component>
+        <Component class="com.o3.bitcoin.ui.screens.stores.PnlStoresScreen" name="pnlStoresScreen">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
+              <CardConstraints cardName="SCREEN_STORES"/>
+            </Constraint>
+          </Constraints>
+        </Component>
       </SubComponents>
     </Container>
     <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavigationMenu" name="pnlLeftNavigationMenu1">

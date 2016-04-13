@@ -21,15 +21,24 @@ import javax.swing.ImageIcon;
 public class ResourcesProvider {
 
     public static final String APP_TITLE = "o3Wallet";
-    public static final String APP_VERSION = "1.0.2 Beta";
+    public static final String APP_VERSION = "1.0.4 Beta";
     public static final int APP_MAJOR = 1;
     public static final int APP_MINOR = 0;
-    public static final int APP_MINOR_MINOR = 2;
+    public static final int APP_MINOR_MINOR = 4;
     public static final String APP_TITLE_VERSION = APP_TITLE + " - " + APP_VERSION;
 
-    //public static final List<String> DEFAULT_CURRENCIES = Arrays.asList(new String[]{"USD", "AUD", "EUR"});
     public static final List<String> DEFAULT_CURRENCIES = Arrays.asList(new String[]{"AUD", "BRL", "CAD", "CNY", "EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"});
+    public static final List<String> FEE_PREF = Arrays.asList(new String[]{"bitcoinfees.21.com", "api.blockcypher.com"});
+    public static HashMap<String,String> FEE_PREF_URLs = new HashMap<String, String>() 
+    {
+        {
+            put("bitcoinfees.21.com","https://bitcoinfees.21.co/api/v1/fees/recommended");
+            put("api.blockcypher.com","http://api.blockcypher.com/v1/btc/main");
+        }
+    };
+
     public static final String DEFAULT_CURRENCY = "USD";
+    public static final String DEFAULT_FEE_PREF = "bitcoinfees.21.com";
     private static Map<String, Image> images = new HashMap();
     private static Map<String, ImageIcon> icons = new HashMap();
     private static Map<String, Font> fonts = new HashMap();
@@ -59,6 +68,7 @@ public class ResourcesProvider {
         public static final Color NAV_MENU_RIGHT_BORDER_COLOR = new Color(212, 213, 206);
         public static final Color NAV_MENU_ITEM_BORDER_COLOR = new Color(232, 232, 223);
         public static final Color DEFAULT_HEADING_COLOR = new Color(120, 122, 121);
+        public static final Color DEFAULT_HEADING_COLOR1 = new Color(115, 195, 129);
         public static final Color LIGHT_HEADING_COLOR = new Color(212, 211, 202);
         public static final Color NAV_MENU_DASHBOARD_COLOR = new Color(225, 95, 104);
         public static final Color NAV_MENU_WALLET_COLOR = new Color(102, 170, 223);
@@ -82,6 +92,7 @@ public class ResourcesProvider {
         public static final Color TABLE_EVEN_ODD_BG_COLOR = new Color(235, 238, 244);
         public static final Color TABLE_CELL_BORDER_COLOR = new Color(227, 228, 232);
         public static final Color TABLE_CELL_TEXT_COLOR = new Color(165, 170, 185);
+        public static final Color TABLE_CELL_TEXT_COLOR1 = new Color(102, 170, 223);
         
         public static final Color RATE_GRAPH_BG_COLOR = new Color(241, 233, 230);
     }
@@ -119,7 +130,7 @@ public class ResourcesProvider {
      * interface that provides License text used in about page
      */
     public static interface License {
-        public static final String licenseText = "<html><center> <blockquote style=\"text-align:center;padding:20px;padding-top:0px;margin:0 auto;\"><b style=\"font-size:1.2em\">O3 Wallet Version: 1.0.2 beta</b><br> <p>Except logo and name, Software is Distributed under following licence:</p><br><p><b style=\"font-size:1.2em\">The MIT Licence (MIT)</b><br>Copyright (c) 2016 O3 wallet technology Pty Ltd<br></p><p><br>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br><br>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br><br>THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></blockquote></center></html>";
+        public static final String licenseText = "<html><center> <blockquote style=\"text-align:center;padding:20px;padding-top:0px;margin:0 auto;\"><b style=\"font-size:1.2em\">O3 Wallet Version: 1.0.4 Beta</b><br> <p>Except logo and name, Software is Distributed under following licence:</p><br><p><b style=\"font-size:1.2em\">The MIT Licence (MIT)</b><br>Copyright (c) 2016 O3 wallet technology Pty Ltd<br></p><p><br>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br><br>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br><br>THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></blockquote></center></html>";
     }
     
     

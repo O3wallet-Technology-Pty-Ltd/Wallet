@@ -5,6 +5,8 @@
  */
 package com.o3.bitcoin;
 
+//import chrriis.dj.nativeswing.NativeSwing;
+//import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 import com.o3.bitcoin.model.WalletConfig;
 import com.o3.bitcoin.service.WalletService;
 import com.o3.bitcoin.model.manager.WalletManager;
@@ -58,6 +60,8 @@ public class Application {
     private static WalletService  mWalletService = null;
     
     public static void main(String args[]) {
+        //NativeSwing.initialize();
+        //NativeInterface.open();
         Application.args = args;
         final ConfigManager manager = ConfigManager.get();
         try {
@@ -135,6 +139,13 @@ public class Application {
                 ApplicationUI.get().setVisible(true);
             }
         });
+        /*NativeInterface.runEventPump();
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+	        @Override
+	        public void run() {
+	            NativeInterface.close();
+	        }
+	    }));*/
     }
 
     /**
@@ -194,38 +205,6 @@ public class Application {
         } catch (Exception e) {
             ApplicationUI.get().showError(e.getMessage() + "\nApplication will exit.");
             System.exit(1);
-        }
-    }
-
-    /**
-     * Restart the current Java application
-     *
-     * @param runBeforeRestart some custom code to be run before restarting
-     * @throws IOException
-     */
-    public static void restart(Runnable runBeforeRestart) throws IOException {
-        try {
-            if (runBeforeRestart != null) {
-                runBeforeRestart.run();
-            }
-            System.exit(100);
-//            StringBuilder cmd = new StringBuilder();
-//            cmd.append("\"").append(System.getProperty("java.home")).append(File.separator).append("bin").append(File.separator).append("java \"");
-//            for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
-//                cmd.append(jvmArg).append(" ");
-//            }
-//            cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
-//            cmd.append(Application.class.getName()).append(" ");
-//            for (String arg : args) {
-//                cmd.append(arg).append(" ");
-//            }
-//            logger.info("Restarting: " + cmd.toString());
-//            Runtime.getRuntime().exec(cmd.toString());
-//            System.out.println("Shutting Down ...");
-//            System.exit(0);
-        } catch (Exception e) {
-            // something went wrong
-            throw new IOException("Error while trying to restart the application", e);
         }
     }
 }

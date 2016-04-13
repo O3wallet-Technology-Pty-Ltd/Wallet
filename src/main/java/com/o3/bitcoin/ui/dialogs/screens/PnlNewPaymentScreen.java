@@ -20,10 +20,15 @@ import com.o3.bitcoin.ui.dialogs.DlgScanQRCode;
 import com.o3.bitcoin.ui.dialogs.YesNoDialog;
 import com.o3.bitcoin.util.BitcoinCurrencyRateApi;
 import com.o3.bitcoin.util.ResourcesProvider;
+import com.o3.bitcoin.util.http.HttpGetClient;
 import java.awt.Cursor;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
+import javax.net.ssl.HttpsURLConnection;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -38,6 +43,7 @@ import org.bitcoinj.core.TransactionConfidence.Listener;
 import org.bitcoinj.core.Wallet;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.utils.MonetaryFormat;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
@@ -53,7 +59,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 public class PnlNewPaymentScreen extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerFactory.getLogger(PnlNewPaymentScreen.class);
-    private final DlgNewPayment dlgNewPaymnet;
+    private DlgNewPayment dlgNewPaymnet;
     private final WalletService service;
     private HDAccount mSelectedAccount = null;
     private boolean paymentPending = false;
@@ -61,6 +67,17 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
     private KeyParameter key;
     private boolean btcFocus = false; 
     private boolean fiatFocus = false;
+    private boolean loading = true;
+    
+    
+    private Coin maxFee = Coin.parseCoin("0.01");
+    private Coin minFee = Coin.parseCoin("0.00015");
+    private Coin selectedFeePerKB = minFee;
+    private Coin fastestFee = minFee;
+    private Coin mediumFee = minFee;
+    private Coin lowFee = minFee;
+    
+    
     
     private final DefaultComboBoxModel<HDAccount> comboModel = new DefaultComboBoxModel<>();
 
@@ -75,7 +92,11 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
         this.service = service;
         initComponents();
         loadAccounts();
-        pnlProgress.setVisible(false);
+        
+        lblProgress.setText("Getting fee information, please wait");
+        pnlProgress.setVisible(true);
+        dlgNewPayment.disablePaymentButton();
+        getFeeInfo();
         
         txtBTC.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -93,8 +114,6 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
                 }
                 if( btcFocus ) {
                     Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
-                    //Double truncatedValue = new BigDecimal(fiatValue ).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
-                    //txtFiat.setText(truncatedValue+"");
                     txtFiat.setText(String.format("%.2f", fiatValue));
                 }
             }
@@ -108,13 +127,10 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
                 }
                 if( txtBTC.getText().equals(".") ) {
                     if( btcFocus )
-                        //txtBTC.setCaretPosition(1);
                         return;
                 }
                 if( btcFocus ) {
                     Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
-                    //Double truncatedValue = new BigDecimal(fiatValue ).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
-                    //txtFiat.setText(truncatedValue+"");
                     txtFiat.setText(String.format("%.2f", fiatValue));
                 }
             }
@@ -128,13 +144,10 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
                 }
                 if( txtBTC.getText().equals(".") ) {
                     if( btcFocus )
-                        //txtBTC.setCaretPosition(1);
                         return;
                 }
                 if( btcFocus ) {
                     Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
-                    //Double truncatedValue = new BigDecimal(fiatValue ).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
-                    //txtFiat.setText(truncatedValue+"");
                     txtFiat.setText(String.format("%.2f", fiatValue));
                 }
             }
@@ -188,7 +201,6 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
                 }
                 if( fiatFocus ) {
                     Double btcValue = (Double.parseDouble(txtFiat.getText())/BitcoinCurrencyRateApi.currentRate.getValue());
-                    //Double truncatedValue = new BigDecimal(btcValue ).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
                     txtBTC.setText(String.format("%.6f", btcValue));
                 }
             }
@@ -196,8 +208,11 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
         String selectedCurrency = ConfigManager.config().getSelectedCurrency();
         if( selectedCurrency != null && !selectedCurrency.isEmpty() )
             lblFiat.setText("Fiat ("+selectedCurrency+")");
-        float feePerKb = (float)(Wallet.SendRequest.DEFAULT_FEE_PER_KB.getValue() / 100000000.0);
-        lblFeeValue.setText(String.format("%.5f", feePerKb)+" BTC");
+        lblSpeed.setVisible(false);
+        cmbSpeed.setVisible(false);
+        lblfeeLabel.setVisible(false);
+        lblFeeValue.setVisible(false);
+        
     }
     
     /**
@@ -232,27 +247,8 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
                 throw new IllegalArgumentException("Not a valid Receiver's address.");
             }
         }
-        /*Coin amount;
-        try {
-            txtAmount.commitEdit();
-        }catch( ParseException pex) {
-            throw new IllegalArgumentException("Not a valid coin value");
-        }
-        if (txtAmount.getValue() == null) {
-            txtAmount.requestFocusInWindow();
-            throw new IllegalArgumentException("Amount is required.");
-        } else {
-            try {
-                amount = Coin.parseCoin(txtAmount.getText());
-            } catch (Exception e) {
-                txtAmount.requestFocusInWindow();
-                throw new IllegalArgumentException("Payment amount is not valid.");
-            }
-        }*/
-        
         Coin amount;
-
-        if (txtBTC.getText() == null || txtAddress.getText().isEmpty()) {
+        if (txtBTC.getText() == null || txtBTC.getText().isEmpty()) {
             txtBTC.requestFocusInWindow();
             throw new IllegalArgumentException("Amount is required.");
         } else {
@@ -269,17 +265,31 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
             txtBTC.requestFocusInWindow();
             throw new IllegalArgumentException("Payment amount is greater than available balance.");
         }
+        
+        Coin feePerKB;
+        if (lblFeeValue.getText() == null || lblFeeValue.getText().isEmpty()) {
+            lblFeeValue.requestFocusInWindow();
+            throw new IllegalArgumentException("Fee Per KB is required.");
+        } else {
+            try {
+                System.out.println("lblFeeValue="+lblFeeValue.getText());
+                feePerKB = Coin.parseCoin(lblFeeValue.getText().trim());
+            } catch (Exception e) {
+                lblFeeValue.requestFocusInWindow();
+                throw new IllegalArgumentException("Fee Per KB amount is not valid.");
+            }
+        }
+        if( feePerKB.isGreaterThan(maxFee) || feePerKB.isLessThan(minFee) )
+                    throw new IllegalArgumentException("Maximum Fee Per KB - 0.01, Minimum Fee Per KB - 0.00015");
         if (service.getWallet().isEncrypted()) {
             try {
                 KeyCrypter crypter = service.getWallet().getKeyCrypter();
-                ////key = crypter.deriveKey(new String(txtPassphrase.getPassword()));
                 key = crypter.deriveKey(new String(WalletManager.walletPassword));
                 if (!service.getWallet().checkAESKey(key)) {
                     throw new ClientRuntimeException();
                 }
             } catch (Exception e) {
                 logger.error("Encrypter Error: {}", e.toString(), e);
-                //txtPassphrase.requestFocusInWindow();
                 throw new IllegalArgumentException("Incorrect Passphrase.");
             }
         }
@@ -311,13 +321,13 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
         try {
             
             Address address = new Address(service.getNetworkParameters(), txtAddress.getText().trim());
-            //Coin amount = Coin.parseCoin(txtAmount.getText());
             Coin amount = Coin.parseCoin(txtBTC.getText());
             final Wallet.SendRequest req;
             final Wallet.SendResult res;
             req = Wallet.SendRequest.to(address, amount);
             req.changeAddress = mSelectedAccount.nextChangeAddress();
             req.coinSelector = mSelectedAccount.coinSelector(false);
+            req.feePerKb = Coin.parseCoin(lblFeeValue.getText());
             if (service.getWallet().isEncrypted()) {
                 req.aesKey = key;
             }
@@ -335,39 +345,6 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
             }
             
             dlgNewPaymnet.dispose();
-            /*Futures.addCallback(res.broadcastComplete, new FutureCallback<Transaction>() {
-                @Override
-                public void onSuccess(Transaction result) {
-                    System.out.println("Success");
-                    setPaymentSuccess(res);
-                }
-
-                @Override
-                public void onFailure(Throwable t) {
-                    setPaymentPending(false);
-                    logger.error("Error occured during making payment: {}", t.getMessage(), t);
-                    ApplicationUI.get().showError("Error occured during making payment: " + t.getMessage());
-                }
-            });*/
-            /*res.tx.getConfidence().addEventListener(new TransactionConfidence.Listener() {
-
-//                @Override
-//                public void onConfidenceChanged(TransactionConfidence confidence, Listener.ChangeReason reason) {
-//                    if (reason == TransactionConfidence.Listener.ChangeReason.SEEN_PEERS) {
-//                        showProgress(res.tx.getConfidence().numBroadcastPeers());
-//                    }
-//                }
-                @Override
-                public void onConfidenceChanged(Transaction tx, Listener.ChangeReason reason) {
-                    if (reason == TransactionConfidence.Listener.ChangeReason.SEEN_PEERS) {
-                        showProgress(res.tx.getConfidence().numBroadcastPeers());
-                    }
-                }
-
-            });*/
-            ////setPaymentPending(true);
-            //showProgress(0);
-            ////dlgNewPaymnet.pack();
         } catch (ECKey.KeyIsEncryptedException e) {
             setPaymentPending(false);
             logger.error("Error occured while making payment: {}", e.getMessage(), e);
@@ -388,8 +365,6 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
         txtAddress.setEditable(!paymentPending);
         txtFiat.setEditable(!paymentPending);
         txtBTC.setEditable(!paymentPending);
-        //txtAmount.setEditable(!paymentPending);
-        //txtPassphrase.setEditable(!paymentPending);
         pnlProgress.setVisible(paymentPending);
         dlgNewPaymnet.markPaymentPending(paymentPending);
     }
@@ -422,6 +397,108 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
     public boolean isPaymentPending() {
         return paymentPending;
     }
+    
+    private void getFeeInfo() {
+        new Thread(new Runnable() {
+            int fFee;
+            int mFee;
+            int lFee;
+            @Override
+            public void run() {
+                try {
+                    String feeDetails = HttpGetClient.getFee(ResourcesProvider.FEE_PREF_URLs.get(ConfigManager.config().getSelectedFeePref()));
+                    if( feeDetails != null && !feeDetails.isEmpty()) {
+                        JSONObject json = new JSONObject(feeDetails);
+                        if( json.has("fastestFee") && json.has("halfHourFee") && json.has("hourFee")) {
+                            fFee = json.getInt("fastestFee");// per byte satoshi
+                            mFee = json.getInt("halfHourFee");
+                            lFee = json.getInt("hourFee");
+                            // convert to satoshi per kb
+                            fFee *= 1000;
+                            mFee *= 1000;
+                            lFee *= 1000;
+                        }
+                        else if( json.has("high_fee_per_kb") && json.has("medium_fee_per_kb") && json.has("low_fee_per_kb")) {
+                            fFee = json.getInt("high_fee_per_kb");
+                            mFee = json.getInt("medium_fee_per_kb");
+                            lFee = json.getInt("low_fee_per_kb");
+                        }
+                        else {
+                            pnlProgress.setVisible(false);
+                            YesNoDialog dialog = new YesNoDialog("Fee Error","Unable to get Fee information, setting default fee", false);
+                            dialog.start();
+                            dlgNewPaymnet.enablePaymentButton();
+                            lblFeeValue.setText(String.format("%.5f", (float)minFee.longValue()/100000000.0));
+                            lblSpeed.setVisible(false);
+                            cmbSpeed.setVisible(false);
+                            
+                            lblfeeLabel.setVisible(true);
+                            lblFeeValue.setVisible(true);
+                            
+                            dlgNewPaymnet.pack();
+                            return;
+                            
+                        }
+                        fastestFee = Coin.valueOf(fFee);
+                        mediumFee = Coin.valueOf(mFee);
+                        lowFee = Coin.valueOf(lFee);
+
+                        System.out.println("fastestFee="+fastestFee.toString());
+                        System.out.println("mediumFee="+mediumFee.toString());
+                        System.out.println("lowFee="+lowFee.toFriendlyString());
+
+                        //apply limits
+                        if( fastestFee.isGreaterThan(maxFee))
+                            fastestFee = maxFee;
+                        if( mediumFee.isGreaterThan(maxFee) )
+                            mediumFee = maxFee;
+                        if( lowFee.isGreaterThan(maxFee))
+                            lowFee = maxFee;
+
+                        if( fastestFee.isLessThan(minFee))
+                            fastestFee = minFee;
+                        if( mediumFee.isLessThan(minFee) )
+                            mediumFee = minFee;
+                        if( lowFee.isLessThan(minFee))
+                            lowFee = minFee;
+                        java.awt.EventQueue.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                
+                                lblSpeed.setVisible(true);
+                                cmbSpeed.setVisible(true);
+                                lblfeeLabel.setVisible(true);
+                                lblFeeValue.setVisible(true);
+                                
+                                dlgNewPaymnet.enablePaymentButton();
+                                lblFeeValue.setText(String.format("%.5f", (float)mediumFee.longValue()/100000000.0));
+                                selectedFeePerKB = mediumFee;
+                                pnlProgress.setVisible(false);
+                                dlgNewPaymnet.pack();
+                                loading = false;
+                            }
+                        });
+                        
+                    }
+                } catch (Exception e) {
+                    logger.error("Fee Exception="+e.getMessage());
+                    pnlProgress.setVisible(false);
+                    YesNoDialog dialog = new YesNoDialog("Fee Error",e.getMessage()+"<br>setting default fee", false);
+                    dialog.start();
+                    dlgNewPaymnet.enablePaymentButton();
+                    lblFeeValue.setText(String.format("%.5f", (float)minFee.longValue()/100000000.0));
+                    lblSpeed.setVisible(false);
+                    cmbSpeed.setVisible(false);
+                    
+                    lblfeeLabel.setVisible(true);
+                    lblFeeValue.setVisible(true);
+                    
+                    dlgNewPaymnet.pack();
+                    return;
+                }
+            }
+        }).start();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -448,7 +525,9 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
         txtBTC = new javax.swing.JTextField();
         txtFiat = new javax.swing.JTextField();
         lblfeeLabel = new javax.swing.JLabel();
-        lblFeeValue = new javax.swing.JLabel();
+        lblSpeed = new javax.swing.JLabel();
+        cmbSpeed = new javax.swing.JComboBox();
+        lblFeeValue = new javax.swing.JTextField();
 
         setOpaque(false);
         setRequestFocusEnabled(false);
@@ -487,7 +566,7 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(15, 5, 5, 5);
@@ -617,20 +696,46 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
 
         lblfeeLabel.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
         lblfeeLabel.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
-        lblfeeLabel.setText("Network Fee:");
+        lblfeeLabel.setText("Fee Per KB (BTC):");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(lblfeeLabel, gridBagConstraints);
+
+        lblSpeed.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
+        lblSpeed.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        lblSpeed.setText("Transaction Speed:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        add(lblfeeLabel, gridBagConstraints);
+        add(lblSpeed, gridBagConstraints);
 
-        lblFeeValue.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
-        lblFeeValue.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        cmbSpeed.setBackground(ResourcesProvider.Colors.SCREEN_TOP_PANEL_BG_COLOR);
+        cmbSpeed.setFont(ResourcesProvider.Fonts.BOLD_LARGE_FONT);
+        cmbSpeed.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        cmbSpeed.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Fast", "Medium", "Low" }));
+        cmbSpeed.setSelectedIndex(1);
+        cmbSpeed.setPreferredSize(new java.awt.Dimension(275, 31));
+        cmbSpeed.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmbSpeedItemStateChanged(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(cmbSpeed, gridBagConstraints);
+
+        lblFeeValue.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
+        lblFeeValue.setPreferredSize(new java.awt.Dimension(275, 31));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(lblFeeValue, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
@@ -688,21 +793,44 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
         fiatFocus = true;
     }//GEN-LAST:event_txtFiatFocusGained
 
+    private void cmbSpeedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbSpeedItemStateChanged
+        // TODO add your handling code here:
+        if( loading )
+            return;
+        String speed  = (String)cmbSpeed.getSelectedItem();
+        if( speed.equalsIgnoreCase("Fast")) {
+            lblFeeValue.setText(String.format("%.5f", (float)fastestFee.longValue()/100000000.0));
+            selectedFeePerKB = fastestFee;
+        }
+        else if ( speed.equalsIgnoreCase("Medium")){
+            lblFeeValue.setText(String.format("%.5f", (float)mediumFee.longValue()/100000000.0));
+            selectedFeePerKB = mediumFee;
+        }
+        else {
+            lblFeeValue.setText(String.format("%.5f", (float)lowFee.longValue()/100000000.0));
+            selectedFeePerKB = lowFee;
+        }
+        
+        System.out.println("selected Fee="+selectedFeePerKB.toFriendlyString());
+    }//GEN-LAST:event_cmbSpeedItemStateChanged
+
     public static void setDefaultCursor() {
         jLabel1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cmbAccounts;
+    private javax.swing.JComboBox cmbSpeed;
     public static javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblAccount;
     private javax.swing.JLabel lblAddress;
     private javax.swing.JLabel lblAmount;
     private javax.swing.JLabel lblBTC;
-    private javax.swing.JLabel lblFeeValue;
+    private javax.swing.JTextField lblFeeValue;
     private javax.swing.JLabel lblFiat;
     private javax.swing.JLabel lblProgress;
+    private javax.swing.JLabel lblSpeed;
     private javax.swing.JLabel lblfeeLabel;
     private javax.swing.JPanel pnlProgress;
     private javax.swing.JProgressBar progressBar;

@@ -183,7 +183,7 @@ public class ChartBuilder {
                 null,
                 dataset,
                 false,
-                true,
+                false,
                 false);
         chart.setBackgroundPaint(ResourcesProvider.Colors.APP_BG_COLOR);
 
@@ -195,7 +195,8 @@ public class ChartBuilder {
         plot.setLabelLinksVisible(false);
         plot.setLabelGenerator(null);
         plot.setSeparatorsVisible(false);
-        plot.setToolTipGenerator(new StandardPieToolTipGenerator("{1} BTC"));
+        if( service.getWallet().getBalance(Wallet.BalanceType.ESTIMATED).isGreaterThan(Coin.ZERO))
+            plot.setToolTipGenerator(new StandardPieToolTipGenerator("{1} BTC"));
         plot.setShadowPaint(ResourcesProvider.Colors.APP_BG_COLOR);
         plot.setSectionOutlinesVisible(false);
         /*List<WalletConfig> walletConfigList = ConfigManager.get().getAllWallets();
@@ -203,15 +204,27 @@ public class ChartBuilder {
             plot.setSectionPaint(walletConfigList.get(i).getId(), walletColors.get(i));
             plot.setSectionDepth(0.4);
         }*/
-        int i = 0;
-        for( HDAccount acct : acctList ){
-            String strBalance = WalletUtil.satoshiToBTC(acct.balance()).toPlainString();
-            Double balance = Double.parseDouble(strBalance);
-            dataset.setValue(strBalance, balance);
-            plot.setSectionPaint(strBalance, walletColors.get(i));
-            plot.setSectionDepth(0.4);
-            i++;
+        
+        if( service.getWallet().getBalance(Wallet.BalanceType.ESTIMATED).isGreaterThan(Coin.ZERO))
+        {
+            int i = 0;
+            for( HDAccount acct : acctList ){
+                String strBalance = WalletUtil.satoshiToBTC(acct.balance()).toPlainString();
+                Double balance = Double.parseDouble(strBalance);
+                dataset.setValue(strBalance, balance);
+                plot.setSectionPaint(strBalance, walletColors.get(i));
+                plot.setSectionDepth(0.4);
+                i++;
+            }
         }
+        else {
+            String strBalance = "0.1";
+            Double balance = 0.1;
+            dataset.setValue(strBalance, balance);
+            plot.setSectionPaint(strBalance, walletColors.get(0));
+            plot.setSectionDepth(0.4);
+        }
+            
 
         return chart;
     }

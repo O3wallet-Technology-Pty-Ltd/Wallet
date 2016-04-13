@@ -36,6 +36,7 @@ public class DlgNewPayment extends BasicDialog {
     private static final Logger logger = LoggerFactory.getLogger(DlgNewPayment.class);
     private final WalletService service;
     private PnlNewPaymentScreen pnlNewPaymentScreen;
+    private JButton paymentButton;
     private List<JButton> controls = new ArrayList<>();
 
     /**
@@ -73,7 +74,7 @@ public class DlgNewPayment extends BasicDialog {
      * @return Pay button
     */
     protected JButton getPaymentButton() {
-        JButton paymentButton = new JButton("Pay");
+        paymentButton = new JButton("Pay");
         XButtonFactory.themedButton(paymentButton)
                 .background(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR)
                 .color(Color.WHITE)
@@ -132,6 +133,14 @@ public class DlgNewPayment extends BasicDialog {
             logger.error("Save Watch-Only config [{}]: Unable to save config: ", service.getWalletConfig().getId(), ex2);
         }
         this.dispose();
+    }
+    
+    public void disablePaymentButton() {
+        paymentButton.setEnabled(false);
+    }
+    
+    public void enablePaymentButton() {
+        paymentButton.setEnabled(true);
     }
 
     /**

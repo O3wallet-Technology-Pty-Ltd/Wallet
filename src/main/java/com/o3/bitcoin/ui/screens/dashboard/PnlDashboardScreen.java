@@ -153,11 +153,12 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
             }
         }
         pnlDashboardStats.setTotalBalance(MonetaryFormat.BTC.noCode().format(totalBalance).toString());
-        pnlDashboardStats.setTotalDebit(MonetaryFormat.BTC.noCode().format(totalDebit).toString());
-        pnlDashboardStats.setTotalCredit(MonetaryFormat.BTC.noCode().format(totalCredit).toString());
+        //pnlDashboardStats.setTotalDebit(MonetaryFormat.BTC.noCode().format(totalDebit).toString());
+        //pnlDashboardStats.setTotalCredit(MonetaryFormat.BTC.noCode().format(totalCredit).toString());
         priceInFiat = Double.valueOf(MonetaryFormat.BTC.noCode().format(totalBalance).toString());
         priceInFiat *= BitcoinCurrencyRateApi.get().getCurrentRateValue();
-        pnlDashboardStats.setPriceInFiat(String.format("%.4f", priceInFiat), "", ConfigManager.config().getSelectedCurrency());
+        pnlDashboardStats.setPriceInFiat(String.format("%.2f", priceInFiat), "", ConfigManager.config().getSelectedCurrency());
+        pnlDashboardStats.setExchangeRate(ConfigManager.config().getSelectedCurrency(), String.format("%.2f",BitcoinCurrencyRateApi.get().getCurrentRateValue()));
         Collections.sort(transactions, new Comparator<TransactionWrapper>() {
             @Override
             public int compare(TransactionWrapper o1, TransactionWrapper o2) {
@@ -170,7 +171,7 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
         for (TransactionWrapper wrapper : transactions) {
             Transaction transaction = wrapper.getTransaction();
             if( transaction.getConfidence().getDepthInBlocks() > 6 )
-                confidence = "> 6";
+                confidence = "<html>6<sup>+</sup></html>";
             else
                 confidence = transaction.getConfidence().getDepthInBlocks() + "";
             Coin amount = wrapper.getAmount();
@@ -347,7 +348,6 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
         pnlTitle.setLayout(new java.awt.GridBagLayout());
 
         lblTitle.setFont(Fonts.BOLD_SMALL_FONT);
-        lblTitle.setForeground(Colors.LIGHT_HEADING_COLOR);
         lblTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/o3_16x16.png"))); // NOI18N
         lblTitle.setText("DASHBOARD");
         lblTitle.setToolTipText("");
