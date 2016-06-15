@@ -231,6 +231,18 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
             }
         }
     }
+    
+    public void setReceiveAddress(String address) {
+        
+        txtAddress.setText(address);
+    }
+    
+    public void setAmount(String amount) {
+        float btcAmount = (float)(Long.parseLong(amount) / 100000000.0f);
+        txtBTC.setText(String.format("%.5f", btcAmount));
+        Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
+        txtFiat.setText(String.format("%.2f", fiatValue));
+    }
 
     /**
      * function that validates ui form data
@@ -442,11 +454,6 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
                         fastestFee = Coin.valueOf(fFee);
                         mediumFee = Coin.valueOf(mFee);
                         lowFee = Coin.valueOf(lFee);
-
-                        System.out.println("fastestFee="+fastestFee.toString());
-                        System.out.println("mediumFee="+mediumFee.toString());
-                        System.out.println("lowFee="+lowFee.toFriendlyString());
-
                         //apply limits
                         if( fastestFee.isGreaterThan(maxFee))
                             fastestFee = maxFee;
@@ -810,8 +817,6 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
             lblFeeValue.setText(String.format("%.5f", (float)lowFee.longValue()/100000000.0));
             selectedFeePerKB = lowFee;
         }
-        
-        System.out.println("selected Fee="+selectedFeePerKB.toFriendlyString());
     }//GEN-LAST:event_cmbSpeedItemStateChanged
 
     public static void setDefaultCursor() {

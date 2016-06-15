@@ -33,6 +33,7 @@ public class DlgScanQRCode extends BasicDialog {
     private PnlScanQRCodeScreen pnlScanQRCodeScreen;
     private List<JButton> controls = new ArrayList<>();
     private String qrCodeString = null;
+    private boolean isPnlNewPaymentScreen=true;
 
     /**
      * Creates new form DlgScanQRCode
@@ -41,16 +42,21 @@ public class DlgScanQRCode extends BasicDialog {
         super(false);
         setupUI();
     }
+    public DlgScanQRCode(boolean isPnlNewPaymentScreen) {
+        super(false);
+        this.isPnlNewPaymentScreen=isPnlNewPaymentScreen;
+        setupUI();
+    }
     
     @Override
     protected JPanel getMainContentPanel() {
         if (pnlScanQRCodeScreen == null) {
             pnlScanQRCodeScreen = new PnlScanQRCodeScreen(this);
+            pnlScanQRCodeScreen.setIsPnlNewPaymentScreen(isPnlNewPaymentScreen);
         }
         return pnlScanQRCodeScreen;
     }
-
-
+    
     @Override
     protected List<JButton> getControls() {
         controls = super.getControls();

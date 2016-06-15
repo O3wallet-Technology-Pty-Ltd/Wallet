@@ -36,7 +36,7 @@ public class Config {
     private List<String> currencies = ResourcesProvider.DEFAULT_CURRENCIES;
     private String selectedCurrency = ResourcesProvider.DEFAULT_CURRENCY;
     private String selectedFeePref = ResourcesProvider.DEFAULT_FEE_PREF;
-    
+
     private String encp = null;
 
     public Config() {
@@ -272,8 +272,8 @@ public class Config {
         }
         return selectedFeePref;
     }
-
-    /**
+    
+     /**
      * function to set selected fee pref
      * @param selectedFeePref fee pref to set as selected
      */

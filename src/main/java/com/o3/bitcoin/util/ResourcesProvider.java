@@ -21,14 +21,74 @@ import javax.swing.ImageIcon;
 public class ResourcesProvider {
 
     public static final String APP_TITLE = "o3Wallet";
-    public static final String APP_VERSION = "1.0.4 Beta";
+    public static final String APP_VERSION = "1.0.5 Beta";
     public static final int APP_MAJOR = 1;
     public static final int APP_MINOR = 0;
-    public static final int APP_MINOR_MINOR = 4;
+    public static final int APP_MINOR_MINOR = 5;
     public static final String APP_TITLE_VERSION = APP_TITLE + " - " + APP_VERSION;
 
     public static final List<String> DEFAULT_CURRENCIES = Arrays.asList(new String[]{"AUD", "BRL", "CAD", "CNY", "EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"});
     public static final List<String> FEE_PREF = Arrays.asList(new String[]{"bitcoinfees.21.com", "api.blockcypher.com"});
+    public static HashMap<String, String> CURRENCY_SHORT_CODES = new HashMap<String, String>() {
+        {
+            put("Bitcoin", "BTC");
+            put("Bitshares", "BTS");
+            put("Blackcoin", "BLK");
+            put("BitCrystals", "BCY");
+            put("Clams", "CLAM");
+            put("Dash", "DASH");
+            put("Dogecoin", "DOGE");
+            put("Digibyte", "DGB");
+            put("Emercoin", "EMC");
+            put("Ether", "ETH");
+            put("Factoids", "FCT");
+            put("GEMZ", "GEMZ");
+            put("Litecoin", "LTC");
+            put("Monacoin", "MONA");
+            put("Nubits", "NBT");
+            put("Novacoin", "NVC");
+            put("Nxt", "NXT");
+            put("Peercoin", "PPC");
+            put("Reddcoin", "RDD");
+            put("Shadowcash", "SDC");
+            put("StorjX", "SJCX");
+            put("Startcoin", "START");
+            put("Vertcoin", "VTC");
+            put("Counterparty", "XCP");
+            put("Monero", "XMR");
+            put("Ripple", "XRP");
+        }
+    };
+    public static HashMap<String, String> CURRENCY_ICONS = new HashMap<String, String>() {
+        {
+            put("Ripple", "/icons/ripple_16x16.png");
+            put("BitCrystals", "/icons/bitcrystals_16x16.png");
+            put("Blackcoin", "/icons/blackcoin_16x16.png");
+            put("Bitshares", "/icons/bitshares_16x16.png");
+            put("Clams", "/icons/clams_16x16.png");
+            put("Dash", "/icons/dash_16x16.png");
+            put("Dogecoin", "/icons/dogecoin_16x16.png");
+            put("Digibyte", "/icons/digibyte_16x16.png");
+            put("Emercoin", "/icons/emercoin_16x16.png");
+            put("Ether", "/icons/ether_16x16.png");
+            put("Factoids", "/icons/factoids_16x16.png");
+            put("GEMZ", "/icons/gemz_16x16.png");
+            put("Litecoin", "/icons/litecoin_16x16.png");
+            put("Monacoin", "/icons/monacoin_16x16.png");
+            put("Nubits", "/icons/nubits_16x16.png");
+            put("Novacoin", "/icons/novacoin_16x16.png");
+            put("Nxt", "/icons/nxt_16x16.png");
+            put("Peercoin", "/icons/peercoin_16x16.png");
+            put("Reddcoin", "/icons/reddcoin_16x16.png");
+            put("Shadowcash", "/icons/shadowcash_16x16.png");
+            put("StorjX", "/icons/storjcoinx_16x16.png");
+            put("Startcoin", "/icons/startcoin_16x16.png");
+            put("Vertcoin", "/icons/vertcoin_16x16.png");
+            put("Counterparty", "/icons/counterparty_16x16.png");
+            put("Monero", "/icons/monero_16x16.png");
+               
+        }
+    };
     public static HashMap<String,String> FEE_PREF_URLs = new HashMap<String, String>() 
     {
         {
@@ -36,7 +96,17 @@ public class ResourcesProvider {
             put("api.blockcypher.com","http://api.blockcypher.com/v1/btc/main");
         }
     };
-
+    
+    public static HashMap<String,String> LTC_BTC_URLs = new HashMap<String, String>() 
+    {
+        {
+             put("MarketInfo","https://shapeshift.io/marketinfo/");
+             put("QuickTrans","https://shapeshift.io/shift");
+             put("PreciseTrans","https://shapeshift.io/sendamount");
+        }
+    };
+    public static String shapShiftPubKey = "b3ddbb51ecf3be24d7c6d0471d8bb2868da010648fff055859eedd2bcb9d6dbfbeb7feaed9e293172864e564c57843123056d8c7daf300dbeed53dad911591be";
+    public static String shapShiftPubKey = "";
     public static final String DEFAULT_CURRENCY = "USD";
     public static final String DEFAULT_FEE_PREF = "bitcoinfees.21.com";
     private static Map<String, Image> images = new HashMap();
@@ -130,7 +200,7 @@ public class ResourcesProvider {
      * interface that provides License text used in about page
      */
     public static interface License {
-        public static final String licenseText = "<html><center> <blockquote style=\"text-align:center;padding:20px;padding-top:0px;margin:0 auto;\"><b style=\"font-size:1.2em\">O3 Wallet Version: 1.0.4 Beta</b><br> <p>Except logo and name, Software is Distributed under following licence:</p><br><p><b style=\"font-size:1.2em\">The MIT Licence (MIT)</b><br>Copyright (c) 2016 O3 wallet technology Pty Ltd<br></p><p><br>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br><br>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br><br>THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></blockquote></center></html>";
+        public static final String licenseText = "<html><center> <blockquote style=\"text-align:center;padding:20px;padding-top:0px;margin:0 auto;\"><b style=\"font-size:1.2em\">O3 Wallet Version: 1.0.5 Beta</b><br> <p>Except logo and name, Software is Distributed under following licence:</p><br><p><b style=\"font-size:1.2em\">The MIT Licence (MIT)</b><br>Copyright (c) 2016 O3 wallet technology Pty Ltd<br></p><p><br>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br><br>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br><br>THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></blockquote></center></html>";
     }
     
     

@@ -49,13 +49,21 @@ public class DlgNewPayment extends BasicDialog {
         this.service = service;
         setupUI();
     }
-
+    
     @Override
     protected JPanel getMainContentPanel() {
         if (pnlNewPaymentScreen == null) {
             pnlNewPaymentScreen = new PnlNewPaymentScreen(this, service);
         }
         return pnlNewPaymentScreen;
+    }
+    
+    public void setReceiveAddress(String address) {
+        pnlNewPaymentScreen.setReceiveAddress(address);
+    }
+    
+    public void setAmount(String amount) {
+        pnlNewPaymentScreen.setAmount(amount);
     }
 
     public void complete(Wallet.SendResult res) {

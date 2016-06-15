@@ -25,6 +25,7 @@ import com.o3.bitcoin.util.ResourcesProvider.Fonts;
 import com.o3.bitcoin.ui.component.progress.ProgressEvent;
 import com.o3.bitcoin.ui.dialogs.DlgCreateNewAccount;
 import com.o3.bitcoin.ui.dialogs.DlgQRCode;
+import com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -94,6 +95,7 @@ public class PnlWalletScreen extends javax.swing.JPanel implements ActionListene
         }
         firstLoad = false;
         currentService = WalletManager.get().getCurentWalletService();
+        PnlShapshiftIOExchangeDividerScreen.stopMarketInfoTimer();
     }
 
     /**
@@ -368,7 +370,6 @@ public class PnlWalletScreen extends javax.swing.JPanel implements ActionListene
         pnlTitle.setLayout(new java.awt.GridBagLayout());
 
         lblTitle.setFont(Fonts.BOLD_SMALL_FONT);
-        lblTitle.setForeground(Colors.LIGHT_HEADING_COLOR);
         lblTitle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/wallet_16x16.png"))); // NOI18N
         lblTitle.setText("Account");
         lblTitle.setToolTipText("");

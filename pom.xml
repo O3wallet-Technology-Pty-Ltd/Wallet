@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.o3.bitcoin</groupId>
     <artifactId>o3wallet</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -72,6 +72,71 @@
             <artifactId>webcam-capture</artifactId>
             <version>0.3.10</version>
         </dependency>
+        
+        <dependency>
+            <groupId>chrriis.dj</groupId>
+            <artifactId>swt-win</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+            
+      </dependency>
+      
+    <!--  
+      <dependency>
+            <groupId>chrriis.dj</groupId>
+            <artifactId>swt-win-32</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+            
+      </dependency>
+      
+      <dependency>
+        <groupId>chrriis.dj</groupId>
+        <artifactId>swt-linux-32</artifactId>
+        <version>1.0</version>
+        <scope>compile</scope>
+      </dependency>
+           
+
+      <dependency>
+            <groupId>chrriis.dj</groupId>
+            <artifactId>swt-linux</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+            
+      </dependency>
+    <dependency>
+        <groupId>chrriis.dj</groupId>
+        <artifactId>swt-mac</artifactId>
+        <version>1.0</version>
+        <scope>compile</scope>
+      </dependency>
+      -->
+      
+        <dependency>
+            <groupId>chrriis.dj</groupId>
+            <artifactId>DJNativeSwing</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+      </dependency>
+      <dependency>
+            <groupId>chrriis.dj</groupId>
+            <artifactId>DJNativeSwing-SWT</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+      </dependency>
+      <dependency>
+            <groupId>com.sun.jna</groupId>
+            <artifactId>jan</artifactId>
+            <version>4.0.0</version>
+            <scope>compile</scope>
+      </dependency>
+      <dependency>
+            <groupId>com.sun.jna</groupId>
+            <artifactId>jna_WindowUtils</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+      </dependency>
     </dependencies>
     <build>
         <plugins>

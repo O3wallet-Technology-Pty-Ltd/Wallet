@@ -27,6 +27,7 @@ import com.o3.bitcoin.ui.dialogs.DlgRenameAccount;
 import com.o3.bitcoin.ui.dialogs.DlgRestoreWallet;
 import com.o3.bitcoin.ui.dialogs.DlgWalletLoadingProgress;
 import com.o3.bitcoin.ui.dialogs.DlgWalletSeedQRCode;
+import com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen;
 import com.o3.bitcoin.util.ResourcesProvider;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
@@ -250,6 +251,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
             feeModel.setSelectedItem(feePref);
         }
         loading = false;
+        PnlShapshiftIOExchangeDividerScreen.stopMarketInfoTimer();
     }
 
     public void renderServiceProperties(WalletService service) {
@@ -448,7 +450,6 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
@@ -468,7 +469,6 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlNetworkSelection.add(rdoTestNet, gridBagConstraints);
@@ -495,7 +495,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
 
         chkUseTor.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
         chkUseTor.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
-        chkUseTor.setText("Use Tor to establish connection with Bitcoin Network");
+        chkUseTor.setText("<html>Use Tor to establish connection with Bitcoin Network <font color=\"#E15F68\">( <b>Warning!</b> This feature is experimental )</font></html>");
         chkUseTor.setOpaque(false);
         chkUseTor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -505,7 +505,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlNetworkSelection.add(chkUseTor, gridBagConstraints);
 

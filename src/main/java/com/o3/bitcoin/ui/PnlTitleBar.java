@@ -55,7 +55,7 @@ public class PnlTitleBar extends javax.swing.JPanel {
             public void run() {
                 try {
                     Thread.sleep(60000);
-                    String versionURL = "https://o3wallet.com/version.html";
+                    String versionURL = "https://o3wallet.com/version";
                     URL url;
                     url = new URL(versionURL);
                     HttpsURLConnection con = (HttpsURLConnection)url.openConnection();

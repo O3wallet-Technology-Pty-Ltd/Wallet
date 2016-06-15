@@ -87,7 +87,7 @@
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;CONTACTS&quot;, &quot;contacts&quot;, Colors.NAV_MENU_CONTACTS_COLOR)"/>
           </AuxValues>
         </Component>
-        <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="pnlLeftNavMenuItem4">
+        <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="mnuItemExchange">
           <Properties>
             <Property name="caption" type="java.lang.String" value="EXCHANGE"/>
             <Property name="edgeColor" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -95,8 +95,19 @@
             </Property>
             <Property name="iconKey" type="java.lang.String" value="exchange"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="mnuItemExchangeMouseClicked"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;EXCHANGE&quot;, &quot;exchange&quot;, Colors.NAV_MENU_EXCHANGE_COLOR)"/>
+          </AuxValues>
+        </Component>
+        <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="mnuItemStores">
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="mnuItemStoresMouseClicked"/>
+          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;STORES&quot;, &quot;store&quot;, Colors.NAV_MENU_CONTACTS_COLOR)"/>
           </AuxValues>
         </Component>
         <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="pnlLeftNavMenuItem5">
@@ -108,14 +119,6 @@
           </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;SETTINGS&quot;, &quot;settings&quot;, Colors.NAV_MENU_SETTINGS_COLOR)"/>
-          </AuxValues>
-        </Component>
-        <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="mnuItemStores">
-          <Events>
-            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="mnuItemStoresMouseClicked"/>
-          </Events>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;STORES&quot;, &quot;store&quot;, Colors.NAV_MENU_CONTACTS_COLOR)"/>
           </AuxValues>
         </Component>
         <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="pnlLeftNavMenuItem6">

@@ -12,6 +12,7 @@ import com.o3.bitcoin.ui.component.PlainTabelCellRenderer;
 import com.o3.bitcoin.ui.component.PlainTableHeaderRenderer;
 import com.o3.bitcoin.ui.component.XScrollbarUI;
 import com.o3.bitcoin.ui.dialogs.screens.BasicScreen;
+import com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen;
 import com.o3.bitcoin.util.BitcoinCurrencyRateApi;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
@@ -61,6 +62,7 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
 
     @Override
     public void loadData() {
+        PnlShapshiftIOExchangeDividerScreen.stopMarketInfoTimer();
     }
 
     /**

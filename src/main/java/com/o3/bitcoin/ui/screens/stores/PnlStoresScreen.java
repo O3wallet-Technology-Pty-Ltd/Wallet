@@ -5,11 +5,30 @@
  */
 package com.o3.bitcoin.ui.screens.stores;
 
-//import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
+import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
+import chrriis.dj.nativeswing.swtimpl.components.JWebBrowserWindow;
+import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
+import chrriis.dj.nativeswing.swtimpl.components.WebBrowserNavigationEvent;
+import chrriis.dj.nativeswing.swtimpl.components.WebBrowserWindowFactory;
+import chrriis.dj.nativeswing.swtimpl.components.WebBrowserWindowWillOpenEvent;
+import com.o3.bitcoin.model.manager.WalletManager;
+import com.o3.bitcoin.service.WalletService;
 import com.o3.bitcoin.ui.dialogs.screens.BasicScreen;
+import com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
+import org.bitcoinj.uri.BitcoinURI;
+import org.bitcoinj.uri.BitcoinURIParseException;
 
 /**
  *
@@ -19,30 +38,33 @@ import java.awt.BorderLayout;
  * Class that implements Stores screen of UI 
  */
 public class PnlStoresScreen extends javax.swing.JPanel  implements BasicScreen{
-
+    private JTabbedPane tabbedPane;
+     private WalletService currentService = null;
     /**
      * Creates new form PnlStoresScreen
      */
     public PnlStoresScreen() {
         initComponents();
         navigateStore();
+        currentService = WalletManager.get().getCurentWalletService();
     }
 
     public void loadData() {
-        
+        currentService = WalletManager.get().getCurentWalletService();
+        PnlShapshiftIOExchangeDividerScreen.stopMarketInfoTimer();
     }
     
     /**
      * function that navigates store page
      */
     public void navigateStore() {
-        /*final JWebBrowser webBrowser = new JWebBrowser();
-        webBrowser.setMenuBarVisible(false);
-        webBrowser.setBarsVisible(false);
-        webBrowser.navigate("https://images.google.com");
-        pnlBrowser.add(webBrowser, BorderLayout.CENTER);*/
+        tabbedPane = new JTabbedPane();
+        TabbedBrowser webBrowser = new TabbedBrowser("https://o3wallet.com/spend-bitcoin-wallet",tabbedPane,"Stores Home",currentService);
+        tabbedPane.addTab("Stores Home", webBrowser);
+        add(tabbedPane, BorderLayout.CENTER);
     }
     
+ 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

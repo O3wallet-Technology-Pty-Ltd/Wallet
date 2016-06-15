@@ -5,8 +5,8 @@
  */
 package com.o3.bitcoin;
 
-//import chrriis.dj.nativeswing.NativeSwing;
-//import chrriis.dj.nativeswing.swtimpl.NativeInterface;
+import chrriis.dj.nativeswing.NativeSwing;
+import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 import com.o3.bitcoin.model.WalletConfig;
 import com.o3.bitcoin.service.WalletService;
 import com.o3.bitcoin.model.manager.WalletManager;
@@ -61,7 +61,7 @@ public class Application {
     
     public static void main(String args[]) {
         //NativeSwing.initialize();
-        //NativeInterface.open();
+        NativeInterface.open();
         Application.args = args;
         final ConfigManager manager = ConfigManager.get();
         try {
@@ -139,13 +139,13 @@ public class Application {
                 ApplicationUI.get().setVisible(true);
             }
         });
-        /*NativeInterface.runEventPump();
+        NativeInterface.runEventPump();
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 	        @Override
 	        public void run() {
 	            NativeInterface.close();
 	        }
-	    }));*/
+	    }));
     }
 
     /**

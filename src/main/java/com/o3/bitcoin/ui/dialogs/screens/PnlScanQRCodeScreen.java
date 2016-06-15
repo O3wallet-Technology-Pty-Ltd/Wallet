@@ -16,6 +16,7 @@ import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.o3.bitcoin.ui.dialogs.BasicDialog;
+import com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.Executor;
@@ -40,6 +41,9 @@ public class PnlScanQRCodeScreen extends javax.swing.JPanel implements Runnable,
     private String qrcodeString = null;
     private BasicDialog parent = null;
     private static boolean stopThread = false;
+    private boolean isPnlNewPaymentScreen=true;
+
+   
     /**
      * Creates new form PnlScanQRCodeScreen
      */
@@ -114,7 +118,11 @@ public class PnlScanQRCodeScreen extends javax.swing.JPanel implements Runnable,
             if (result != null) {
                 qrcodeString = result.getText();
                 panel.stop();
-                PnlNewPaymentScreen.setDefaultCursor();
+                 if(isPnlNewPaymentScreen ==true ){
+            PnlNewPaymentScreen.setDefaultCursor();
+            }else{
+                PnlShapshiftIOExchangeDividerScreen.setDefaultCursor();
+            }
                 java.awt.EventQueue.invokeLater(new Runnable() {
 
                     @Override
@@ -159,10 +167,17 @@ public class PnlScanQRCodeScreen extends javax.swing.JPanel implements Runnable,
         if( panel != null ) {
             panel.stop();
             stopThread = true;
-            PnlNewPaymentScreen.setDefaultCursor();
+            if(isPnlNewPaymentScreen ==true ){
+                PnlNewPaymentScreen.setDefaultCursor();
+            }else{
+                PnlShapshiftIOExchangeDividerScreen.setDefaultCursor();
+            }
         }
     }
         
+    public void setIsPnlNewPaymentScreen(boolean isPnlNewPaymentScreen) {
+        this.isPnlNewPaymentScreen = isPnlNewPaymentScreen;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
