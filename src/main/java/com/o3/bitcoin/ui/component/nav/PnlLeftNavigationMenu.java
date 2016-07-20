@@ -11,6 +11,7 @@ import com.o3.bitcoin.ui.ApplicationUI;
 import com.o3.bitcoin.ui.DirectionRatio;
 import com.o3.bitcoin.ui.ScaleDescriptor;
 import com.o3.bitcoin.ui.dialogs.YesNoDialog;
+import com.o3.bitcoin.util.ResourcesProvider;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Dimensions;
 import com.o3.bitcoin.util.Utils;
@@ -68,7 +69,7 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
         mnuItemDashboard = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("DASHBOARD", "o3", Colors.NAV_MENU_DASHBOARD_COLOR);
         mnuItemWallet = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("ACCOUNT", "wallet", Colors.NAV_MENU_WALLET_COLOR);
         pnlLeftNavMenuItem3 = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("CONTACTS", "contacts", Colors.NAV_MENU_CONTACTS_COLOR);
-        mnuItemExchange = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("EXCHANGE", "exchange", Colors.NAV_MENU_EXCHANGE_COLOR);
+        mnuItemExchange = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("APPLICATIONS", "exchange", Colors.NAV_MENU_EXCHANGE_COLOR);
         mnuItemStores = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("STORES", "store", Colors.NAV_MENU_CONTACTS_COLOR);
         pnlLeftNavMenuItem5 = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("SETTINGS", "settings", Colors.NAV_MENU_SETTINGS_COLOR);
         pnlLeftNavMenuItem6 = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("ABOUT", "info", Colors.NAV_MENU_ABOUT_COLOR);

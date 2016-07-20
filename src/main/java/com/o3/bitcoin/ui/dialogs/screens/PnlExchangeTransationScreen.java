@@ -5,7 +5,9 @@
  */
 package com.o3.bitcoin.ui.dialogs.screens;
 
+import com.o3.bitcoin.model.manager.WalletManager;
 import com.o3.bitcoin.ui.dialogs.DlgExchangeTransaction;
+import com.o3.bitcoin.ui.dialogs.DlgNewPayment;
 import com.o3.bitcoin.ui.dialogs.DlgQRCode;
 import com.o3.bitcoin.util.ResourcesProvider;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
@@ -24,6 +26,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -33,7 +36,9 @@ public class PnlExchangeTransationScreen extends javax.swing.JPanel {
 
     private DlgExchangeTransaction dlgExchangeTransaction = null;
     private String orderStatusUrl = "https://shapeshift.io/#/status/";
-
+    private String dAddress="";
+    private String satoshiPrice="";
+   
     /**
      * Creates new form pnlExchangeTransationScreen
      */
@@ -63,6 +68,33 @@ public class PnlExchangeTransationScreen extends javax.swing.JPanel {
         setLabelTextUnderline(lblOrderStatusUrlValue);
 
     }
+    
+    public PnlExchangeTransationScreen(DlgExchangeTransaction dlgExchangeTransaction, String title, String orderId, String depositeAddress, String depositeAmount, String expiryTime,String statusAddress,String satoshiPrice) {
+        this.dlgExchangeTransaction = dlgExchangeTransaction;
+        initComponents();
+        lblOrderIdValue.setText(orderId);
+        lblDepositeAddressValue.setText(depositeAddress);
+        lblDepositeAmountValue.setText(depositeAmount);
+        lblExpiryTimeValue.setText(expiryTime);
+        if(statusAddress.isEmpty()||statusAddress.equalsIgnoreCase("N/A")){
+            lblOrderStatusUrlValue.setVisible(false);
+            lblOrderStatusUrl.setVisible(false);
+        }else{
+            lblOrderStatusUrlValue.setText(statusAddress);
+        }
+        
+        setLabelTextUnderline(lblOrderStatusUrlValue);
+       this.dAddress = depositeAddress;
+       this.satoshiPrice = satoshiPrice;
+    }
+    
+  public void payCoins(){
+       DlgNewPayment dlgNewPayment = new DlgNewPayment(WalletManager.get().getCurentWalletService());
+                            dlgNewPayment.centerOnScreen();
+                            dlgNewPayment.setReceiveAddress(dAddress);
+                            dlgNewPayment.setAmount(satoshiPrice);
+                            dlgNewPayment.setVisible(true);
+  }
 
     private void setLabelTextUnderline(javax.swing.JLabel label) {
         Font font = label.getFont();

@@ -6,9 +6,12 @@
 package com.o3.bitcoin.ui.screens.exchange;
 
 import com.o3.bitcoin.ui.dialogs.screens.BasicScreen;
+import com.o3.bitcoin.util.ResourcesProvider;
+
 
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -26,9 +29,9 @@ public class pnlExchangeScreen extends javax.swing.JPanel implements BasicScreen
     }
 
     public void loadData() {
-      
-       pnlShapshiftIOExchangeDividerScreen.loadData();
-   
+       pnlBitrefillScreen.setVisible(false);
+       pnlShapshiftIOExchangeDividerScreen.setVisible(false);
+  //     pnlBitrefillScreen.loadData();
     }
 
   
@@ -49,9 +52,13 @@ public class pnlExchangeScreen extends javax.swing.JPanel implements BasicScreen
         pnlTitle = new javax.swing.JPanel();
         lblTop = new javax.swing.JLabel();
         pnlMain = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         pnlShapshiftIOExchangeDividerScreen = new com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen();
+        jPanel1 = new javax.swing.JPanel();
+        lblShapshift = new javax.swing.JLabel();
+        lblBitrefill = new javax.swing.JLabel();
+        pnlBitrefillScreen = new com.o3.bitcoin.ui.screens.exchange.PnlBitrefillScreen();
+        pnlSpace = new javax.swing.JPanel();
 
         setOpaque(false);
         setPreferredSize(new java.awt.Dimension(1024, 340));
@@ -67,14 +74,14 @@ public class pnlExchangeScreen extends javax.swing.JPanel implements BasicScreen
         pnlTop.add(pnlTopEdge, java.awt.BorderLayout.NORTH);
 
         pnlTitle.setBackground(Colors.SCREEN_TOP_PANEL_BG_COLOR);
-        pnlTitle.setPreferredSize(new java.awt.Dimension(86, 24));
+        pnlTitle.setPreferredSize(new java.awt.Dimension(130, 24));
         pnlTitle.setLayout(new java.awt.GridBagLayout());
 
         lblTop.setFont(Fonts.BOLD_SMALL_FONT);
         lblTop.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblTop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/exchange_16x16.png"))); // NOI18N
-        lblTop.setText("EXCHANGE");
-        lblTop.setPreferredSize(new java.awt.Dimension(77, 24));
+        lblTop.setText("APPLICATIONS");
+        lblTop.setPreferredSize(new java.awt.Dimension(120, 24));
         pnlTitle.add(lblTop, new java.awt.GridBagConstraints());
 
         pnlTop.add(pnlTitle, java.awt.BorderLayout.EAST);
@@ -83,32 +90,114 @@ public class pnlExchangeScreen extends javax.swing.JPanel implements BasicScreen
 
         pnlMain.setLayout(new java.awt.GridBagLayout());
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(10, 100));
+        jPanel2.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        pnlMain.add(jPanel1, gridBagConstraints);
-
-        jPanel2.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(pnlShapshiftIOExchangeDividerScreen, gridBagConstraints);
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, ResourcesProvider.Fonts.BOLD_LARGE_FONT, ResourcesProvider.Colors.DEFAULT_HEADING_COLOR));
+        jPanel1.setMinimumSize(new java.awt.Dimension(200, 90));
+        jPanel1.setPreferredSize(new java.awt.Dimension(810, 90));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 20, 5));
+
+        lblShapshift.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/shapeshift.png"))); // NOI18N
+        lblShapshift.setText("Shapeshift    ");
+        lblShapshift.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblShapshift.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lblShapshift.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        lblShapshift.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblShapshiftMouseClicked(evt);
+            }
+        });
+        jPanel1.add(lblShapshift);
+
+        lblBitrefill.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/bitrefill.png"))); // NOI18N
+        lblBitrefill.setText("Bitrefill");
+        lblBitrefill.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblBitrefill.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lblBitrefill.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        lblBitrefill.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblBitrefillMouseClicked(evt);
+            }
+        });
+        jPanel1.add(lblBitrefill);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        jPanel2.add(jPanel1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
         gridBagConstraints.weightx = 1.0;
         pnlMain.add(jPanel2, gridBagConstraints);
 
+        pnlBitrefillScreen.setRequestFocusEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        pnlMain.add(pnlBitrefillScreen, gridBagConstraints);
+
+        pnlSpace.setMinimumSize(new java.awt.Dimension(1, 1));
+        pnlSpace.setOpaque(false);
+        pnlSpace.setPreferredSize(new java.awt.Dimension(1, 1));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        pnlMain.add(pnlSpace, gridBagConstraints);
+
         add(pnlMain, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void lblShapshiftMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblShapshiftMouseClicked
+        // TODO add your handling code here:
+         if(pnlShapshiftIOExchangeDividerScreen.isVisible() ) {
+            pnlShapshiftIOExchangeDividerScreen.setVisible(false);
+            PnlShapshiftIOExchangeDividerScreen.stopMarketInfoTimer();
+        }
+        else {
+            pnlShapshiftIOExchangeDividerScreen.setVisible(true);
+            pnlBitrefillScreen.setVisible(false);
+            pnlShapshiftIOExchangeDividerScreen.loadData();
+        }
+    }//GEN-LAST:event_lblShapshiftMouseClicked
+
+    private void lblBitrefillMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblBitrefillMouseClicked
+        // TODO add your handling code here:
+        if(pnlBitrefillScreen.isVisible() ) {
+            pnlBitrefillScreen.setVisible(false);
+        }
+        else {
+            pnlBitrefillScreen.setVisible(true);
+            pnlShapshiftIOExchangeDividerScreen.setVisible(false);
+            PnlShapshiftIOExchangeDividerScreen.stopMarketInfoTimer();
+            pnlBitrefillScreen.loadData();
+        }
+    }//GEN-LAST:event_lblBitrefillMouseClicked
 
    
 
@@ -118,9 +207,13 @@ public class pnlExchangeScreen extends javax.swing.JPanel implements BasicScreen
     private javax.swing.ButtonGroup btnGroupNetwork;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lblBitrefill;
+    private javax.swing.JLabel lblShapshift;
     private javax.swing.JLabel lblTop;
+    private com.o3.bitcoin.ui.screens.exchange.PnlBitrefillScreen pnlBitrefillScreen;
     private javax.swing.JPanel pnlMain;
     private com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen pnlShapshiftIOExchangeDividerScreen;
+    private javax.swing.JPanel pnlSpace;
     private javax.swing.JPanel pnlTitle;
     private javax.swing.JPanel pnlTop;
     private javax.swing.JPanel pnlTopEdge;

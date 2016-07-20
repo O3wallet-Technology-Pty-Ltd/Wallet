@@ -99,7 +99,7 @@
             <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="mnuItemExchangeMouseClicked"/>
           </Events>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;EXCHANGE&quot;, &quot;exchange&quot;, Colors.NAV_MENU_EXCHANGE_COLOR)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem(&quot;APPLICATIONS&quot;, &quot;exchange&quot;, Colors.NAV_MENU_EXCHANGE_COLOR)"/>
           </AuxValues>
         </Component>
         <Component class="com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem" name="mnuItemStores">

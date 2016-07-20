@@ -57,6 +57,24 @@ public class HttpGetClient {
         }
         return result;
     }
+    public static String getValuesFromUrlWithBase64Auth(String url,String encoding) throws IOException {
+        String result = "";
+        HttpClient client = new DefaultHttpClient();
+        HttpGet request = new HttpGet(url);
+        request.setHeader("Authorization",  encoding);
+        HttpResponse response = client.execute(request);
+        // Get the response
+        if (response.getStatusLine().getStatusCode() == 200) {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                result += line;
+            }
+        }
+        return result;
+    }
+    
+   
     /*
      public static String makeLtcToBtcTransaction(String url,List<NameValuePair> urlParameters) throws IOException {
      String result = "";
@@ -88,6 +106,53 @@ public class HttpGetClient {
         StringEntity params = new StringEntity(urlParameters);
     //    httpPost.addHeader("content-type", "application/x-www-form-urlencoded");
         httpPost.addHeader("Content-Type", "application/json");
+        httpPost.setEntity(params);
+
+        HttpResponse response = client.execute(httpPost);
+
+// Get the response
+        if (response.getStatusLine().getStatusCode() == 200) {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                result += line;
+            }
+        }
+        return result;
+    }
+    
+    public static String placeOrderTransaction(String url, String urlParameters) throws IOException {
+
+        String result = "";
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost httpPost = new HttpPost(url);
+        StringEntity params = new StringEntity(urlParameters);
+    //    httpPost.addHeader("content-type", "application/x-www-form-urlencoded");
+        httpPost.addHeader("Content-Type", "application/json");
+        httpPost.setEntity(params);
+
+        HttpResponse response = client.execute(httpPost);
+
+// Get the response
+        if (response.getStatusLine().getStatusCode() == 200) {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                result += line;
+            }
+        }
+        return result;
+    }
+    
+    public static String placeOrderTransaction(String url, String urlParameters,String encoding) throws IOException {
+
+        String result = "";
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost httpPost = new HttpPost(url);
+        StringEntity params = new StringEntity(urlParameters);
+    //    httpPost.addHeader("content-type", "application/x-www-form-urlencoded");
+        httpPost.addHeader("Content-Type", "application/json");
+        httpPost.setHeader("Authorization",  encoding);
         httpPost.setEntity(params);
 
         HttpResponse response = client.execute(httpPost);

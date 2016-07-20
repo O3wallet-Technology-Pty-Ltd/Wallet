@@ -6,8 +6,14 @@
 package com.o3.bitcoin.ui.dialogs;
 
 import com.o3.bitcoin.service.WalletService;
+import com.o3.bitcoin.ui.ApplicationUI;
+import com.o3.bitcoin.ui.component.XButtonFactory;
 import com.o3.bitcoin.ui.dialogs.screens.PnlExchangeTransationScreen;
 import com.o3.bitcoin.ui.dialogs.screens.PnlNewPaymentScreen;
+import com.o3.bitcoin.util.ResourcesProvider;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -17,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author
+ * @author 
  */
 public class DlgExchangeTransaction extends BasicDialog {
 
@@ -29,9 +35,14 @@ public class DlgExchangeTransaction extends BasicDialog {
     private String orderId;
     private String depositeAmount;
     private String expiryTime;
+    private String statusAddress;
     private JButton paymentButton;
     private List<JButton> controls = new ArrayList<>();
-    private boolean isQuick;
+    private boolean isQuick=false;
+    private boolean isPercise=false;
+    private boolean bitrefill=false;
+    private String satoshiPrice="";
+   
     
     /**
      * Creates new form DlgExchangeTransaction
@@ -50,7 +61,7 @@ public class DlgExchangeTransaction extends BasicDialog {
      */
     public DlgExchangeTransaction(String title, String orderId, String depositAddress, String depositeAmount, String expiryTime) {
         super(false);
-        isQuick = false;
+        isPercise=true;
         this.title = title;
         this.orderId = orderId;
         this.depositAddress = depositAddress;
@@ -58,19 +69,80 @@ public class DlgExchangeTransaction extends BasicDialog {
         this.expiryTime = expiryTime;
         setupUI();
     }
+     public DlgExchangeTransaction(String title, String orderId, String depositAddress, String depositeAmount, String expiryTime,String statusAddress,Long satoshiPrice) {
+        super(false);
+        bitrefill=true;
+        this.title = title;
+        this.orderId = orderId;
+        this.depositAddress = depositAddress;
+        this.depositeAmount = depositeAmount;
+        this.expiryTime = expiryTime;
+        this.statusAddress = statusAddress;
+        this.satoshiPrice = satoshiPrice.toString();
+        setupUI();
+    }
 
      @Override
     protected JPanel getMainContentPanel() {
         if (pnlExchangeTransationScreen == null) {
-            if( isQuick )
+            if( isQuick ){
+                controls.get(0).setVisible(false);
                 pnlExchangeTransationScreen = new PnlExchangeTransationScreen(this, title, orderId, depositAddress);
-            else
+            }
+            else if(isPercise){
+                controls.get(0).setVisible(false);
                 pnlExchangeTransationScreen = new PnlExchangeTransationScreen(this, title, orderId, depositAddress, depositeAmount, expiryTime);
+            }
+            else if(bitrefill){
+                pnlExchangeTransationScreen = new PnlExchangeTransationScreen(this, title, orderId, depositAddress, depositeAmount, expiryTime,statusAddress,satoshiPrice);
+            }
         }
         return pnlExchangeTransationScreen;
     }
     
-    
+    @Override
+    protected List<JButton> getControls() {
+        controls = super.getControls();
+        controls.add(0, getPaymentButton());
+        return controls;
+    }
+
+    /**
+     * function to get Pay button for dialog and attach event handler
+     * @return Pay button
+    */
+    protected JButton getPaymentButton() {
+        paymentButton = new JButton("Pay");
+        XButtonFactory.themedButton(paymentButton)
+                .background(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR)
+                .color(Color.WHITE)
+                .font(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT)
+                .size(XButtonFactory.NORMAL_BUTTON_DIMENSION);
+
+        paymentButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handlePayCoinsButtonClickEvent(e);
+            }
+        });
+        return paymentButton;
+    }
+
+    /**
+     * callback function for Pay button event 
+    */
+    protected void handlePayCoinsButtonClickEvent(ActionEvent e) {
+        try {
+           pnlExchangeTransationScreen.payCoins();
+        } catch (IllegalArgumentException ex) {
+            logger.error("Payment failed: {}", ex.toString(), ex);
+            ApplicationUI.get().showError(ex);
+        } catch (Exception ex) {
+            logger.error("Payment failed: {}", ex.getMessage(), ex);
+            ApplicationUI.get().showError(ex);
+        }
+    }
     
     public void setDepositAddress(String address) {
         pnlExchangeTransationScreen.setDepositAddress(address);
@@ -81,6 +153,8 @@ public class DlgExchangeTransaction extends BasicDialog {
         return title;
     }
 
+     
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
