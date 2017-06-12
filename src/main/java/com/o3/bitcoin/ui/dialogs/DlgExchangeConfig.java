@@ -1,0 +1,151 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.o3.bitcoin.ui.dialogs;
+
+import com.o3.bitcoin.Application;
+import com.o3.bitcoin.exception.ClientRuntimeException;
+import com.o3.bitcoin.model.ExchangeConfig;
+import com.o3.bitcoin.model.manager.ConfigManager;
+import com.o3.bitcoin.model.manager.WalletManager;
+import com.o3.bitcoin.ui.ApplicationUI;
+import com.o3.bitcoin.ui.component.XButtonFactory;
+import com.o3.bitcoin.ui.dialogs.screens.PnlExchangeConfigScreen;
+import com.o3.bitcoin.ui.dialogs.screens.PnlLoginScreen;
+import com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen;
+import com.o3.bitcoin.util.ResourcesProvider;
+import com.o3.bitcoin.util.Utils;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import org.bitcoinj.crypto.EncryptedData;
+import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.crypto.KeyCrypterScrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.apache.commons.codec.binary.Base64;
+
+/**
+ *
+ * @author
+ */
+public class DlgExchangeConfig extends BasicDialog {
+    
+    private static final Logger logger = LoggerFactory.getLogger(DlgExchangeConfig.class);
+    private PnlExchangeConfigScreen pnlExchangeConfigScreen;
+    private List<JButton> controls = new ArrayList<>();
+    private JButton configButton;
+    private PnlExchangeScreen parent;
+
+    /**
+     * Creates new form DlgExchangeConfig
+     */
+    public DlgExchangeConfig(PnlExchangeScreen parent) {
+        super(false);
+        this.parent = parent;
+        setupUI();
+    }
+    
+    @Override
+    protected JPanel getMainContentPanel() {
+        if (pnlExchangeConfigScreen == null) {
+            pnlExchangeConfigScreen = new PnlExchangeConfigScreen(this);
+        }
+        return pnlExchangeConfigScreen;
+    }
+    
+    @Override
+    protected List<JButton> getControls() {
+        controls = super.getControls();
+        controls.add(0, getConfigButton());
+        return controls;
+    }
+    
+    /**
+     * function to get Login button for dialog and attach event handler
+     * @return Login button
+    */
+    protected JButton getConfigButton() {
+        configButton = new JButton("Add Exchange");
+        XButtonFactory.themedButton(configButton)
+                .background(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR)
+                .color(Color.WHITE)
+                .font(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
+        
+        configButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleConfigButtonClickEvent(e);
+            }
+        });
+        return configButton;
+    }
+    
+    /**
+     * callback function for Login button event 
+    */
+    protected void handleConfigButtonClickEvent(ActionEvent e) {
+        try {
+            pnlExchangeConfigScreen.validateData();
+            configButton.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            KeyCrypter keyCrypter = WalletManager.get().getCurentWalletService().getWallet().getKeyCrypter();
+            String encryptedApiKey = Utils.encryptData(keyCrypter, WalletManager.walletPassword, pnlExchangeConfigScreen.getApiKey());
+            String encryptedApiSecret = Utils.encryptData(keyCrypter, WalletManager.walletPassword, pnlExchangeConfigScreen.getApiSecret());
+            String encryptedCustomerID = "";
+            if( !pnlExchangeConfigScreen.getCustomerID().isEmpty() )
+                encryptedCustomerID = Utils.encryptData(keyCrypter, WalletManager.walletPassword, pnlExchangeConfigScreen.getCustomerID());
+            ExchangeConfig exchange = new ExchangeConfig(pnlExchangeConfigScreen.getSelectedExchange(),encryptedApiKey,encryptedApiSecret,encryptedCustomerID);
+            ConfigManager.config().addUpdateExchange(exchange);
+            ConfigManager.get().save();
+            parent.populateExchangeCombo();
+            configButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            handleCloseDialogControlEvent(e);
+        } catch (Exception ex) {
+            logger.error("Add Exchange failed: {}", ex.getMessage(), ex);
+            ApplicationUI.get().showError(ex);
+        }
+    }
+    
+    @Override
+    protected String getHeadingText() {
+        return "Add Exchange";
+    }
+    
+    @Override
+    protected void handleDefaultCloseEvent(ActionEvent e) {
+        handleCloseDialogControlEvent(e);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+    }// </editor-fold>//GEN-END:initComponents
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // End of variables declaration//GEN-END:variables
+}

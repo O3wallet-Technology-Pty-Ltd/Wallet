@@ -9,6 +9,10 @@ import com.o3.bitcoin.ui.component.XButtonFactory;
 import com.o3.bitcoin.util.ResourcesProvider;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -16,6 +20,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.jfree.util.StringUtils;
 
 /**
  * <p>Class that implements utility ui dialog</p>
@@ -31,6 +36,7 @@ public class YesNoDialog extends BasicDialog {
     private String heading = "Confirmation Required";
     private JLabel lblMessage = null;
     private boolean showCancelButton = true;
+    private boolean copyText = false;
 
     public YesNoDialog(String message) {
         this(null, message);
@@ -48,13 +54,38 @@ public class YesNoDialog extends BasicDialog {
         this.heading = heading;
         this.showCancelButton = showCancelButton;
     }
+    
+    public YesNoDialog(String heading, String message, boolean showCancelButton, boolean copyText) {
+        super(true);
+        this.message = message;
+        this.heading = heading;
+        this.showCancelButton = showCancelButton;
+        this.copyText = copyText;
+    }
 
     public void start() {
         setupUI();
+        setCopyText();
         setHeading(getHeadingText());
         setSize(425, 250);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+    
+    private void setCopyText() {
+        if( copyText ) {
+            lblMessage.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            lblMessage.setToolTipText("Click to copy text on clipboard");
+            lblMessage.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    String address = lblMessage.getText();
+                    address = address.replaceAll("<html>", "");
+                    address = address.replaceAll("</html>", "");
+                    Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    clpbrd.setContents(new StringSelection(address), null);
+                }
+            });
+        }
     }
 
     @Override

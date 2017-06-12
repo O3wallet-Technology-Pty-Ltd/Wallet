@@ -74,8 +74,7 @@ public class PnlWalletStats extends javax.swing.JPanel {
         lblTitle.setForeground(Colors.DEFAULT_HEADING_COLOR);
         lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblTitle.setText("Debit");
-        lblTitle.setFont(Fonts.DEFAULT_HEADING_FONT
-        );
+        lblTitle.setFont(Fonts.DEFAULT_HEADING_FONT);
         pnlDebitFiat.add(lblTitle, java.awt.BorderLayout.PAGE_START);
 
         pnlContensMain.setOpaque(false);

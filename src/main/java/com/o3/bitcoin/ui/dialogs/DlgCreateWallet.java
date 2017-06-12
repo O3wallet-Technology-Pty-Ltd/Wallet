@@ -17,6 +17,7 @@ import com.o3.bitcoin.util.Utils;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JButton;
@@ -109,7 +110,7 @@ public class DlgCreateWallet extends BasicDialog {
             WalletConfig wallet = null;
             if( pnlCreateWalletScreen.isRestoreFromSeed() )
                 wallet = new WalletConfig(id, location, Utils.getNetworkName(pnlCreateWalletScreen.getSelectedNetwork()), mnemonicCodes, pnlCreateWalletScreen.getCreationDate(),"",pnlCreateWalletScreen.getNumberOfAccounts());
-            else
+            else 
                 wallet = new WalletConfig(id, location, Utils.getNetworkName(pnlCreateWalletScreen.getSelectedNetwork()), mnemonicCodes, new Date(), pnlCreateWalletScreen.getAccountName(),-1);
             service = WalletManager.get().createOrLoadWalletService(pnlCreateWalletScreen.getSelectedNetwork(), wallet);
             dispose();

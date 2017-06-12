@@ -14,7 +14,8 @@ import chrriis.dj.nativeswing.swtimpl.components.WebBrowserWindowWillOpenEvent;
 import com.o3.bitcoin.model.manager.WalletManager;
 import com.o3.bitcoin.service.WalletService;
 import com.o3.bitcoin.ui.dialogs.screens.BasicScreen;
-import com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.applications.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
 import java.awt.BorderLayout;
@@ -52,6 +53,7 @@ public class PnlStoresScreen extends javax.swing.JPanel  implements BasicScreen{
     public void loadData() {
         currentService = WalletManager.get().getCurentWalletService();
         PnlShapshiftIOExchangeDividerScreen.stopMarketInfoTimer();
+        PnlExchangeScreen.stopTimers();
     }
     
     /**

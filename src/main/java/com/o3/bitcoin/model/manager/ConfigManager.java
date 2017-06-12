@@ -7,16 +7,24 @@ package com.o3.bitcoin.model.manager;
 
 import com.o3.bitcoin.exception.ClientRuntimeException;
 import com.o3.bitcoin.model.Config;
+import com.o3.bitcoin.model.ExchangeConfig;
 import com.o3.bitcoin.model.WalletConfig;
+import com.o3.bitcoin.util.Utils;
 import com.o3.bitcoin.util.WalletCleanupThread;
 import com.thoughtworks.xstream.XStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import org.apache.commons.codec.binary.Base64;
 import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.crypto.EncryptedData;
+import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.crypto.KeyCrypterScrypt;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.params.TestNet3Params;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -27,6 +35,7 @@ import org.bitcoinj.params.TestNet3Params;
  * <p>Class that serialize/deserialize data as xml in file</p>
 */
 public class ConfigManager {
+    private static final Logger logger = LoggerFactory.getLogger(ConfigManager.class);
 
     public static final String CONFIG_ROOT = System.getProperty("user.home") + File.separator + ".o3bcl";
     public static final String CONFIG_FILE_NAME = "o3bcl-config.xml";
@@ -34,6 +43,7 @@ public class ConfigManager {
 
     public static final String ALIAS_WALLET = "wallet";
     public static final String ALIAS_CONFIG = "config";
+    public static final String ALIAS_EXCHANGE = "exchange";
 
     private static ConfigManager manager;
     private Config config = new Config();
@@ -111,7 +121,7 @@ public class ConfigManager {
     public List<WalletConfig> getAllWallets() {
         return config.getWallets(getActiveNetworkParamsString());
     }
-
+    
     /**
      * function to load data from file  
     */
@@ -132,6 +142,7 @@ public class ConfigManager {
         XStream xstream = new XStream();
         xstream.alias(ALIAS_CONFIG, Config.class);
         xstream.alias(ALIAS_WALLET, WalletConfig.class);
+        xstream.alias(ALIAS_EXCHANGE, ExchangeConfig.class);
         return xstream;
     }
     
@@ -163,5 +174,23 @@ public class ConfigManager {
         if( wallets != null && wallets.size() > 0 )
             return wallets.get(0);
         return null;
+    }
+    
+    public boolean reEncryptExchangesConfig(KeyCrypter oldKeyCrypter, String oldPasspharse, KeyCrypter newKeyCrypter, String newPasspharse) {
+        try {
+            List<ExchangeConfig> exchanges = config.getExchanges();
+            if( exchanges != null ) {
+                for(ExchangeConfig exchange : exchanges) {
+                    exchange.setApiKey(Utils.encryptData(newKeyCrypter, newPasspharse, Utils.decryptData(oldKeyCrypter, oldPasspharse, exchange.getApiKey())));
+                    exchange.setApiSecret(Utils.encryptData(newKeyCrypter, newPasspharse, Utils.decryptData(oldKeyCrypter, oldPasspharse, exchange.getApiSecret())));
+                }
+                save();
+            }
+            return true;
+        }catch(Exception ex) {
+            logger.error("Exchange config Re-Encrypt Exchanges Config error: {}", ex.getMessage());
+            System.out.println("Exchange config Re-Encrypt Exchanges Config error: "+ ex.getMessage());
+        }
+        return false;
     }
 }

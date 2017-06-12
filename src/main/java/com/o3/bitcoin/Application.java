@@ -56,12 +56,11 @@ public class Application {
     public static final String SUN_JAVA_COMMAND = "sun.java.command";
     private static boolean loggedIn = false;
     public static boolean appLoaded = false;
-    private static String args[];
+    public static String args[];
     private static WalletService  mWalletService = null;
     
     public static void main(String args[]) {
-        //NativeSwing.initialize();
-        NativeInterface.open();
+        ////NativeInterface.open();
         Application.args = args;
         final ConfigManager manager = ConfigManager.get();
         try {
@@ -139,13 +138,13 @@ public class Application {
                 ApplicationUI.get().setVisible(true);
             }
         });
-        NativeInterface.runEventPump();
+        /*NativeInterface.runEventPump();
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 	        @Override
 	        public void run() {
 	            NativeInterface.close();
 	        }
-	    }));
+	    }));*/
     }
 
     /**

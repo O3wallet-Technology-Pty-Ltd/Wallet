@@ -10,9 +10,12 @@ import com.o3.bitcoin.Application;
 import com.o3.bitcoin.exception.ClientRuntimeException;
 import com.o3.bitcoin.exception.CurrencyRateNotAvailableException;
 import com.o3.bitcoin.model.manager.ConfigManager;
+import com.o3.bitcoin.model.manager.WalletManager;
 import com.o3.bitcoin.ui.DirectionRatio;
 import com.o3.bitcoin.ui.ScaleDescriptor;
+import com.o3.bitcoin.ui.component.XButtonFactory;
 import com.o3.bitcoin.util.ResourcesProvider.Dimensions;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -27,8 +30,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JRootPane;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -36,6 +41,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.crypto.EncryptedData;
+import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.crypto.KeyCrypterScrypt;
 import org.bitcoinj.params.MainNetParams;
 import org.slf4j.Logger;
@@ -278,4 +285,56 @@ public class Utils {
     public static String getNetworkName(NetworkParameters params) {
         return params instanceof MainNetParams ? "MAINNET" : "TESTNET";
     }
+    
+    public static String encryptData(KeyCrypter keyCrypter, String passpharse, String dataToEncrypt) {
+        EncryptedData encryptedApiKey = keyCrypter.encrypt(dataToEncrypt.getBytes(),keyCrypter.deriveKey(passpharse));
+        byte[] iv = encryptedApiKey.initialisationVector;
+        byte[] encryptedBytes = encryptedApiKey.encryptedBytes;
+        byte[] fullData = new byte[iv.length+encryptedBytes.length];
+        int i = 0;
+        for( i = 0; i < iv.length; i++)
+            fullData[i] = iv[i];
+        for( int j = 0; j < encryptedBytes.length; j++)
+        {
+            fullData[i] = encryptedBytes[j];
+            i++;
+        }
+        String strEncryptedData = new String(Base64.encodeBase64(fullData));
+        return strEncryptedData;
+    }
+    
+    public static String decryptData(KeyCrypter keyCrypter, String passpharse, String dataToDecrypt) {
+        byte[] enBytes = Base64.decodeBase64(dataToDecrypt);
+        byte[] iv = new byte[KeyCrypterScrypt.BLOCK_LENGTH];
+        for( int j = 0; j < KeyCrypterScrypt.BLOCK_LENGTH; j++ )
+            iv[j] = enBytes[j];
+        byte[] encryptedBytes = new byte[enBytes.length - iv.length];
+        int k = 0;
+        for( int j = KeyCrypterScrypt.BLOCK_LENGTH; j < enBytes.length; j++ )
+        {
+            encryptedBytes[k] = enBytes[j];
+            k++;
+        }
+        EncryptedData encryptedData = new EncryptedData(iv, encryptedBytes);
+        byte[] decryptedData = keyCrypter.decrypt(encryptedData, keyCrypter.deriveKey(passpharse));
+        String strDecryptedData = new String(decryptedData);
+        return strDecryptedData;
+    }
+    
+    public static void themeSelectButton(JButton button, Color background) {
+        XButtonFactory
+                .themedButton(button)
+                .color(Color.WHITE)
+                .background(background)
+                .font(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
+    }
+
+    public static void themeUnSelectButton(JButton button) {
+        XButtonFactory
+                .themedButton(button)
+                .color(Color.BLACK)
+                .background(Color.LIGHT_GRAY)
+                .font(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
+    }
+    
 }

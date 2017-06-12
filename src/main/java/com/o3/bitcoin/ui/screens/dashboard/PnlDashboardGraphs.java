@@ -191,7 +191,7 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
                     logger.error("Unable to load Price Graph: ", e);
                 } finally {
                     if (error != null) {
-                        showError(pnlPriceGraphView, error);
+                        showError(pnlPriceGraphView, "");
                     }
                 }
                 pnlPriceGraphContainer.validate();
@@ -242,7 +242,7 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
             logger.error("Unable to load Balances Graph: ", e);
         } finally {
             if (error != null) {
-                showError(pnlBalanceGraphContainer, error);
+                showError(pnlBalanceGraphContainer, "Unable to load graph this time");
             }
         }
         pnlBalanceGraphContainer.validate();
@@ -441,7 +441,7 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
         pnlWallet5.setOpaque(false);
         pnlWallet5.setLayout(new java.awt.BorderLayout(10, 0));
 
-        pnlBullet5.setBackground(ResourcesProvider.Colors.NAV_MENU_EXCHANGE_COLOR);
+        pnlBullet5.setBackground(ResourcesProvider.Colors.NAV_MENU_APPLICATIONS_COLOR);
         pnlBullet5.setPreferredSize(new java.awt.Dimension(16, 16));
 
         javax.swing.GroupLayout pnlBullet5Layout = new javax.swing.GroupLayout(pnlBullet5);

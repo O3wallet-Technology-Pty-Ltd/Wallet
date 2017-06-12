@@ -7,6 +7,7 @@ package com.o3.bitcoin.ui.dialogs.screens;
 
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.o3.bitcoin.model.manager.ConfigManager;
 import com.o3.bitcoin.qrcode.QRCodeUtil;
 import java.io.File;
 import java.util.HashMap;
@@ -41,14 +42,14 @@ public class PnlQRCodeScreen extends javax.swing.JPanel {
      */
     public void loadQRCode() {
         try {
-            File tmpDir = new File("tmp");
+            String tmpDirPath = ConfigManager.CONFIG_ROOT+ File.separator+"tmp";
+            File tmpDir = new File(tmpDirPath);
             if( !tmpDir.exists()) {
-                tmpDir.mkdir();
+                tmpDir.mkdirs();
             }
-            //String qrcodeFilePath = "tmp" + File.separator + "qrcode.png";
-            qrcodeFilePath = "tmp" + File.separator + "qrcode"+count+".png";
+            qrcodeFilePath = tmpDirPath + File.separator + "qrcode"+count+".png";
             if( count > 0 ) {
-                String oldQrcodeFilePath = "tmp" + File.separator + "qrcode"+(count-1)+".png";
+                String oldQrcodeFilePath = tmpDirPath + File.separator + "qrcode"+(count-1)+".png";
                 File file = new File(oldQrcodeFilePath);
                 if( file.exists() )
                     file.delete();

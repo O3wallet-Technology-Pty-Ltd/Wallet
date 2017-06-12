@@ -18,7 +18,12 @@ import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,10 +60,26 @@ public class PnlTitleBar extends javax.swing.JPanel {
             public void run() {
                 try {
                     Thread.sleep(60000);
-                    String versionURL = "https://o3wallet.com/version";
-                    URL url;
-                    url = new URL(versionURL);
+                    URL url = new URL(ResourcesProvider.VERSION_INFO_URL);
+                    TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager()
+                    {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers()
+                        {
+                            return null;
+                        }
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
+                        {
+                        }
+                        public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType)
+                        {
+                        }
+                    } };
+                    SSLContext sc = SSLContext.getInstance("SSL");
+                    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
                     HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+                    con.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
                     BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                    String version = null;
                    String line = null; 			

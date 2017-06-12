@@ -69,17 +69,17 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="com.o3.bitcoin.ui.screens.stores.PnlStoresScreen" name="pnlStoresScreen">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
-              <CardConstraints cardName="SCREEN_STORES"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="com.o3.bitcoin.ui.screens.exchange.pnlExchangeScreen" name="pnlExchangeScreen">
+        <Component class="com.o3.bitcoin.applications.PnlApplicationsScreen" name="pnlApplicationsScreen">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
               <CardConstraints cardName="card7"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen" name="pnlExchangeScreen">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
+              <CardConstraints cardName="card8"/>
             </Constraint>
           </Constraints>
         </Component>

@@ -241,11 +241,6 @@ public class PnlWalletGraphs extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_cmbGraphTypeItemStateChanged
 
-    public static void main(String... args) {
-        double dub = 0.001;
-        System.out.println("DUB > " + String.format("%.4f", dub));
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cmbGraphType;
     private javax.swing.JPanel lblLeftSpacer;

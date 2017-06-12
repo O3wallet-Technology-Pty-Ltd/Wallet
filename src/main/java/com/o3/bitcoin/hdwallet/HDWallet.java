@@ -114,10 +114,10 @@ public class HDWallet {
         // Add account.
         mAccounts = new ArrayList<HDAccount>();
         if( acctNums == -1 )// create case
-            mAccounts.add(new HDAccount(mParams, mWalletRoot, walletConfig.getFirstAccountName(), 10));// first 10 accounts are reserved
+            mAccounts.add(new HDAccount(mParams, mWalletRoot, walletConfig.getFirstAccountName(), 0));
         else { // restore case 
-            for (int ii = 10; ii < acctNums + 10; ++ii) {// first 10 accounts are reserved
-                String acctName = String.format("Account %d", ii);
+            for (int ii = 0; ii < acctNums; ++ii) {
+                String acctName = String.format("Account %d", ii+1);
                 mAccounts.add(new HDAccount(mParams, mWalletRoot, acctName, ii));
             }
         }
@@ -548,7 +548,7 @@ public class HDWallet {
      * @return  max account id
     */
     public int getHeighestAccountId() {
-        int maxAccountId = 9;
+        int maxAccountId = -1;
         for (HDAccount hda : mAccounts){
             if( hda.getAccountId() > maxAccountId ) {
                 maxAccountId = hda.getAccountId();

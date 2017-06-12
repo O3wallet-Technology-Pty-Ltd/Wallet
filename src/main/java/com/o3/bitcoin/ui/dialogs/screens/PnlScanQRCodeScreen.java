@@ -16,7 +16,7 @@ import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.o3.bitcoin.ui.dialogs.BasicDialog;
-import com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.applications.PnlShapshiftIOExchangeDividerScreen;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.Executor;

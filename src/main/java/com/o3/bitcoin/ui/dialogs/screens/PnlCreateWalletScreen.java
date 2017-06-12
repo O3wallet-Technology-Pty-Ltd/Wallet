@@ -75,7 +75,15 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
         chkUseSeedActionPerformed(null);
         lblConfirmPassphrase.setVisible(false);
         txtConfirmPassphrase.setVisible(false);
-        jLabel1.setVisible(false);
+        lblUserMessage.setVisible(true);
+        txtWalletName.setText("wallet");
+        //txtWalletName.setEditable(false);
+        txtAccountName.setText("Account 1");
+        //txtAccountName.setEditable(false);
+        lblWalletName.setVisible(false);
+        txtWalletName.setVisible(false);
+        lblAccountName.setVisible(false);
+        txtAccountName.setVisible(false);
     }
 
     /**
@@ -100,7 +108,7 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
         scrollpane = new javax.swing.JScrollPane();
         txtSeed = new javax.swing.JTextArea();
         lblSeed = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
+        lblUserMessage = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         rdoMainNet = new javax.swing.JRadioButton();
@@ -186,7 +194,7 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(chkUseSeed, gridBagConstraints);
@@ -234,21 +242,21 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
         lblSeed.setText("Restore Wallet:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(lblSeed, gridBagConstraints);
 
-        jLabel1.setFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
-        jLabel1.setForeground(ResourcesProvider.Colors.NAV_MENU_DASHBOARD_COLOR);
-        jLabel1.setText("(Passphrase is optional and can be left empty.)");
-        jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 15, 1));
+        lblUserMessage.setFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
+        lblUserMessage.setForeground(ResourcesProvider.Colors.NAV_MENU_DASHBOARD_COLOR);
+        lblUserMessage.setText("Backup Mnemonic Codes and Creation Date to secure place ");
+        lblUserMessage.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 15, 1));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(1, 5, 1, 5);
-        add(jLabel1, gridBagConstraints);
+        add(lblUserMessage, gridBagConstraints);
 
         jLabel2.setFont(ResourcesProvider.Fonts.DEFAULT_HEADING_FONT);
         jLabel2.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
@@ -369,32 +377,30 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 5;
         add(lblQrcode, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void chkUseSeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkUseSeedActionPerformed
         txtSeed.setEditable(chkUseSeed.isSelected());
         if (!chkUseSeed.isSelected()) {
+            lblUserMessage.setVisible(true);
             lblQrcode.setVisible(false);
-            lblCreationDate.setVisible(false);
-            datePicker.setVisible(false);
+            lblCreationDate.setVisible(true);
+            datePicker.setVisible(true);
             lblAccountNums.setVisible(false);
             txtAccountNums.setVisible(false);
-            lblAccountName.setVisible(true);
-            txtAccountName.setVisible(true);
             txtSeed.setText("");
             for (String code : mnemonicCodes) {
                 txtSeed.append(code + " ");
             }
         } else {
+            lblUserMessage.setVisible(false);
             lblQrcode.setVisible(true);
             lblCreationDate.setVisible(true);
             datePicker.setVisible(true);
             lblAccountNums.setVisible(true);
             txtAccountNums.setVisible(true);
-            lblAccountName.setVisible(false);
-            txtAccountName.setVisible(false);
             txtSeed.setText("");
         }
         dlgCreateWallet.pack();
@@ -506,10 +512,10 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
         if (WalletManager.get().isWalletLocationMarkedForDeletion(location + txtWalletName.getText().trim())) {
             btnBrowseLocation.requestFocusInWindow();
             throw new IllegalArgumentException("<html>Selected wallet location is marked for deletion. An application restart is required to make this location available for a new wallet.</html>");
-        } else if (!WalletManager.get().isWalletLocationAvailable(location + txtWalletName.getText().trim())) {
+        } /*else if (!WalletManager.get().isWalletLocationAvailable(location + txtWalletName.getText().trim())) {
             btnBrowseLocation.requestFocusInWindow();
             throw new IllegalArgumentException("Wallet location is already in use by another wallet.");
-        } else {
+        }*/ else {
             location = location.trim();
             File path = new File(location);
             if (!path.exists()) {
@@ -545,8 +551,8 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
             }catch(Exception e ) {
                 throw new IllegalArgumentException("Not a valid Number of Accounts.");
             }
-            if( acctNums > 5 ) {
-                    throw new IllegalArgumentException("Maximum 5 accounts can be restored.");
+            if( acctNums > 2 ) {
+                    throw new IllegalArgumentException("Maximum 2 accounts can be restored.");
                 }
         }
         return true;
@@ -561,7 +567,6 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
     private javax.swing.ButtonGroup btnGroupBitcoinNetwork;
     private javax.swing.JCheckBox chkUseSeed;
     private org.jdesktop.swingx.JXDatePicker datePicker;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblAccountName;
@@ -572,6 +577,7 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
     private javax.swing.JLabel lblMnemonicCodes;
     private static javax.swing.JLabel lblQrcode;
     private javax.swing.JLabel lblSeed;
+    private javax.swing.JLabel lblUserMessage;
     private javax.swing.JLabel lblWalletName;
     private javax.swing.JRadioButton rdoMainNet;
     private javax.swing.JRadioButton rdoTestNet;

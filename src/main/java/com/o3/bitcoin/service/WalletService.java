@@ -436,6 +436,7 @@ public class WalletService {
             getWallet().encrypt(passphrase);
             newKeyCrypter = getWallet().getKeyCrypter();
             mHDWallet.changeO3WalletPassword(getWalletConfig(), oldKeyCrypter, newKeyCrypter, oldPassword, passphrase, true);
+            ConfigManager.get().reEncryptExchangesConfig(oldKeyCrypter, oldPassword, newKeyCrypter, passphrase);
             WalletConfig walletConfig = ConfigManager.getWalletConfigOnUnactiveNetwork();
             if( walletConfig != null )
             {

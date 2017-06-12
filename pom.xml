@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.o3.bitcoin</groupId>
     <artifactId>o3wallet</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -72,7 +72,7 @@
             <artifactId>webcam-capture</artifactId>
             <version>0.3.10</version>
         </dependency>
-       <!-- 
+<!--        
         <dependency>
             <groupId>chrriis.dj</groupId>
             <artifactId>swt-win</artifactId>
@@ -89,8 +89,6 @@
             <scope>compile</scope>
             
       </dependency>
-      o3wallet-windows-32
-      
       <dependency>
         <groupId>chrriis.dj</groupId>
         <artifactId>swt-linux-32</artifactId>
@@ -106,7 +104,7 @@
             <scope>compile</scope>
             
       </dependency>
-      -->
+      
       
     <dependency>
         <groupId>chrriis.dj</groupId>
@@ -114,7 +112,7 @@
         <version>1.0</version>
         <scope>compile</scope>
       </dependency>
-      
+      -->
       
         <dependency>
             <groupId>chrriis.dj</groupId>
@@ -145,7 +143,18 @@
             <artifactId>mail</artifactId> 
             <version>1.4</version> 
         </dependency>
+        <dependency>
+            <groupId>org.knowm.xchange</groupId>
+            <artifactId>xchange-core</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.knowm.xchange</groupId>
+            <artifactId>xchange-examples</artifactId>
+            <version>4.0.0</version>
+        </dependency>
     </dependencies>
+    
     <build>
         <plugins>
             <plugin>

@@ -16,6 +16,7 @@ import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Dimensions;
 import com.o3.bitcoin.util.Utils;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import javax.swing.JOptionPane;
 
@@ -34,9 +35,8 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
      */
     public PnlLeftNavigationMenu() {
         initComponents();
-        mnuItemExchange.setVisible(true);
-        pnlLeftNavMenuItem3.setVisible(false);
-        //mnuItemStores.setVisible(false);
+        mnuItemApplications.setVisible(true);
+        mnuItemExchanges.setVisible(true);
     }
     
     @Override
@@ -68,9 +68,8 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
         pnlMain = new javax.swing.JPanel();
         mnuItemDashboard = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("DASHBOARD", "o3", Colors.NAV_MENU_DASHBOARD_COLOR);
         mnuItemWallet = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("ACCOUNT", "wallet", Colors.NAV_MENU_WALLET_COLOR);
-        pnlLeftNavMenuItem3 = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("CONTACTS", "contacts", Colors.NAV_MENU_CONTACTS_COLOR);
-        mnuItemExchange = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("APPLICATIONS", "exchange", Colors.NAV_MENU_EXCHANGE_COLOR);
-        mnuItemStores = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("STORES", "store", Colors.NAV_MENU_CONTACTS_COLOR);
+        mnuItemExchanges = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("EXCHANGES", "exchange", Colors.NAV_MENU_EXCHANGES_COLOR);
+        mnuItemApplications = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("APPLICATIONS", "application", Colors.NAV_MENU_APPLICATIONS_COLOR);
         pnlLeftNavMenuItem5 = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("SETTINGS", "settings", Colors.NAV_MENU_SETTINGS_COLOR);
         pnlLeftNavMenuItem6 = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("ABOUT", "info", Colors.NAV_MENU_ABOUT_COLOR);
         pnlSpacer = new javax.swing.JPanel();
@@ -102,32 +101,25 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
         });
         pnlMain.add(mnuItemWallet);
 
-        pnlLeftNavMenuItem3.setCaption("CONTACTS");
-        pnlLeftNavMenuItem3.setEdgeColor(Colors.NAV_MENU_CONTACTS_COLOR);
-        pnlLeftNavMenuItem3.setIconKey("contacts");
-        pnlLeftNavMenuItem3.addMouseListener(new java.awt.event.MouseAdapter() {
+        mnuItemExchanges.setCaption("EXCHANGES");
+        mnuItemExchanges.setEdgeColor(Colors.NAV_MENU_EXCHANGES_COLOR);
+        mnuItemExchanges.setIconKey("exchange");
+        mnuItemExchanges.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                pnlLeftNavMenuItem3MouseClicked(evt);
+                mnuItemExchangesMouseClicked(evt);
             }
         });
-        pnlMain.add(pnlLeftNavMenuItem3);
+        pnlMain.add(mnuItemExchanges);
 
-        mnuItemExchange.setCaption("EXCHANGE");
-        mnuItemExchange.setEdgeColor(Colors.NAV_MENU_EXCHANGE_COLOR);
-        mnuItemExchange.setIconKey("exchange");
-        mnuItemExchange.addMouseListener(new java.awt.event.MouseAdapter() {
+        mnuItemApplications.setCaption("EXCHANGE");
+        mnuItemApplications.setEdgeColor(Colors.NAV_MENU_APPLICATIONS_COLOR);
+        mnuItemApplications.setIconKey("application");
+        mnuItemApplications.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                mnuItemExchangeMouseClicked(evt);
+                mnuItemApplicationsMouseClicked(evt);
             }
         });
-        pnlMain.add(mnuItemExchange);
-
-        mnuItemStores.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                mnuItemStoresMouseClicked(evt);
-            }
-        });
-        pnlMain.add(mnuItemStores);
+        pnlMain.add(mnuItemApplications);
 
         pnlLeftNavMenuItem5.setCaption("SETTINGS");
         pnlLeftNavMenuItem5.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -163,43 +155,47 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
         ApplicationUI.get().showScreen(ApplicationUI.SCREEN_SETTINGS);
     }//GEN-LAST:event_pnlLeftNavMenuItem5MousePressed
 
-    private void pnlLeftNavMenuItem3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlLeftNavMenuItem3MouseClicked
+    private void mnuItemExchangesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mnuItemExchangesMouseClicked
         // TODO add your handling code here:
-        YesNoDialog dialog = new YesNoDialog("Info","Contacts is still under Development", false);
-        dialog.start();
-    }//GEN-LAST:event_pnlLeftNavMenuItem3MouseClicked
+        Config config = ConfigManager.config();
+        String currentNetwork = config.getDefaultNetwork();
+        if( currentNetwork.equals("MAINNET")) {
+            mnuItemExchanges.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            ApplicationUI.get().showScreen(ApplicationUI.SCREEN_EXCHANGES);
+            mnuItemExchanges.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+        else
+        {
+            YesNoDialog dialog = new YesNoDialog("Network Error","Exchanges works on MainNet network, please change bitcoin network from SETTINGS page", false);
+            dialog.start();
+        }
+    }//GEN-LAST:event_mnuItemExchangesMouseClicked
 
     private void pnlLeftNavMenuItem6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlLeftNavMenuItem6MouseClicked
         // TODO add your handling code here:
         ApplicationUI.get().showScreen(ApplicationUI.SCREEN_ABOUT);
     }//GEN-LAST:event_pnlLeftNavMenuItem6MouseClicked
 
-    private void mnuItemStoresMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mnuItemStoresMouseClicked
-        // TODO add your handling code here:
-        ApplicationUI.get().showScreen(ApplicationUI.SCREEN_STORES);
-    }//GEN-LAST:event_mnuItemStoresMouseClicked
-
-    private void mnuItemExchangeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mnuItemExchangeMouseClicked
+    private void mnuItemApplicationsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mnuItemApplicationsMouseClicked
         // TODO add our handling code here:
         Config config = ConfigManager.config();
         String currentNetwork = config.getDefaultNetwork();
         if( currentNetwork.equals("MAINNET")) {
-            ApplicationUI.get().showScreen(ApplicationUI.SCREEN_EXCHANGE);
+            ApplicationUI.get().showScreen(ApplicationUI.SCREEN_APPLICATIONS);
         }
         else
         {
-            YesNoDialog dialog = new YesNoDialog("Bitcoin Network Error","Exchange works on Main Net, please change bitcoin network from SETTINGS page", false);
+            YesNoDialog dialog = new YesNoDialog("Bitcoin Network Error","Applications works on MainNet network, please change bitcoin network from SETTINGS page", false);
             dialog.start();
         }    
-    }//GEN-LAST:event_mnuItemExchangeMouseClicked
+    }//GEN-LAST:event_mnuItemApplicationsMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem mnuItemApplications;
     private com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem mnuItemDashboard;
-    private com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem mnuItemExchange;
-    private com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem mnuItemStores;
+    private com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem mnuItemExchanges;
     private com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem mnuItemWallet;
-    private com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem pnlLeftNavMenuItem3;
     private com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem pnlLeftNavMenuItem5;
     private com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem pnlLeftNavMenuItem6;
     private javax.swing.JPanel pnlMain;

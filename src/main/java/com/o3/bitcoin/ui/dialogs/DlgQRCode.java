@@ -99,6 +99,12 @@ public class DlgQRCode extends BasicDialog {
         ImageSelection imgSel = new ImageSelection(new ImageIcon(pnlQRCodeScreen.getQrcodeFilePath()).getImage());
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(imgSel, null);
     }
+    
+    private void deleteQRCodeFile() {
+        File file = new File(pnlQRCodeScreen.getQrcodeFilePath());
+        if( file.exists() )
+            file.delete();
+    }
 
     @Override
     protected String getHeadingText() {
@@ -108,6 +114,7 @@ public class DlgQRCode extends BasicDialog {
     @Override
     protected void handleCloseDialogControlEvent(ActionEvent e) {
         super.handleCloseDialogControlEvent(e);
+        deleteQRCodeFile();
     }
 
     @Override

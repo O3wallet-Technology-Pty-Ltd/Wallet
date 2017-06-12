@@ -8,7 +8,8 @@ import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
 import com.o3.bitcoin.util.ResourcesProvider.License;
 import com.o3.bitcoin.ui.dialogs.screens.BasicScreen;
-import com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.applications.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen;
 
 /**
  *
@@ -28,6 +29,7 @@ public class PnlAboutScreen extends javax.swing.JPanel implements BasicScreen {
     
     public void loadData() {
         PnlShapshiftIOExchangeDividerScreen.stopMarketInfoTimer();
+        PnlExchangeScreen.stopTimers();
     }
 
     /**

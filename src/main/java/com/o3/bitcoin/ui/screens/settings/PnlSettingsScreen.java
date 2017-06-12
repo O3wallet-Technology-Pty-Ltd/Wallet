@@ -27,7 +27,8 @@ import com.o3.bitcoin.ui.dialogs.DlgRenameAccount;
 import com.o3.bitcoin.ui.dialogs.DlgRestoreWallet;
 import com.o3.bitcoin.ui.dialogs.DlgWalletLoadingProgress;
 import com.o3.bitcoin.ui.dialogs.DlgWalletSeedQRCode;
-import com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.applications.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen;
 import com.o3.bitcoin.util.ResourcesProvider;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
@@ -252,6 +253,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         }
         loading = false;
         PnlShapshiftIOExchangeDividerScreen.stopMarketInfoTimer();
+        PnlExchangeScreen.stopTimers();
     }
 
     public void renderServiceProperties(WalletService service) {

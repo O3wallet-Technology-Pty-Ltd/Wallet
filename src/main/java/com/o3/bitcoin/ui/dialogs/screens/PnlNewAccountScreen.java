@@ -11,6 +11,8 @@ import com.o3.bitcoin.ui.ApplicationUI;
 import com.o3.bitcoin.ui.dialogs.DlgCreateNewAccount;
 import com.o3.bitcoin.util.ResourcesProvider;
 import javax.swing.JOptionPane;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,21 +62,28 @@ public class PnlNewAccountScreen extends javax.swing.JPanel {
         try {
             validateData();
             String accountName = new String(txtAccountName.getText());
-            if( !service.isAccountExists(txtAccountName.getText()) )
-            {
-                if( service.getAllAccounts().size() >= 5 ) {
-                   JOptionPane.showMessageDialog(null, "ERROR: You can't create more than 5 accounts", "ERROR", JOptionPane.ERROR_MESSAGE); 
-                   return false;
+            Coin balance = service.getWallet().getBalance(Wallet.BalanceType.ESTIMATED);
+            if(balance.value > 0) {
+                if( !service.isAccountExists(txtAccountName.getText()) )
+                {
+                    if( service.getAllAccounts().size() >= 2 ) {
+                       JOptionPane.showMessageDialog(null, "ERROR: You can't create more than 2 accounts", "ERROR", JOptionPane.ERROR_MESSAGE); 
+                       return false;
+                    }
+
+                    service.addAccount(accountName);
+                    return true;
                 }
+                else {
+                     JOptionPane.showMessageDialog(null, "ERROR: " + txtAccountName.getText() + " already exists", "ERROR", JOptionPane.ERROR_MESSAGE);
+                     return false;
+                }
+            }
+            else {
+                    JOptionPane.showMessageDialog(null, "ERROR: You can't create new account with 0 wallet balance", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    return false;
+            }    
                 
-                service.addAccount(accountName);
-                return true;
-            }
-            else
-            {
-                 JOptionPane.showMessageDialog(null, "ERROR: " + txtAccountName.getText() + " already exists", "ERROR", JOptionPane.ERROR_MESSAGE);
-                 return false;
-            }
         } catch (Exception e) {
             logger.error("Account Creation failed: {}", e.getMessage());
             ApplicationUI.get().showError(e);

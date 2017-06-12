@@ -25,7 +25,8 @@ import com.o3.bitcoin.util.ResourcesProvider.Fonts;
 import com.o3.bitcoin.ui.component.progress.ProgressEvent;
 import com.o3.bitcoin.ui.dialogs.DlgCreateNewAccount;
 import com.o3.bitcoin.ui.dialogs.DlgQRCode;
-import com.o3.bitcoin.ui.screens.exchange.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.applications.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -96,6 +97,7 @@ public class PnlWalletScreen extends javax.swing.JPanel implements ActionListene
         firstLoad = false;
         currentService = WalletManager.get().getCurentWalletService();
         PnlShapshiftIOExchangeDividerScreen.stopMarketInfoTimer();
+        PnlExchangeScreen.stopTimers();
     }
 
     /**

@@ -5,6 +5,8 @@
  */
 package com.o3.bitcoin.ui.dialogs;
 
+import com.o3.bitcoin.Application;
+import com.o3.bitcoin.model.manager.WalletManager;
 import com.o3.bitcoin.ui.component.progress.ProgressEvent;
 import com.o3.bitcoin.ui.dialogs.screens.PnlProgressScreen;
 import java.awt.event.ActionEvent;

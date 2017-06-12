@@ -36,6 +36,7 @@ public class Config {
     private List<String> currencies = ResourcesProvider.DEFAULT_CURRENCIES;
     private String selectedCurrency = ResourcesProvider.DEFAULT_CURRENCY;
     private String selectedFeePref = ResourcesProvider.DEFAULT_FEE_PREF;
+    private List<ExchangeConfig> exchanges = new ArrayList<ExchangeConfig>();
 
     private String encp = null;
 
@@ -47,6 +48,7 @@ public class Config {
      * @param wallets list of wallets configuration
      */
     public Config(List<WalletConfig> wallets) {
+        System.out.println("Config one argument constructor");// delete it
         this.wallets = wallets;
         if (this.wallets == null) {
             this.wallets = new ArrayList<>();
@@ -123,7 +125,57 @@ public class Config {
     public boolean removeWallet(WalletConfig wallet) {
         return wallets.remove(wallet);
     }
+    
+    /**
+     * function to add/update ExchangeConfig 
+     * @param wallet wallet configuration
+     */
+    public void addUpdateExchange(ExchangeConfig exchange) {
+        if( exchanges == null ) {
+            exchanges = new ArrayList<>();
+            exchanges.add(exchange);
+            return;
+        }
+        if(exchanges.size() > 0 ) {
+            if (!exchanges.contains(exchange)) {
+                exchanges.add(exchange);
+            }
+            else {
+                ExchangeConfig exchangeConfig = getExchange(exchange.getExchangeName());
+                exchangeConfig.setApiKey(exchange.getApiKey());
+                exchangeConfig.setApiSecret(exchange.getApiSecret());
+                exchangeConfig.setCustomerID(exchange.getCustomerID());
+            }
+        }
+        else {
+            exchanges.add(exchange);
+        }
+    }
 
+    /**
+     * function to get a specific exchange configuration 
+     * @param name exchange name
+     * @return exchange configuration
+    */
+    public ExchangeConfig getExchange(String name) {
+        if(exchanges == null ) {
+            return null;
+        }
+        for (ExchangeConfig exchange : exchanges) {
+            if (exchange.getExchangeName().equals(name)) {
+                return exchange;
+            }
+        }
+        return null;
+    }
+
+    public List<ExchangeConfig> getExchanges() {
+        if( exchanges == null )
+            return null;
+        else
+            return exchanges;
+    }
+    
     public List<String> getDeleted() {
         if (deleted == null) {
             deleted = new ArrayList<String>();

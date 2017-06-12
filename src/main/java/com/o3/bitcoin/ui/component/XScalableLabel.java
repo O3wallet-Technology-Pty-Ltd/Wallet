@@ -81,6 +81,10 @@ public class XScalableLabel extends JLabel {
     public void setDirectionratio(DirectionRatio directionratio) {
         this.directionratio = directionratio;
     }
+    
+    public void setHandCursor() {
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
 
     @Override
     public void paintComponent(Graphics g) {

@@ -8,6 +8,7 @@ package com.o3.bitcoin.ui;
 import com.o3.bitcoin.ui.dialogs.YesNoDialog;
 import com.o3.bitcoin.ui.dialogs.screens.BasicScreen;
 import com.o3.bitcoin.ui.screens.dashboard.PnlDashboardScreen;
+import com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen;
 import com.o3.bitcoin.ui.screens.settings.PnlSettingsScreen;
 import com.o3.bitcoin.ui.screens.wallet.PnlWalletScreen;
 import com.o3.bitcoin.util.ResourcesProvider;
@@ -44,7 +45,8 @@ public class ApplicationUI extends javax.swing.JFrame {
     public static final String SCREEN_SETTINGS = "SCREEN_SETTINGS";
     public static final String SCREEN_ABOUT = "SCREEN_ABOUT";
     public static final String SCREEN_STORES = "SCREEN_STORES";
-    public static final String SCREEN_EXCHANGE = "card7";
+    public static final String SCREEN_APPLICATIONS = "card7";
+    public static final String SCREEN_EXCHANGES = "card8";
 
     private static ApplicationUI instance = null;
     private Dimension minimumDimension = new Dimension(BASE_UI_DIMENSION.width, BASE_UI_DIMENSION.height);
@@ -69,8 +71,9 @@ public class ApplicationUI extends javax.swing.JFrame {
         screens.put(SCREEN_WALLET, pnlWalletScreen);
         screens.put(SCREEN_SETTINGS, pnlSettingsScreen);
         screens.put(SCREEN_ABOUT, pnlAboutScreen);
-        screens.put(SCREEN_STORES, pnlStoresScreen);
-        screens.put(SCREEN_EXCHANGE, pnlExchangeScreen);
+        ////screens.put(SCREEN_STORES, pnlStoresScreen);
+        screens.put(SCREEN_APPLICATIONS, pnlApplicationsScreen);
+        screens.put(SCREEN_EXCHANGES, pnlExchangeScreen);
     }
 
     public static ApplicationUI get() {
@@ -171,6 +174,11 @@ public class ApplicationUI extends javax.swing.JFrame {
         dialog.start();
     }
     
+    public void showMessage(String title, String message, boolean showCancelButton, boolean copyText) {
+        YesNoDialog dialog = new YesNoDialog(title, message, showCancelButton, copyText);
+        dialog.start();
+    }
+    
     /**
      * function to get Dashboard screen object
      * @return PnlDashboardScreen object that represent Dashboard screen
@@ -195,6 +203,10 @@ public class ApplicationUI extends javax.swing.JFrame {
         return pnlSettingsScreen;
     }
     
+    public PnlExchangeScreen getExchangeScreen() {
+        return pnlExchangeScreen;
+    }
+    
     /**
      * function to get application title bar
      * @return PnlTitleBar
@@ -217,8 +229,8 @@ public class ApplicationUI extends javax.swing.JFrame {
         pnlWalletScreen = new com.o3.bitcoin.ui.screens.wallet.PnlWalletScreen();
         pnlSettingsScreen = new com.o3.bitcoin.ui.screens.settings.PnlSettingsScreen();
         pnlAboutScreen = new com.o3.bitcoin.ui.screens.about.PnlAboutScreen();
-        pnlStoresScreen = new com.o3.bitcoin.ui.screens.stores.PnlStoresScreen();
-        pnlExchangeScreen = new com.o3.bitcoin.ui.screens.exchange.pnlExchangeScreen();
+        pnlApplicationsScreen = new com.o3.bitcoin.applications.PnlApplicationsScreen();
+        pnlExchangeScreen = new com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen();
         pnlLeftNavigationMenu1 = new com.o3.bitcoin.ui.component.nav.PnlLeftNavigationMenu();
         pnlTitleBar1 = new com.o3.bitcoin.ui.PnlTitleBar();
 
@@ -236,8 +248,8 @@ public class ApplicationUI extends javax.swing.JFrame {
         pnlContents.add(pnlWalletScreen, "SCREEN_WALLET");
         pnlContents.add(pnlSettingsScreen, "SCREEN_SETTINGS");
         pnlContents.add(pnlAboutScreen, "SCREEN_ABOUT");
-        pnlContents.add(pnlStoresScreen, "SCREEN_STORES");
-        pnlContents.add(pnlExchangeScreen, "card7");
+        pnlContents.add(pnlApplicationsScreen, "card7");
+        pnlContents.add(pnlExchangeScreen, "card8");
 
         getContentPane().add(pnlContents, java.awt.BorderLayout.CENTER);
         getContentPane().add(pnlLeftNavigationMenu1, java.awt.BorderLayout.WEST);
@@ -252,12 +264,12 @@ public class ApplicationUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.o3.bitcoin.ui.screens.about.PnlAboutScreen pnlAboutScreen;
+    private com.o3.bitcoin.applications.PnlApplicationsScreen pnlApplicationsScreen;
     private javax.swing.JPanel pnlContents;
     private com.o3.bitcoin.ui.screens.dashboard.PnlDashboardScreen pnlDashboardScreen;
-    private com.o3.bitcoin.ui.screens.exchange.pnlExchangeScreen pnlExchangeScreen;
+    private com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen pnlExchangeScreen;
     private com.o3.bitcoin.ui.component.nav.PnlLeftNavigationMenu pnlLeftNavigationMenu1;
     private com.o3.bitcoin.ui.screens.settings.PnlSettingsScreen pnlSettingsScreen;
-    private com.o3.bitcoin.ui.screens.stores.PnlStoresScreen pnlStoresScreen;
     private com.o3.bitcoin.ui.PnlTitleBar pnlTitleBar1;
     private com.o3.bitcoin.ui.screens.wallet.PnlWalletScreen pnlWalletScreen;
     // End of variables declaration//GEN-END:variables

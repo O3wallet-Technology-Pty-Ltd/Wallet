@@ -13,11 +13,15 @@ import com.o3.bitcoin.model.currency.Rate;
 import com.o3.bitcoin.model.manager.ConfigManager;
 import com.o3.bitcoin.model.manager.WalletManager;
 import com.o3.bitcoin.service.WalletService;
+import com.o3.bitcoin.ui.ApplicationUI;
+import com.o3.bitcoin.util.exchange.ExchangeServiceFactory;
+import com.o3.bitcoin.util.exchange.GraphDTO;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Paint;
 import java.awt.geom.Ellipse2D;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -66,7 +70,7 @@ public class ChartBuilder {
                 ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR,
                 ResourcesProvider.Colors.NAV_MENU_CONTACTS_COLOR,
                 ResourcesProvider.Colors.NAV_MENU_SETTINGS_COLOR,
-                ResourcesProvider.Colors.NAV_MENU_EXCHANGE_COLOR,
+                ResourcesProvider.Colors.NAV_MENU_APPLICATIONS_COLOR,
                 ResourcesProvider.Colors.NAV_MENU_ABOUT_COLOR
             }));
 
@@ -307,7 +311,134 @@ public class ChartBuilder {
 
         return new TransactionsChart(chart, totalDebit, totalCredit, type);
     }
+    
+    
+    /**
+     * function that creates Account debit/create bar chart on Accounts page
+     * @param config wallet
+     * @param days number of days for which to create graph
+     * @param type debit or credit or debit and credit
+     * @return chart
+     */
+    
+    public JFreeChart getExchangeChart( List<GraphDTO> dataList, SimpleDateFormat dateFormatter ) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        prepareExchangeDataset(dataList, dataset,dateFormatter);
+        JFreeChart chart = ChartFactory.createLineChart(
+                null,
+                null,
+                null,
+                dataset,
+                PlotOrientation.VERTICAL,
+                false,
+                true,
+                false);
 
+        chart.setBackgroundPaint(ResourcesProvider.Colors.APP_BG_COLOR);
+        chart.setBorderPaint(ResourcesProvider.Colors.APP_BG_COLOR);
+
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
+
+        plot.setOutlineVisible(false);
+        plot.setBackgroundPaint(ResourcesProvider.Colors.APP_BG_COLOR);
+        plot.setDomainGridlinesVisible(true);
+        plot.setRangeGridlinePaint(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        plot.setDomainGridlinePaint(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+
+        rangeAxis.setAxisLineVisible(false);
+        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        
+        if(dataList.size() > 0) {
+            MinMax minMaxPrice = getMinMaxExchangePrice(dataList); 
+            double minValue = minMaxPrice.getMinValue();
+            double maxValue = minMaxPrice.getMaxValue();
+            double percent = 0.15;
+            double diff = maxValue - minValue;
+            double margin = diff * percent;
+            rangeAxis.setRange(minValue - margin, maxValue + margin);
+            rangeAxis.setTickUnit(new NumberTickUnit((maxValue-minValue)/5));
+        }
+        else {
+            //rangeAxis.setRange(0,5);
+            //rangeAxis.setTickUnit(new NumberTickUnit(5/5));
+        }
+        
+        
+        rangeAxis.setTickLabelFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
+        rangeAxis.setTickLabelPaint(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+
+        plot.getDomainAxis().setTickLabelFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
+        plot.getDomainAxis().setTickLabelPaint(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+
+        LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot.getRenderer();
+
+        renderer.setSeriesShapesVisible(0, Boolean.TRUE);
+        renderer.setDrawOutlines(true);
+        renderer.setUseFillPaint(true);
+        renderer.setSeriesPaint(0, ResourcesProvider.Colors.NAV_MENU_DASHBOARD_COLOR);
+        renderer.setSeriesFillPaint(0, Color.WHITE);
+        renderer.setSeriesShape(0, new Ellipse2D.Double(-4, -4, 8, 8));
+        renderer.setSeriesStroke(0, new BasicStroke(3));
+        renderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator("{2} " + ExchangeServiceFactory.getExchange(ApplicationUI.get().getExchangeScreen().getSelectedExchange()).getFiatCurrency().toUpperCase(), new DecimalFormat("##.####")));
+
+        return chart;
+    }
+    
+    private MinMax getMinMaxExchangePrice(List<GraphDTO> dataList) {
+        BigDecimal min = new BigDecimal(9999999.00);
+        BigDecimal max = BigDecimal.ZERO;
+        for( int i = 0; i < dataList.size(); i++) {
+            GraphDTO data = dataList.get(i);
+            if( data.getPrice().compareTo(max) == 1 )// greater
+                max = data.getPrice();
+            if( data.getPrice().compareTo(min) == -1 ) // less
+                min = data.getPrice();
+        }
+        MinMax minMaxValues = new MinMax();
+        minMaxValues.setMaxValue(max.doubleValue());
+        minMaxValues.setMinValue(min.doubleValue());
+        return minMaxValues;
+    }
+    
+    /*public JFreeChart getExchangeChart( List<GraphDTO> dataList, SimpleDateFormat dateFormatter ) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        prepareExchangeDataset(dataList, dataset,dateFormatter);
+        JFreeChart chart;
+        chart = ChartFactory.createBarChart(
+                null,
+                null,
+                null,
+                dataset,
+                PlotOrientation.VERTICAL,
+                false, true,
+                false);
+        chart.setBackgroundPaint(ResourcesProvider.Colors.APP_BG_COLOR);
+        chart.setBorderVisible(false);
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
+        plot.setBackgroundPaint(ResourcesProvider.Colors.TABLE_EVEN_ODD_BG_COLOR);
+        plot.getDomainAxis().setTickLabelFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
+        plot.getDomainAxis().setTickLabelPaint(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setAxisLineVisible(false);
+        rangeAxis.setTickLabelFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
+        rangeAxis.setTickLabelPaint(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        plot.setOutlineVisible(false);
+        plot.getRenderer().setBaseToolTipGenerator(new StandardCategoryToolTipGenerator("{2}", new DecimalFormat("#.####")));
+        return chart;
+    }*/
+    
+    
+    public void prepareExchangeDataset(List<GraphDTO> dataList, DefaultCategoryDataset dataset,SimpleDateFormat dateFormatter) {
+        for( int i = 0; i < dataList.size(); i++) {
+            GraphDTO data = dataList.get(i);
+            dataset.addValue(data.getPrice(), "Ex",dateFormatter.format(data.getTime().getTime()));
+        }
+    }
+    
+    
     /**
      * function that provides data set for transaction chart
      * @param config wallet
