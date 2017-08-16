@@ -97,114 +97,115 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
         pnlProgress.setVisible(true);
         dlgNewPayment.disablePaymentButton();
         getFeeInfo();
-        
-        txtBTC.getDocument().addDocumentListener(new DocumentListener() {
+        if(BitcoinCurrencyRateApi.currentRate != null ) {
+            txtBTC.getDocument().addDocumentListener(new DocumentListener() {
 
-            @Override
-            public void insertUpdate(DocumentEvent de) {
-                if( txtBTC.getText().isEmpty() ) {
-                    if( btcFocus )
-                        txtFiat.setText("");
-                    return;
-                }
-                if( txtBTC.getText().equals(".") ) {
-                    if( btcFocus )
-                        txtBTC.setCaretPosition(1);
+                @Override
+                public void insertUpdate(DocumentEvent de) {
+                    if( txtBTC.getText().isEmpty() ) {
+                        if( btcFocus )
+                            txtFiat.setText("");
                         return;
+                    }
+                    if( txtBTC.getText().equals(".") ) {
+                        if( btcFocus )
+                            txtBTC.setCaretPosition(1);
+                            return;
+                    }
+                    if( btcFocus ) {
+                        Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
+                        txtFiat.setText(String.format("%.2f", fiatValue));
+                    }
                 }
-                if( btcFocus ) {
-                    Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
-                    txtFiat.setText(String.format("%.2f", fiatValue));
-                }
-            }
 
-            @Override
-            public void removeUpdate(DocumentEvent de) {
-                if( txtBTC.getText().isEmpty() ) {
-                    if( btcFocus )
-                        txtFiat.setText("");
-                    return;
-                }
-                if( txtBTC.getText().equals(".") ) {
-                    if( btcFocus )
+                @Override
+                public void removeUpdate(DocumentEvent de) {
+                    if( txtBTC.getText().isEmpty() ) {
+                        if( btcFocus )
+                            txtFiat.setText("");
                         return;
+                    }
+                    if( txtBTC.getText().equals(".") ) {
+                        if( btcFocus )
+                            return;
+                    }
+                    if( btcFocus ) {
+                        Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
+                        txtFiat.setText(String.format("%.2f", fiatValue));
+                    }
                 }
-                if( btcFocus ) {
-                    Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
-                    txtFiat.setText(String.format("%.2f", fiatValue));
-                }
-            }
 
-            @Override
-            public void changedUpdate(DocumentEvent de) {
-                if( txtBTC.getText().isEmpty() ) {
-                    if( btcFocus )
-                        txtFiat.setText("");
-                    return;
-                }
-                if( txtBTC.getText().equals(".") ) {
-                    if( btcFocus )
+                @Override
+                public void changedUpdate(DocumentEvent de) {
+                    if( txtBTC.getText().isEmpty() ) {
+                        if( btcFocus )
+                            txtFiat.setText("");
                         return;
+                    }
+                    if( txtBTC.getText().equals(".") ) {
+                        if( btcFocus )
+                            return;
+                    }
+                    if( btcFocus ) {
+                        Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
+                        txtFiat.setText(String.format("%.2f", fiatValue));
+                    }
                 }
-                if( btcFocus ) {
-                    Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
-                    txtFiat.setText(String.format("%.2f", fiatValue));
-                }
-            }
-        });
-        
-        txtFiat.getDocument().addDocumentListener(new DocumentListener() {
+            });
 
-            @Override
-            public void insertUpdate(DocumentEvent de) {
-                if( txtFiat.getText().isEmpty() ) {
-                    if( fiatFocus ) 
-                        txtBTC.setText("");
-                    return;
-                }
-                if( txtFiat.getText().equals(".") ) {
-                    return;
-                }
-                
-                
-                if( fiatFocus ) {
-                    Double btcValue = (Double.parseDouble(txtFiat.getText())/BitcoinCurrencyRateApi.currentRate.getValue());
-                    txtBTC.setText(String.format("%.6f", btcValue));        
-                }
-            }
+            txtFiat.getDocument().addDocumentListener(new DocumentListener() {
 
-            @Override
-            public void removeUpdate(DocumentEvent de) {
-                if( txtFiat.getText().isEmpty() ) {
-                    if( fiatFocus ) 
-                        txtBTC.setText("");
-                    return;
-                }
-                if( txtFiat.getText().equals(".") ) {
-                    return;
-                }
-                if( fiatFocus ) {
-                    Double btcValue = (Double.parseDouble(txtFiat.getText())/BitcoinCurrencyRateApi.currentRate.getValue());
-                    txtBTC.setText(String.format("%.6f", btcValue));
-                }
-            }
+                @Override
+                public void insertUpdate(DocumentEvent de) {
+                    if( txtFiat.getText().isEmpty() ) {
+                        if( fiatFocus ) 
+                            txtBTC.setText("");
+                        return;
+                    }
+                    if( txtFiat.getText().equals(".") ) {
+                        return;
+                    }
 
-            @Override
-            public void changedUpdate(DocumentEvent de) {
-                if( txtFiat.getText().isEmpty() ) {
-                    if( fiatFocus ) 
-                        txtBTC.setText("");
-                    return;
+
+                    if( fiatFocus ) {
+                        Double btcValue = (Double.parseDouble(txtFiat.getText())/BitcoinCurrencyRateApi.currentRate.getValue());
+                        txtBTC.setText(String.format("%.6f", btcValue));        
+                    }
                 }
-                if( txtFiat.getText().equals(".") ) {
-                    return;
+
+                @Override
+                public void removeUpdate(DocumentEvent de) {
+                    if( txtFiat.getText().isEmpty() ) {
+                        if( fiatFocus ) 
+                            txtBTC.setText("");
+                        return;
+                    }
+                    if( txtFiat.getText().equals(".") ) {
+                        return;
+                    }
+                    if( fiatFocus ) {
+                        Double btcValue = (Double.parseDouble(txtFiat.getText())/BitcoinCurrencyRateApi.currentRate.getValue());
+                        txtBTC.setText(String.format("%.6f", btcValue));
+                    }
                 }
-                if( fiatFocus ) {
-                    Double btcValue = (Double.parseDouble(txtFiat.getText())/BitcoinCurrencyRateApi.currentRate.getValue());
-                    txtBTC.setText(String.format("%.6f", btcValue));
+
+                @Override
+                public void changedUpdate(DocumentEvent de) {
+                    if( txtFiat.getText().isEmpty() ) {
+                        if( fiatFocus ) 
+                            txtBTC.setText("");
+                        return;
+                    }
+                    if( txtFiat.getText().equals(".") ) {
+                        return;
+                    }
+                    if( fiatFocus ) {
+                        Double btcValue = (Double.parseDouble(txtFiat.getText())/BitcoinCurrencyRateApi.currentRate.getValue());
+                        txtBTC.setText(String.format("%.6f", btcValue));
+                    }
                 }
-            }
-        });
+            });
+        }
         String selectedCurrency = ConfigManager.config().getSelectedCurrency();
         if( selectedCurrency != null && !selectedCurrency.isEmpty() )
             lblFiat.setText("Fiat ("+selectedCurrency+")");
@@ -240,8 +241,12 @@ public class PnlNewPaymentScreen extends javax.swing.JPanel {
     public void setAmount(String amount) {
         float btcAmount = (float)(Long.parseLong(amount) / 100000000.0f);
         txtBTC.setText(String.format("%.5f", btcAmount));
-        Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
-        txtFiat.setText(String.format("%.2f", fiatValue));
+        try {
+            Double fiatValue = (Double.parseDouble(txtBTC.getText())*BitcoinCurrencyRateApi.currentRate.getValue());
+            txtFiat.setText(String.format("%.2f", fiatValue));
+        }catch(Exception e) {
+            txtFiat.setText("");
+        }
     }
 
     /**

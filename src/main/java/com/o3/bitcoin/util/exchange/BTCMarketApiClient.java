@@ -5,11 +5,15 @@
  */
 package com.o3.bitcoin.util.exchange;
 
+import com.o3.bitcoin.util.http.HttpGetClient;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -25,6 +29,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class BTCMarketApiClient {
@@ -33,16 +38,20 @@ public class BTCMarketApiClient {
 
     public  boolean DEBUG = false;
 
-    private  final String BASEURL = "https://api.btcmarkets.net";
+    private  final static String BASEURL = "https://api.btcmarkets.net";
     
     private  final String CREATE_WITHDRAW_PATH = "/fundtransfer/withdrawCrypto";
     private  final String ORDER_OPEN_PATH = "/order/open";
+    private final static String MARKET_TRADE_DATA = "/market/{COIN}/{FIAT}/trades";
     
     private static final String APIKEY_HEADER = "apikey";
     private static final String TIMESTAMP_HEADER = "timestamp";
     private static final String SIGNATURE_HEADER = "signature";
     private static final String ENCODING = "UTF-8";
     private static final String ALGORITHM = "HmacSHA512";
+    
+    public BTCMarketApiClient() {
+    }
 
     public BTCMarketApiClient(String apiKey, String privateKey) {
         this.apiKey = apiKey;
@@ -210,5 +219,18 @@ public class BTCMarketApiClient {
         sb.append("}");
         return sb.toString();
     }
-  
+    
+    public static List<JSONObject> getMarketData(String coin, String fiat) throws Exception {
+        List<JSONObject> arrayJO = new ArrayList<JSONObject>();
+        String url = BASEURL + MARKET_TRADE_DATA;
+        url = url.replace("{COIN}", coin);
+        url = url.replace("{FIAT}", fiat);
+        String result = HttpGetClient.getValuesFromUrl(url);
+        JSONArray jA = new JSONArray(result);
+        for(int i = 0; i < jA.length(); i++ ) {
+            JSONObject jO = jA.getJSONObject(i);
+            arrayJO.add(jO);
+        }
+        return arrayJO;
+    }
 }

@@ -357,8 +357,14 @@ public class ChartBuilder {
             double percent = 0.15;
             double diff = maxValue - minValue;
             double margin = diff * percent;
-            rangeAxis.setRange(minValue - margin, maxValue + margin);
-            rangeAxis.setTickUnit(new NumberTickUnit((maxValue-minValue)/5));
+            if(minValue == maxValue) {
+                rangeAxis.setRange(minValue-2,minValue+3);
+                rangeAxis.setTickUnit(new NumberTickUnit(1));
+            }
+            else {
+                rangeAxis.setRange(minValue - margin, maxValue + margin);
+                rangeAxis.setTickUnit(new NumberTickUnit((maxValue-minValue)/5));
+            }
         }
         else {
             //rangeAxis.setRange(0,5);

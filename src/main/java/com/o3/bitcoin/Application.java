@@ -20,7 +20,13 @@ import java.util.ArrayList;
 import com.o3.bitcoin.util.seed.SeedGeneratorUtils;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -34,6 +40,7 @@ import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.params.TestNet3Params;
+import org.bitcoinj.uri.BitcoinURI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +69,26 @@ public class Application {
     public static void main(String args[]) {
         ////NativeInterface.open();
         Application.args = args;
+        if(Utils.isWindows()) {
+            try {
+                ServerSocket srvSocket = new ServerSocket(29753,0,InetAddress.getByName(null));
+                srvSocket.close();
+             }catch(IOException e) {
+                   System.out.println("Server Exception="+e.getMessage());
+                   try {
+                       if(Application.args.length == 1) {
+                            Socket clientSocket = new Socket(InetAddress.getByName(null), 29753);
+                            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+                            outToServer.writeBytes(Application.args[0]+System.lineSeparator());
+                            clientSocket.close();
+                       }
+                   }catch(Exception ex) {
+                       System.out.println("Client exception="+ex.getMessage());
+                       logger.error("Client Exception: ", e.getMessage(), e);
+                   }
+                   System.exit(0);
+            }
+        }
         final ConfigManager manager = ConfigManager.get();
         try {
             manager.init();

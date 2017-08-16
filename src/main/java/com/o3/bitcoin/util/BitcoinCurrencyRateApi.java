@@ -55,14 +55,16 @@ public class BitcoinCurrencyRateApi {
     }
 
     public BitcoinCurrencyRateHistory getBitcoinCurrentRateHistory() throws IOException {
-        return getCurrentRateHistoryData("USD");
+        ////return getCurrentRateHistoryData("USD");
+        return getCurrentRateHistoryData("BTCUSD");
     }
 
     public BitcoinCurrencyRateHistory getCurrentRateHistoryData(String currency) throws IOException {
         Date endDate = new Date();
         Date startDate = new Date();
         startDate.setDate(startDate.getDate() - 6);
-        return getCurrentRateHistoryData(currency, startDate, endDate);
+        ////return getCurrentRateHistoryData(currency, startDate, endDate);
+        return getCurrentRateHistoryData("BTC"+currency, startDate, endDate);
     }
 
     /**
@@ -92,7 +94,8 @@ public class BitcoinCurrencyRateApi {
         });
         List<String> lines = new ArrayList<String>();
         try {
-        URL url = new URL("https://api.bitcoinaverage.com/history/"+currency+"/per_hour_monthly_sliding_window.csv");
+          URL url = new URL("https://apiv2.bitcoinaverage.com/indices/global/history/"+currency+"?period=monthly&format=csv");  
+        
         URLConnection conn = url.openConnection();
         conn.setConnectTimeout(60000);
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -108,15 +111,8 @@ public class BitcoinCurrencyRateApi {
         }
         in.close();
         int day = 1;
-        int index = 1;
         long numberOfDays = (endDate.getTime() - startDate.getTime())/(1000 * 60 * 60 * 24);
         for (Map.Entry<Date, Double> entry : maps.entrySet()) {
-            // skip first entry as first entry is get as current rate value
-            if( index == 1 )
-            {
-                index = 2;
-                continue;
-            }
             if( day > numberOfDays )
                 break;
             history.addRate(new Rate(entry.getValue(), getPreviousDate(day++)));
@@ -135,28 +131,33 @@ public class BitcoinCurrencyRateApi {
      * @return current rate
      * @throws IOException 
      */
-        
     public Rate getCurrentRate(String currency) throws IOException {
-        if (currency == null || currency.isEmpty()) {
-            throw new ClientRuntimeException("currency is required.");
-        }
         Rate rate = null;
-        HttpClient httpClient = new DefaultHttpClient();
         try {
-            String apiCall = "https://api.bitcoinaverage.com/ticker/$CURRENCY/";
-            apiCall = apiCall.replace("$CURRENCY", currency);
-            String data = Utils.getHttpResponseAsString(apiCall);
-            if (data == null || data.isEmpty()) {
-                throw new CurrencyRateNotAvailableException(101);
+          URL url = new URL("https://apiv2.bitcoinaverage.com/indices/global/history/"+currency+"?period=daily&format=json");  
+            URLConnection conn = url.openConnection();
+            conn.setConnectTimeout(60000);
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String inputLine;
+            String str = "";
+            String strRate = "";
+            while ((inputLine = in.readLine()) != null) {
+                str = inputLine;
+                if(str.contains("average")) {
+                    String[] values = inputLine.split(":");
+                    String[] rates = values[1].split(",");
+                    strRate = rates[0];
+                    rate = new Rate(Double.parseDouble(strRate), new Date());
+                    currentRate = rate;
+                    break;
+                }
             }
-            JSONObject jsonObject = new JSONObject(data);
-            rate = new Rate(jsonObject.getDouble("last"), new Date());
-            currentRate = rate;
-        } finally {
-            httpClient.getConnectionManager().shutdown();
+            in.close();
+        }catch(Exception e) {
+            throw new ClientRuntimeException(e.getMessage());
         }
         return rate;
-    }  
+    }
         
     public double getCurrentRateValue() {
         if(currentRate == null) {

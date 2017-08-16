@@ -94,10 +94,11 @@ public class PnlExchangeScreen extends javax.swing.JPanel implements BasicScreen
                 ExchangeServiceFactory.clearExchangeMap();
                 keyCrypter = WalletManager.get().getCurentWalletService().getWallet().getKeyCrypter();
                 for (ExchangeConfig exchange : exchanges) {
+                    if(exchange.getExchangeName().equalsIgnoreCase("BTC-e"))
+                        continue;
                     customerID = "";
                     apiKey = Utils.decryptData(keyCrypter, WalletManager.walletPassword, exchange.getApiKey());
                     apiSecret = Utils.decryptData(keyCrypter, WalletManager.walletPassword, exchange.getApiSecret());
-                    
                     if(!exchange.getCustomerID().isEmpty())
                         customerID = Utils.decryptData(keyCrypter, WalletManager.walletPassword, exchange.getCustomerID());
                     ExchangeServiceFactory.addExchange(exchange.getExchangeName().toLowerCase(), apiKey, apiSecret, customerID);

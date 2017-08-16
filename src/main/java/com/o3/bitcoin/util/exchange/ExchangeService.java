@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.ExchangeFactory;
 import org.knowm.xchange.ExchangeSpecification;
@@ -101,19 +102,6 @@ public class ExchangeService {
                 spec.setSecretKey(apiSecret);
                 exchange.applySpecification(spec);
                 break;
-            case "btc-e":
-                try {
-                    ExchangeSpecification exSpec = new ExchangeSpecification(BTCEExchange.class);
-                    exSpec.setSecretKey(apiSecret);
-                    exSpec.setApiKey(apiKey);
-                    currencyPair = "BTC/USD";
-                    exSpec.setSslUri("https://btc-e.com");
-                    exchange = ExchangeFactory.INSTANCE.createExchange(exSpec);
-                    exchange.remoteInit();
-                }catch(Exception e) {
-                    System.out.println("BTC-E creation exception ="+e.getMessage());
-                }
-                break;
             case "independentreserve":
                 ExchangeSpecification exSpec = new IndependentReserveExchange().getDefaultExchangeSpecification();
                 exSpec.setApiKey(apiKey);
@@ -149,14 +137,6 @@ public class ExchangeService {
                 //set current currency pair selected
                 ExchangeServiceFactory.currentCurrency = currencyPair;
                 break;
-            case "btc-e":
-                ExchangeSpecification spec1 =  this.exchange.getExchangeSpecification();
-                this.currencyPair = currencyPair;
-                spec1.getExchangeSpecificParameters().put(BTCMarketsExchange.CURRENCY_PAIR,new CurrencyPair(currencyPair) );
-                this.exchange.applySpecification(spec1);
-                //set current currency pair selected
-                ExchangeServiceFactory.currentCurrency = currencyPair;
-                 break;
             case "independentreserve":
                 ExchangeSpecification spec2 =  exchange.getExchangeSpecification();
                 this.currencyPair = currencyPair;
@@ -199,9 +179,6 @@ public class ExchangeService {
             case "btcmarkets":
                 currencyPairs.add("BTC/AUD");
                 currencyPairs.add("LTC/AUD");
-                break;
-            case "btc-e":
-                currencyPairs.add("BTC/USD");
                 break;
             case "independentreserve":
                 currencyPairs.add("BTC/AUD");
@@ -290,5 +267,9 @@ public class ExchangeService {
             return new Trades(new ArrayList<Trade>(),Trades.TradeSortType.SortByTimestamp);
         }
         return trades;
+    }
+   
+   public List<JSONObject> getTradeData(String coin, String fiat) throws Exception {
+        return null;
     }
 }

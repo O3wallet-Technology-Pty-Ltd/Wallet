@@ -5,6 +5,9 @@
  */
 package com.o3.bitcoin.ui;
 
+import com.o3.bitcoin.Application;
+import com.o3.bitcoin.model.manager.WalletManager;
+import com.o3.bitcoin.ui.dialogs.DlgNewPayment;
 import com.o3.bitcoin.util.ResourcesProvider;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Dimensions;
@@ -16,7 +19,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URL;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -24,6 +31,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import org.bitcoinj.uri.BitcoinURI;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +49,8 @@ public class PnlTitleBar extends javax.swing.JPanel {
     private static final Logger logger = LoggerFactory.getLogger(PnlTitleBar.class);
     private int x;
     private int y;
+    private String paymentURI = "";
+    private ServerSocket svrSocket;
 
     /**
      * Creates new form PnlTitleBar
@@ -51,7 +61,50 @@ public class PnlTitleBar extends javax.swing.JPanel {
         lblSupport.setVisible(true);
         lblUser.setVisible(false);
         pnlNotification.setVisible(false);
-        getVersionNotification();
+//        getVersionNotification();
+        startTCPServer();
+        checkForBitcoinURIPayment();
+    }
+    
+    private void checkForBitcoinURIPayment() {
+        if(Application.args.length == 1) {
+            showPaymentNotification(Application.args[0]);
+        }
+    }
+    
+    private void showPaymentNotification(String bitcoinURI) {
+        try {
+            BitcoinURI bcuri = new BitcoinURI(bitcoinURI);
+            paymentURI = bitcoinURI;
+            if( bcuri.getAddress() != null && bcuri.getAmount() != null ) {
+                float btcAmount = (float)(Long.parseLong(bcuri.getAmount().toString()) / 100000000.0f);
+                lblNotification.setText("Payment to: "+bcuri.getAddress().toString()+" , Amount: "+String.format("%.5f", btcAmount)+" BTC");
+                pnlNotification.setVisible(true);
+            }
+        }catch(Exception ex) {
+            System.out.println("showPaymentNotification Invalid Bitcoin URI");
+        }
+    }
+    
+    private void startTCPServer() {
+         new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                     svrSocket = new ServerSocket(29753,0,InetAddress.getByName(null));
+                     while (true) {
+                         System.out.println("accepting connection");
+                         Socket connectionSocket = svrSocket.accept();
+                         BufferedReader inFromClient =  new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                         paymentURI = inFromClient.readLine();
+                         System.out.println("Received: " + paymentURI);
+                         showPaymentNotification(paymentURI);
+                     }
+                  }catch(Exception e) {
+                        System.out.println("TCP Server Exception="+e.getMessage());
+                 }
+                }
+        }).start();
     }
     
     private void getVersionNotification() {
@@ -215,6 +268,11 @@ public class PnlTitleBar extends javax.swing.JPanel {
         pnlTopNav.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0));
 
         pnlNotification.setPreferredSize(new java.awt.Dimension(500, 40));
+        pnlNotification.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlNotificationMouseClicked(evt);
+            }
+        });
         pnlNotification.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         lblNotificationClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/close.png"))); // NOI18N
@@ -225,6 +283,13 @@ public class PnlTitleBar extends javax.swing.JPanel {
             }
         });
         pnlNotification.add(lblNotificationClose);
+
+        lblNotification.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblNotification.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblNotificationMouseClicked(evt);
+            }
+        });
         pnlNotification.add(lblNotification);
 
         pnlTopNav.add(pnlNotification);
@@ -282,6 +347,28 @@ public class PnlTitleBar extends javax.swing.JPanel {
         // TODO add your handling code here:
         pnlNotification.setVisible(false);
     }//GEN-LAST:event_lblNotificationCloseMouseClicked
+
+    private void pnlNotificationMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlNotificationMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pnlNotificationMouseClicked
+
+    private void lblNotificationMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNotificationMouseClicked
+        // TODO add your handling code here:
+        try {
+            lblNotification.setText("");
+            pnlNotification.setVisible(false);
+            BitcoinURI bcuri = new BitcoinURI(paymentURI);
+            if( bcuri.getAddress() != null && bcuri.getAmount() != null ) {
+                DlgNewPayment dlgNewPayment = new DlgNewPayment(WalletManager.get().getCurentWalletService());
+                dlgNewPayment.centerOnScreen();
+                dlgNewPayment.setReceiveAddress(bcuri.getAddress().toString());
+                dlgNewPayment.setAmount(bcuri.getAmount().toString());
+                dlgNewPayment.setVisible(true);
+            }
+        } catch(Exception e) {
+            System.out.println("Invalid Bitcoin URI "+e.getMessage());
+        }
+    }//GEN-LAST:event_lblNotificationMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -36,8 +36,6 @@ public class ExchangeServiceFactory {
             //exchangeService = ExchangeService.getExchange(name.toLowerCase(),apiKey,apiSecret);
             if( name.toLowerCase().equals("btcmarkets"))
                 exchangeService = new BTCMarketExchangeService(name.toLowerCase(),apiKey,apiSecret);
-            else if(name.toLowerCase().equals("btc-e"))
-                exchangeService = new BTCEExchangeService(name.toLowerCase(),apiKey,apiSecret);
             else if( name.toLowerCase().equals("independentreserve"))
                 exchangeService = new IndependentReserveExchangeService(name.toLowerCase(),apiKey,apiSecret);
             else if( name.toLowerCase().equals("bitstamp"))

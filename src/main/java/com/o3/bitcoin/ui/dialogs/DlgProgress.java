@@ -12,6 +12,7 @@ import com.o3.bitcoin.ui.dialogs.screens.PnlProgressScreen;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JPanel;
+import org.bitcoinj.uri.BitcoinURI;
 
 /**
  * <p>Class that implements ui dialog to show block chain download progress</p>
@@ -27,6 +28,7 @@ public class DlgProgress extends BasicDialog implements ActionListener {
     protected boolean closeOnComplete = true;
     protected boolean hideBeforeComplete = false;
     protected boolean completed = false;
+    public static boolean isAlreadyShown = false;
 
     public DlgProgress() {
         super(false);
@@ -73,6 +75,22 @@ public class DlgProgress extends BasicDialog implements ActionListener {
             if (closeOnComplete) {
                 if (isCompleted()) {
                     this.dispose();
+                    /*if(!isAlreadyShown) {
+                        if(Application.args.length == 1) {
+                            try {
+                                BitcoinURI bcuri = new BitcoinURI(Application.args[0]);
+                                if( bcuri.getAddress() != null && bcuri.getAmount() != null ) {
+                                    DlgNewPayment dlgNewPayment = new DlgNewPayment(WalletManager.get().getCurentWalletService());
+                                    dlgNewPayment.centerOnScreen();
+                                    dlgNewPayment.setReceiveAddress(bcuri.getAddress().toString());
+                                    dlgNewPayment.setAmount(bcuri.getAmount().toString());
+                                    dlgNewPayment.setVisible(true);
+                                    isAlreadyShown = true;
+                                }
+                            }catch(Exception ex) {
+                            }
+                        }
+                    }*/
                 }
             }
         }

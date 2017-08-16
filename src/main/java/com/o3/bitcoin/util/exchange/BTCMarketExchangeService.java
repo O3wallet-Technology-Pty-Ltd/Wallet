@@ -98,6 +98,12 @@ public class BTCMarketExchangeService extends ExchangeService{
         return result;
     }
    
+   public List<JSONObject> getTradeData(String coin, String fiat) throws Exception {
+        BTCMarketApiClient client = new BTCMarketApiClient();
+        List<JSONObject> arrJO = client.getMarketData(coin,fiat);
+        return arrJO;
+    }
+   
    /*public Trades getTradeHistory() throws IOException {
         UserTrades tradeHistory = null;
         PollingTradeService tradeService = exchange.getPollingTradeService();

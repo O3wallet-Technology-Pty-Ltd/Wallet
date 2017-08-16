@@ -15,6 +15,7 @@ import com.o3.bitcoin.util.exchange.GraphDTO;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +32,7 @@ import org.jfree.chart.plot.PiePlot3D;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 import org.jfree.util.Rotation;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.knowm.xchange.dto.marketdata.Trade;
@@ -60,7 +62,7 @@ public class PnlExchangeGraph extends javax.swing.JPanel {
         graphButtons.add(btnGraph4);
         graphButtons.add(btnGraph5);
         graphButtons.add(btnGraph6);
-        setSelectedButton(btnGraph1);
+        setSelectedButton(btnGraph6);
     }
     
     private void disableGraphButtons() {
@@ -82,9 +84,9 @@ public class PnlExchangeGraph extends javax.swing.JPanel {
     }
     
     public void loadData() {
-        setSelectedButton(btnGraph1);
+        setSelectedButton(btnGraph6);
         SimpleDateFormat dateFormater = new SimpleDateFormat("HH:mm");
-        loadExchangeGraph(3,10,dateFormater);
+        loadExchangeGraph(24,10,dateFormater);
     }
     /**
      * function that loads exchange chart
@@ -157,26 +159,58 @@ public class PnlExchangeGraph extends javax.swing.JPanel {
         boolean startTimeFound = false;
         int index = -1,entryGap = 0;
         exchange = ExchangeServiceFactory.getExchange(ApplicationUI.get().getExchangeScreen().getSelectedExchange());
-        Trades trades = exchange.getTradeData(exchange.getSelectedCurrencyPair());
-        long totalTrades = trades.getTrades().size();
-        for (Trade trade : trades.getTrades()) {
-            index++;
-            if(trade.getTimestamp().getTime() >= startTime && !startTimeFound){
-                startTimeFound=true;
-                entryGap = (int)(totalTrades - index ) / 18;
-                graphDTO = new GraphDTO();
-                graphDTO.setPrice(trade.getPrice());
-                graphDTO.setTime(trade.getTimestamp());
-                graphDTO.setVolume(trade.getTradableAmount());
-                graphData.add(graphDTO);
-                index = 0;
-            }else if(trade.getTimestamp().getTime() >= startTime && startTimeFound && index == entryGap){
-                graphDTO = new GraphDTO();
-                graphDTO.setPrice(trade.getPrice());
-                graphDTO.setTime(trade.getTimestamp());
-                graphDTO.setVolume(trade.getTradableAmount());
-                graphData.add(graphDTO);
-                index = 0;
+        if(!exchange.getExchangeName().equalsIgnoreCase("btcmarkets")) {
+            Trades trades = exchange.getTradeData(exchange.getSelectedCurrencyPair());
+            long totalTrades = trades.getTrades().size();
+            for (Trade trade : trades.getTrades()) {
+                index++;
+                if(trade.getTimestamp().getTime() >= startTime && !startTimeFound){
+                    startTimeFound=true;
+                    entryGap = (int)(totalTrades - index ) / 18;
+                    graphDTO = new GraphDTO();
+                    graphDTO.setPrice(trade.getPrice());
+                    graphDTO.setTime(trade.getTimestamp());
+                    graphDTO.setVolume(trade.getTradableAmount());
+                    graphData.add(graphDTO);
+                    index = 0;
+                }else if(trade.getTimestamp().getTime() >= startTime && startTimeFound && index == entryGap){
+                    graphDTO = new GraphDTO();
+                    graphDTO.setPrice(trade.getPrice());
+                    graphDTO.setTime(trade.getTimestamp());
+                    graphDTO.setVolume(trade.getTradableAmount());
+                    graphData.add(graphDTO);
+                    index = 0;
+                }
+            }
+        }
+        else {
+            JSONObject trade;
+            List<JSONObject> arrJO = exchange.getTradeData(exchange.getAltcoinCurrency().toUpperCase(),exchange.getFiatCurrency().toUpperCase());
+            long totalTrades = arrJO.size();
+            for (int i = (arrJO.size() - 1); i >= 0; i--) {
+                trade = arrJO.get(i);
+                index++;
+                if(trade.getLong("date") >= (long)(startTime / 1000) && !startTimeFound){
+                    startTimeFound=true;
+                    entryGap = (int)(totalTrades - index ) / 18;
+                    graphDTO = new GraphDTO();
+                    graphDTO.setPrice(BigDecimal.valueOf(trade.getDouble("price")));
+                    Date tradeDate = new Date();
+                    tradeDate.setTime(trade.getLong("date")*1000);
+                    graphDTO.setTime(tradeDate);
+                    graphDTO.setVolume(BigDecimal.valueOf(trade.getDouble("amount")));
+                    graphData.add(graphDTO);
+                    index = 0;
+                }else if(trade.getLong("date") >= (long)(startTime / 1000) && startTimeFound && index == entryGap){
+                    graphDTO = new GraphDTO();
+                    graphDTO.setPrice(BigDecimal.valueOf(trade.getDouble("price")));
+                    Date tradeDate = new Date();
+                    tradeDate.setTime(trade.getLong("date")*1000);
+                    graphDTO.setTime(tradeDate);
+                    graphDTO.setVolume(BigDecimal.valueOf(trade.getDouble("amount")));
+                    graphData.add(graphDTO);
+                    index = 0;
+                }
             }
         }
         return graphData;
