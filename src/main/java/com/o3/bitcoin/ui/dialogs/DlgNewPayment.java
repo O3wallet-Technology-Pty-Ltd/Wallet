@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +26,16 @@ import org.slf4j.LoggerFactory;
  *
  * @author
  */
-
 /**
- * <p>Class that implements ui dialog to make payment</p>
-*/
+ * <p>
+ * Class that implements ui dialog to make payment</p>
+ */
 public class DlgNewPayment extends BasicDialog {
 
     private static final Logger logger = LoggerFactory.getLogger(DlgNewPayment.class);
     private final WalletService service;
     private PnlNewPaymentScreen pnlNewPaymentScreen;
-    private JButton paymentButton;
+    public static JButton paymentButton;
     private List<JButton> controls = new ArrayList<>();
 
     /**
@@ -49,7 +48,7 @@ public class DlgNewPayment extends BasicDialog {
         this.service = service;
         setupUI();
     }
-    
+
     @Override
     protected JPanel getMainContentPanel() {
         if (pnlNewPaymentScreen == null) {
@@ -57,11 +56,11 @@ public class DlgNewPayment extends BasicDialog {
         }
         return pnlNewPaymentScreen;
     }
-    
+
     public void setReceiveAddress(String address) {
         pnlNewPaymentScreen.setReceiveAddress(address);
     }
-    
+
     public void setAmount(String amount) {
         pnlNewPaymentScreen.setAmount(amount);
     }
@@ -79,8 +78,9 @@ public class DlgNewPayment extends BasicDialog {
 
     /**
      * function to get Pay button for dialog and attach event handler
+     *
      * @return Pay button
-    */
+     */
     protected JButton getPaymentButton() {
         paymentButton = new JButton("Pay");
         XButtonFactory.themedButton(paymentButton)
@@ -100,23 +100,41 @@ public class DlgNewPayment extends BasicDialog {
     }
 
     /**
-     * callback function for Pay button event 
-    */
+     * callback function for Pay button event
+     */
     protected void handlePayCoinsButtonClickEvent(ActionEvent e) {
-        try {
-            pnlNewPaymentScreen.payCoins();
-        } catch (IllegalArgumentException ex) {
-            logger.error("Payment failed: {}", ex.toString(), ex);
-            ApplicationUI.get().showError(ex);
-        } catch (Exception ex) {
-            logger.error("Payment failed: {}", ex.getMessage(), ex);
-            ApplicationUI.get().showError(ex);
+        String comboBoxSelectedItem = String.valueOf(PnlNewPaymentScreen.cmbAccounts.getSelectedItem());
+        if(comboBoxSelectedItem.endsWith("."))
+        {
+             ApplicationUI.get().showError("This is watch only acount, You can not proceed with this acount Switch to watch only acount to proceed");
         }
+        else
+        {
+            try {
+            pnlNewPaymentScreen.payCoins();
+            } catch (IllegalArgumentException ex) {
+                logger.error("Payment failed: {}", ex.toString(), ex);
+                ApplicationUI.get().showError(ex);
+            } catch (Exception ex) {
+                logger.error("Payment failed: {}", ex.getMessage(), ex);
+                ApplicationUI.get().showError(ex);
+            }
+        }
+    }
+
+    protected void handleQRCodeButtonClickEvent(ActionEvent e) {
+        String address = PnlNewPaymentScreen.txtAddress.getText();
+        String amount = PnlNewPaymentScreen.txtFiat.getText();
+        String btcAmount = PnlNewPaymentScreen.txtBTC.getText();
+        String description = PnlNewPaymentScreen.lblEditDescription.getText();
+        DlgQRCode dlgQrcode = new DlgQRCode(address, description, amount, btcAmount);
+        dlgQrcode.centerOnScreen();
+        dlgQrcode.setVisible(true);
     }
 
     @Override
     protected String getHeadingText() {
-        return "New Payment";
+        return "Send Payment";
     }
 
     @Override
@@ -142,11 +160,11 @@ public class DlgNewPayment extends BasicDialog {
         }
         this.dispose();
     }
-    
+
     public void disablePaymentButton() {
         paymentButton.setEnabled(false);
     }
-    
+
     public void enablePaymentButton() {
         paymentButton.setEnabled(true);
     }

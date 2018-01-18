@@ -7,6 +7,10 @@ package com.o3.bitcoin.ui.screens.dashboard;
 
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
+import com.thoughtworks.xstream.converters.extended.TextAttributeConverter;
+import java.awt.Color;
+import static java.awt.PageAttributes.ColorType.COLOR;
+import java.awt.font.TextAttribute;
 
 /**
  *
@@ -41,7 +45,8 @@ public class PnlDashboardStats extends javax.swing.JPanel {
     }
 
     public void setPriceInFiat(String priceInFiat, String prefixSymbol, String currencySymbol) {
-        lblPriceInFiat.setText(currencySymbol + "   -   "+  priceInFiat);
+        
+        lblPriceInFiat.setText( " =   " + priceInFiat + "   " +  currencySymbol);
     }
     
     public void setExchangeRate(String currencySymbol, String exchangeRate) {
@@ -101,14 +106,10 @@ public class PnlDashboardStats extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 10);
         pnlContents2.add(lblTotalBalance, gridBagConstraints);
 
+        lblPriceInFiat.setForeground(new java.awt.Color(153, 153, 153));
         lblPriceInFiat.setText("0.0000");
         lblPriceInFiat.setFont(Fonts.DEFAULT_HEADING_FONT);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(1, 10, 5, 10);
-        pnlContents2.add(lblPriceInFiat, gridBagConstraints);
+        pnlContents2.add(lblPriceInFiat, new java.awt.GridBagConstraints());
 
         pnlBalance.add(pnlContents2, java.awt.BorderLayout.CENTER);
 

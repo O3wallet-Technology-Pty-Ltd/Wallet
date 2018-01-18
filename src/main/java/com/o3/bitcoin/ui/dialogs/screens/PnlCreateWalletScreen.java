@@ -37,22 +37,28 @@ import org.slf4j.LoggerFactory;
  *
  * @author
  */
-
 /**
- * <p>Class that creates UI form for Create Wallet dialog</p>
-*/
+ * <p>
+ * Class that creates UI form for Create Wallet dialog</p>
+ */
 public class PnlCreateWalletScreen extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerFactory.getLogger(PnlCreateWalletScreen.class);
     private List<String> mnemonicCodes;
 
     DlgCreateWallet dlgCreateWallet;
+    public static String confirmMnemonicCode = "";
+    public static PnlCreateWalletScreen obj;
 
     /**
      * Creates new form PnlCreateWalletScreen
      *
      * @param dlgCreateWallet
      */
+    public PnlCreateWalletScreen() {
+        obj = new PnlCreateWalletScreen();
+    }
+
     public PnlCreateWalletScreen(DlgCreateWallet dlgCreateWallet) {
         initComponents();
         this.dlgCreateWallet = dlgCreateWallet;
@@ -61,7 +67,7 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
 
     /**
      * function to setup initial form ui
-    */
+     */
     private void setup() {
         XButtonFactory.themedButton(btnBrowseLocation)
                 .color(Color.WHITE)
@@ -394,6 +400,8 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
             for (String code : mnemonicCodes) {
                 txtSeed.append(code + " ");
             }
+            //Setiing Mnemonics code for backup
+            confirmMnemonicCode = txtSeed.getText();
         } else {
             lblUserMessage.setVisible(false);
             lblQrcode.setVisible(true);
@@ -409,11 +417,11 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
     public boolean isRestoreFromSeed() {
         return chkUseSeed.isSelected();
     }
-    
+
     public Date getCreationDate() {
-          return datePicker.getDate();
+        return datePicker.getDate();
     }
-    
+
     private void btnBrowseLocationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowseLocationActionPerformed
         JFileChooser jc = new JFileChooser(new File(txtLocation.getText()));
         jc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -427,12 +435,12 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
     private void lblQrcodeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblQrcodeMouseClicked
         // TODO add your handling code here:
         Webcam webcam = Webcam.getDefault();
-        if( webcam == null ) {
+        if (webcam == null) {
             JOptionPane.showMessageDialog(null, "FATAL ERROR: No Webcam found", "ERROR", JOptionPane.ERROR_MESSAGE);
             return;
         }
         webcam.close();
-        
+
         lblQrcode.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
@@ -441,14 +449,14 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
                 dlgSWS.centerOnScreen();
                 dlgSWS.setVisible(true);
                 String qrCodeString = dlgSWS.getQRCode();
-                if( qrCodeString != null ) {
-                    if( qrCodeString.contains("\n")) {
-                        String mnemonicCodes = qrCodeString.substring(0,qrCodeString.indexOf("\n"));
-                        String creationDate = qrCodeString.substring(qrCodeString.indexOf("\n")+1);
+                if (qrCodeString != null) {
+                    if (qrCodeString.contains("\n")) {
+                        String mnemonicCodes = qrCodeString.substring(0, qrCodeString.indexOf("\n"));
+                        String creationDate = qrCodeString.substring(qrCodeString.indexOf("\n") + 1);
                         try {
                             datePicker.setDate(new SimpleDateFormat("dd/MM/yyyy").parse(creationDate));
                             txtSeed.setText(mnemonicCodes);
-                        }catch(ParseException pe) {
+                        } catch (ParseException pe) {
                             logger.error("Date parse exception ::" + pe.getMessage());
                         }
                     }
@@ -460,11 +468,11 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
     public static void setDefaultCursor() {
         lblQrcode.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
-    
-    public String getAccountName(){
+
+    public String getAccountName() {
         return new String(txtAccountName.getText());
     }
-    
+
     public String getLocationPath() {
         return txtLocation.getText();
     }
@@ -482,14 +490,15 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
         }
         return codes;
     }
-    
-    public int getNumberOfAccounts(){
+
+    public int getNumberOfAccounts() {
         return Integer.parseInt(txtAccountNums.getText());
     }
 
     /**
      * function that validate ui form data
-     * @return whether data validated or not 
+     *
+     * @return whether data validated or not
      */
     public boolean validateData() {
         if (txtWalletName.getText() == null || txtWalletName.getText().isEmpty()) {
@@ -548,12 +557,12 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
             int acctNums = 7;
             try {
                 acctNums = Integer.parseInt(txtAccountNums.getText());
-            }catch(Exception e ) {
+            } catch (Exception e) {
                 throw new IllegalArgumentException("Not a valid Number of Accounts.");
             }
-            if( acctNums > 2 ) {
-                    throw new IllegalArgumentException("Maximum 2 accounts can be restored.");
-                }
+            if (acctNums > 2) {
+                throw new IllegalArgumentException("Maximum 5 accounts can be restored.");
+            }
         }
         return true;
     }
@@ -561,6 +570,55 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
     public NetworkParameters getSelectedNetwork() {
         return rdoMainNet.isSelected() ? MainNetParams.get() : TestNet3Params.get();
     }
+
+//    public static boolean ValidationData()
+//    {
+//     //PnlCreateWalletScreen obj=new PnlCreateWalletScreen();
+//     return obj.validateData();   
+//    }
+//    
+//    public static String getWalletNameStatic()
+//    {
+//        //PnlCreateWalletScreen obj=new PnlCreateWalletScreen();
+//        return obj.getWalletName();
+//    }
+//    
+//    public static String getLocationPathStatic()
+//    {
+//        //PnlCreateWalletScreen obj=new PnlCreateWalletScreen();
+//        return obj.getLocationPath();
+//    }
+//    
+//    public static List<String> getMnemonicCodesStatic()
+//    {
+//        //PnlCreateWalletScreen obj=new PnlCreateWalletScreen();
+//        return obj.getMnemonicCodes(); 
+//    }
+//    
+//    public static boolean isRestoreFromSeedStatic()
+//    {
+//        return obj.isRestoreFromSeed();
+//    }
+//    
+//    public static NetworkParameters getSelectedNetworkStatic()
+//    {
+//        return obj.getSelectedNetwork();
+//    }
+//    
+//    public static Date getCreationDateStatic()
+//    {
+//        return obj.getCreationDate();
+//    }
+//    
+//    public static int getNumberOfAccountsStatic()
+//    {
+//        return obj.getNumberOfAccounts();
+//    }
+//    
+//    public static String getAccountNameStatic()
+//    {
+//        return obj.getAccountName();
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBrowseLocation;
@@ -586,7 +644,7 @@ public class PnlCreateWalletScreen extends javax.swing.JPanel {
     private javax.swing.JTextField txtAccountNums;
     private javax.swing.JPasswordField txtConfirmPassphrase;
     private javax.swing.JTextField txtLocation;
-    private javax.swing.JTextArea txtSeed;
+    public javax.swing.JTextArea txtSeed;
     private javax.swing.JTextField txtWalletName;
     // End of variables declaration//GEN-END:variables
 }

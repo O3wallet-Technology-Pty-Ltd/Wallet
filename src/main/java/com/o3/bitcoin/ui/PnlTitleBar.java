@@ -7,17 +7,24 @@ package com.o3.bitcoin.ui;
 
 import com.o3.bitcoin.Application;
 import com.o3.bitcoin.model.manager.WalletManager;
+import com.o3.bitcoin.service.WalletService;
 import com.o3.bitcoin.ui.dialogs.DlgNewPayment;
 import com.o3.bitcoin.util.ResourcesProvider;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Dimensions;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
+import com.o3.bitcoin.util.ResponseResult;
+import com.o3.bitcoin.util.bitid.BitIdURI;
 import com.o3.bitcoin.util.http.HttpGetClient;
 import com.o3.bitcoin.util.http.HttpPostClient;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -25,12 +32,15 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import org.bitcoinj.core.ECKey;
 import org.bitcoinj.uri.BitcoinURI;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -50,7 +60,9 @@ public class PnlTitleBar extends javax.swing.JPanel {
     private int x;
     private int y;
     private String paymentURI = "";
+    private BitIdURI bitIdURI = null;
     private ServerSocket svrSocket;
+    int operation = 0;
 
     /**
      * Creates new form PnlTitleBar
@@ -67,22 +79,37 @@ public class PnlTitleBar extends javax.swing.JPanel {
     }
     
     private void checkForBitcoinURIPayment() {
-        if(Application.args.length == 1) {
-            showPaymentNotification(Application.args[0]);
+        try
+        {
+            if(Application.args.length == 1) {
+                showPaymentNotification(Application.args[0]);
+            }
         }
+        catch(NullPointerException e){System.out.println("Main Exception Handled");}
     }
     
-    private void showPaymentNotification(String bitcoinURI) {
+    private void showPaymentNotification(String uri) {
         try {
-            BitcoinURI bcuri = new BitcoinURI(bitcoinURI);
-            paymentURI = bitcoinURI;
-            if( bcuri.getAddress() != null && bcuri.getAmount() != null ) {
-                float btcAmount = (float)(Long.parseLong(bcuri.getAmount().toString()) / 100000000.0f);
-                lblNotification.setText("Payment to: "+bcuri.getAddress().toString()+" , Amount: "+String.format("%.5f", btcAmount)+" BTC");
+            if( uri.startsWith("bitcoin:")) {
+                operation = 1;
+                BitcoinURI bcuri = new BitcoinURI(uri);
+                paymentURI = uri;
+                if( bcuri.getAddress() != null && bcuri.getAmount() != null ) {
+                    float btcAmount = (float)(Long.parseLong(bcuri.getAmount().toString()) / 100000000.0f);
+                    lblNotification.setText("Payment to: "+bcuri.getAddress().toString()+" , Amount: "+String.format("%.5f", btcAmount)+" BTC");
+                    pnlNotification.setVisible(true);
+                    lblNotification.setToolTipText("");
+                }
+            }
+            else if( uri.startsWith("bitid:")) {
+                operation = 2;
+                bitIdURI = new BitIdURI(uri);
+                lblNotification.setText("BitId Domain: "+bitIdURI.getCallbackURI().toString());
                 pnlNotification.setVisible(true);
+                lblNotification.setToolTipText("");
             }
         }catch(Exception ex) {
-            System.out.println("showPaymentNotification Invalid Bitcoin URI");
+            System.out.println("exception ="+ex.getMessage());
         }
     }
     
@@ -355,19 +382,64 @@ public class PnlTitleBar extends javax.swing.JPanel {
     private void lblNotificationMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNotificationMouseClicked
         // TODO add your handling code here:
         try {
-            lblNotification.setText("");
-            pnlNotification.setVisible(false);
-            BitcoinURI bcuri = new BitcoinURI(paymentURI);
-            if( bcuri.getAddress() != null && bcuri.getAmount() != null ) {
-                DlgNewPayment dlgNewPayment = new DlgNewPayment(WalletManager.get().getCurentWalletService());
-                dlgNewPayment.centerOnScreen();
-                dlgNewPayment.setReceiveAddress(bcuri.getAddress().toString());
-                dlgNewPayment.setAmount(bcuri.getAmount().toString());
-                dlgNewPayment.setVisible(true);
+            if(operation == 1) { 
+                operation = 0;
+                lblNotification.setText("");
+                pnlNotification.setVisible(false);
+                BitcoinURI bcuri = new BitcoinURI(paymentURI);
+                if( bcuri.getAddress() != null && bcuri.getAmount() != null ) {
+                    DlgNewPayment dlgNewPayment = new DlgNewPayment(WalletManager.get().getCurentWalletService());
+                    dlgNewPayment.centerOnScreen();
+                    dlgNewPayment.setReceiveAddress(bcuri.getAddress().toString());
+                    dlgNewPayment.setAmount(bcuri.getAmount().toString());
+                    dlgNewPayment.setVisible(true);
+                }
+            }
+            else {
+                if( operation == 3 ) {
+                    if(lblNotification.getText().contains("Success:")) {
+                        String address = lblNotification.getText();
+                        address = address.replaceAll("<html>", "");
+                        address = address.replaceAll("Success:", "");
+                        address = address.replaceAll("<br>", "");
+                        address = address.replaceAll("Used Address: ", "");
+                        address = address.replaceAll("</html>", "");
+                        Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+                        clpbrd.setContents(new StringSelection(address), null);
+                    }
+                    lblNotification.setText("");
+                    pnlNotification.setVisible(false);
+                    operation = 0;
+                    lblNotification.setToolTipText("");
+                }
+                else {
+                    operation = 3;
+                    lblNotification.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                    lblNotification.setText("Processing .......");
+                    WalletService currentService = WalletManager.get().getCurentWalletService();
+                    ECKey firstKey = currentService.getWalletFirstKey();
+                    if(firstKey == null)
+                        System.out.println("firstKey is null");
+                    String signature = firstKey.signMessage(bitIdURI.getBitIdURI());
+                    String address = currentService.getWalletFirstReceiveAddress().toString();
+                    String bitIdUri = bitIdURI.getBitIdURI();
+                    Map<String,String> params = new HashMap<>();
+                    params.put("uri", bitIdUri);
+                    params.put("address", address);
+                    params.put("signature", signature);
+                    ResponseResult resResult = HttpPostClient.postJson(bitIdURI.getCallbackURI().toURL().toString(), params);
+                    if(resResult.getStatusCode() == 200) {
+                        lblNotification.setText("<html>Success:<br>Used Address: "+address+"</html>");
+                        lblNotification.setToolTipText("Click to copy Address");
+                    }
+                    else
+                        lblNotification.setText("<html>Error:<br>"+resResult.getResponseText()+"</html>");
+                }
             }
         } catch(Exception e) {
-            System.out.println("Invalid Bitcoin URI "+e.getMessage());
+            System.out.println("Invalid URI "+e.getMessage());
         }
+        lblNotification.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }//GEN-LAST:event_lblNotificationMouseClicked
 
 

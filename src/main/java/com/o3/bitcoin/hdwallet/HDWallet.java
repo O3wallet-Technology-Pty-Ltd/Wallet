@@ -628,9 +628,26 @@ public class HDWallet {
     
     public DeterministicKey getAccount0PublicKey() {
         for (HDAccount hda : mAccounts){
-            if( hda.getAccountId() == 0 )
+            if( hda.getAccountId() == 0)
                 return hda.getPublicKey();
         }
         return null;
     } 
+    
+    public ECKey getAccount0FirstKeyOnReceiveKeyChain() {
+        for (HDAccount hda : mAccounts){
+            if( hda.getAccountId() == 0  || hda.getAccountId() == 10)
+                return hda.getAccountFirstReceiveKey();
+        }
+        
+        return null;
+    }
+    
+    public Address getAccount0FirstAddressOnReceiveKeyChain() {
+        for (HDAccount hda : mAccounts){
+            if( hda.getAccountId() == 0   || hda.getAccountId() == 10)
+                return hda.getAccountFirstReceiveAddress();
+        }
+        return null;
+    }        
 }

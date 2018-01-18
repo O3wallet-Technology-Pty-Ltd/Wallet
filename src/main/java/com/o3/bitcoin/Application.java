@@ -5,8 +5,10 @@
  */
 package com.o3.bitcoin;
 
-import chrriis.dj.nativeswing.NativeSwing;
-import chrriis.dj.nativeswing.swtimpl.NativeInterface;
+////import chrriis.dj.nativeswing.NativeSwing;
+////import chrriis.dj.nativeswing.swtimpl.NativeInterface;
+import com.o3.bitcoin.macuri.OSXAppleEventHelper;
+import com.o3.bitcoin.macuri.OpenUriAppleEventHandler;
 import com.o3.bitcoin.model.WalletConfig;
 import com.o3.bitcoin.service.WalletService;
 import com.o3.bitcoin.model.manager.WalletManager;
@@ -16,6 +18,7 @@ import com.o3.bitcoin.ui.dialogs.DlgWalletLoadingProgress;
 import com.o3.bitcoin.model.manager.ConfigManager;
 import com.o3.bitcoin.ui.dialogs.DlgEula;
 import com.o3.bitcoin.ui.dialogs.DlgLogin;
+import com.o3.bitcoin.util.Utils;
 import java.util.ArrayList;
 import com.o3.bitcoin.util.seed.SeedGeneratorUtils;
 import java.awt.Image;
@@ -27,12 +30,13 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.core.Utils;
+////import org.bitcoinj.core.Utils;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
@@ -70,24 +74,16 @@ public class Application {
         ////NativeInterface.open();
         Application.args = args;
         if(Utils.isWindows()) {
-            try {
-                ServerSocket srvSocket = new ServerSocket(29753,0,InetAddress.getByName(null));
-                srvSocket.close();
-             }catch(IOException e) {
-                   System.out.println("Server Exception="+e.getMessage());
-                   try {
-                       if(Application.args.length == 1) {
-                            Socket clientSocket = new Socket(InetAddress.getByName(null), 29753);
-                            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-                            outToServer.writeBytes(Application.args[0]+System.lineSeparator());
-                            clientSocket.close();
-                       }
-                   }catch(Exception ex) {
-                       System.out.println("Client exception="+ex.getMessage());
-                       logger.error("Client Exception: ", e.getMessage(), e);
-                   }
-                   System.exit(0);
-            }
+            passUriData();
+        }
+        else if(Utils.isMac()) {
+            OSXAppleEventHelper.setOpenURIAppleEventHandler(new OpenUriAppleEventHandler() {
+                @Override
+                public void handleURI(URI url) {
+                    Application.args = new String[]{url.toString()};
+                    passUriData();
+                }
+            });
         }
         final ConfigManager manager = ConfigManager.get();
         try {
@@ -98,7 +94,6 @@ public class Application {
             System.exit(1);
         }
         java.awt.EventQueue.invokeLater(new Runnable() {
-
             @Override
             public void run() {
                 UIManager.put("TabbedPane.contentOpaque", Boolean.FALSE);
@@ -172,6 +167,28 @@ public class Application {
 	            NativeInterface.close();
 	        }
 	    }));*/
+    }
+    
+    private static void passUriData() {
+        try {
+                ServerSocket srvSocket = new ServerSocket(29753,0,InetAddress.getByName(null));
+                srvSocket.close();
+             }catch(IOException e) {
+                    System.out.println("Server Exception="+e.getMessage());
+                    try {
+                       if(Application.args.length == 1) {
+                            Socket clientSocket = new Socket(InetAddress.getByName(null), 29753);
+                            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+                            outToServer.writeBytes(Application.args[0]+System.lineSeparator());
+                            clientSocket.close();
+                       }
+                    }catch(Exception ex) {
+                        System.out.println("Client exception="+ex.getMessage());
+                        logger.error("Client Exception: ", e.getMessage(), e);
+                    }
+                    if( Utils.isWindows())
+                         System.exit(0);
+            }
     }
 
     /**

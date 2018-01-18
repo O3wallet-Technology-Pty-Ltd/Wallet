@@ -5,8 +5,6 @@
  */
 package com.o3.bitcoin.service;
 
-import com.google.common.io.Files;
-import com.o3.bitcoin.Application;
 import com.o3.bitcoin.util.seed.SeedGeneratorUtils;
 import com.o3.bitcoin.exception.ClientRuntimeException;
 import com.o3.bitcoin.hdwallet.HDAccount;
@@ -17,56 +15,35 @@ import static com.o3.bitcoin.hdwallet.util.WalletUtil.getWalletFilePath;
 import com.o3.bitcoin.model.WalletConfig;
 import com.o3.bitcoin.model.manager.ConfigManager;
 import com.o3.bitcoin.model.manager.WalletManager;
-import com.o3.bitcoin.ui.ApplicationUI;
 import com.o3.bitcoin.ui.component.progress.ProgressEvent;
 import com.o3.bitcoin.ui.component.progress.DownloadProgressTracker;
-import com.o3.bitcoin.ui.dialogs.DlgCreateWallet;
 import com.o3.bitcoin.ui.dialogs.DlgWalletLoadingProgress;
 import com.o3.bitcoin.util.ResourcesProvider;
 import com.subgraph.orchid.TorClient;
 import com.subgraph.orchid.TorInitializationListener;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.channels.FileChannel;
-import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.swing.SwingUtilities;
 import org.bitcoinj.core.AbstractWalletEventListener;
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.PeerGroup;
-import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.core.Wallet;
-import org.bitcoinj.core.WrongNetworkException;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.kits.WalletAppKit;
 import org.bitcoinj.params.MainNetParams;
-import org.bitcoinj.store.BlockStoreException;
-import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.utils.MonetaryFormat;
 import org.bitcoinj.wallet.DeterministicSeed;
-import org.bitcoinj.wallet.KeyChainGroup;
 import org.bitcoinj.wallet.WalletTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.crypto.params.KeyParameter;
 
 /**
  *
@@ -110,6 +87,13 @@ public class WalletService {
     private Thread tRun = null;
     
     private HDWallet mHDWallet = null;
+    private String watchOnlyAcountName;
+    
+//    public WalletService(String acountName)
+//    {
+//        watchOnlyAcountName = acountName;
+//        addAccount(watchOnlyAcountName);
+//    }
 
     /**
      * function to add block chain download progress listener  
@@ -122,6 +106,8 @@ public class WalletService {
             }
         }
     }
+    
+    
 
     /**
      * function to remove block chain download progress listener  
@@ -822,4 +808,13 @@ public class WalletService {
     public DeterministicKey getAccount0PublicKey() {
         return mHDWallet.getAccount0PublicKey();
     }
+    
+    public ECKey getWalletFirstKey() {
+        return mHDWallet.getAccount0FirstKeyOnReceiveKeyChain();
+    }
+    
+    public Address getWalletFirstReceiveAddress() {
+        return mHDWallet.getAccount0FirstAddressOnReceiveKeyChain();
+    }
+    
 }

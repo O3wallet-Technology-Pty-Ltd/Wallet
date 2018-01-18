@@ -82,13 +82,12 @@ public class HttpGetClient {
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost httpPost = new HttpPost(url);
         StringEntity params = new StringEntity(urlParameters);
-    //    httpPost.addHeader("content-type", "application/x-www-form-urlencoded");
         httpPost.addHeader("Content-Type", "application/json");
         httpPost.setEntity(params);
 
         HttpResponse response = client.execute(httpPost);
 
-// Get the response
+        // Get the response
         if (response.getStatusLine().getStatusCode() == 200) {
             BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             String line = "";
@@ -105,13 +104,10 @@ public class HttpGetClient {
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost httpPost = new HttpPost(url);
         StringEntity params = new StringEntity(urlParameters);
-    //    httpPost.addHeader("content-type", "application/x-www-form-urlencoded");
         httpPost.addHeader("Content-Type", "application/json");
         httpPost.setEntity(params);
-
         HttpResponse response = client.execute(httpPost);
-
-// Get the response
+        // Get the response
         if (response.getStatusLine().getStatusCode() == 200) {
             BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             String line = "";
@@ -128,14 +124,13 @@ public class HttpGetClient {
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost httpPost = new HttpPost(url);
         StringEntity params = new StringEntity(urlParameters);
-    //    httpPost.addHeader("content-type", "application/x-www-form-urlencoded");
         httpPost.addHeader("Content-Type", "application/json");
         httpPost.setHeader("Authorization",  encoding);
         httpPost.setEntity(params);
 
         HttpResponse response = client.execute(httpPost);
 
-// Get the response
+        // Get the response
         if (response.getStatusLine().getStatusCode() == 200) {
             BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             String line = "";
@@ -145,28 +140,4 @@ public class HttpGetClient {
         }
         return result;
     }
-    
-    public static void main(String args[]) {
-        try {
-            String result = getValuesFromUrl("https://shapeshift.io/getcoins");
-            JSONObject jObject = new JSONObject(result);
-            Iterator<?> keys = jObject.keys();
-
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                System.out.println("Key="+key);
-                if (jObject.get(key) instanceof JSONObject) {
-                    JSONObject jO = (JSONObject) jObject.get(key);
-                    if(jO.getString("status").equalsIgnoreCase("available")) {
-                        System.out.println("name="+jO.getString("name")+ " symbol="+jO.getString("symbol")+" imageSmall="+jO.getString("imageSmall"));
-                    }
-                    //countryNames.add(jO.getString("name"));
-                    //System.out.println("Value="+jO.toString());
-                }
-            }
-        }catch(Exception e) {
-            System.out.println("Exception ="+e.getMessage());
-        }
-    }
-
 }

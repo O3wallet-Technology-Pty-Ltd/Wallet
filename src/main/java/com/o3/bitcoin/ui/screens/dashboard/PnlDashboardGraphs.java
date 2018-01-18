@@ -13,6 +13,7 @@ import com.o3.bitcoin.model.manager.WalletManager;
 import com.o3.bitcoin.service.WalletService;
 import com.o3.bitcoin.ui.ApplicationUI;
 import com.o3.bitcoin.ui.component.WalletComboBoxUI;
+import com.o3.bitcoin.ui.screens.settings.PnlSettingsScreen;
 import com.o3.bitcoin.util.ChartBuilder;
 import com.o3.bitcoin.util.ResourcesProvider;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
@@ -219,13 +220,51 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
             }*/
             WalletConfig config = ConfigManager.get().getFirstWallet(); 
             WalletService service = WalletManager.get().getWalletService(config.getId());
+            
             List<HDAccount> acctList = service.getAllAccounts();
-            int i = 0;
-            for( HDAccount acct : acctList ){
-                walletPanels.get(i).setVisible(true);
-                walletLabels.get(i).setText(acct.toString());
-                i++;
+            
+            ///////////////////////////////////////
+            walletLabels.get(0).setText("");
+            walletLabels.get(1).setText("");
+            walletLabels.get(2).setText("");
+            walletLabels.get(3).setText("");
+            walletLabels.get(4).setText("");
+            //System.out.println("Cleared All");
+            
+            /*if(PnlSettingsScreen.AccountCondition == false)
+            {
+                int i = 0;
+                for (HDAccount account : acctList)
+                {
+                    walletPanels.get(i).setVisible(true);
+                    walletLabels.get(i).setText(account.toString());
+                    i++;
+                    if (i == 2)
+                    {
+                        pnlBullet3.setVisible(false);
+                        pnlBullet4.setVisible(false);
+                        pnlBullet5.setVisible(false);
+                        break;
+                    }
+                }
             }
+            else
+            {*/
+                int i = 0;
+                for( HDAccount acct : acctList ){
+                    walletPanels.get(i).setVisible(true);
+                    walletLabels.get(i).setText(acct.toString());
+//                    pnlBullet3.setVisible(true);
+//                    pnlBullet4.setVisible(true);
+//                    pnlBullet5.setVisible(true);
+                    i++;
+                }
+            //}
+            
+            //////////////////////////////////////
+            //System.out.println("Filled All");
+            
+            
             panel.setPopupMenu(null);
             panel.setMouseZoomable(false);
             panel.setDomainZoomable(false);
@@ -292,6 +331,7 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
         pnlBullet5 = new javax.swing.JPanel();
         lblWallet5 = new com.o3.bitcoin.ui.component.XScalableLabel();
         pnlSpacer = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         pnlPriceGraphContainer = new javax.swing.JPanel();
         pnlPriceGraphView = new javax.swing.JPanel();
 
@@ -497,6 +537,10 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         pnlOtherGraphs.add(pnlSpacer, gridBagConstraints);
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel1.setText("BTC");
+        pnlOtherGraphs.add(jLabel1, new java.awt.GridBagConstraints());
+
         add(pnlOtherGraphs, java.awt.BorderLayout.EAST);
 
         pnlPriceGraphContainer.setOpaque(false);
@@ -511,6 +555,7 @@ public class PnlDashboardGraphs extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private com.o3.bitcoin.ui.component.XScalableLabel lblWallet1;
     private com.o3.bitcoin.ui.component.XScalableLabel lblWallet2;
     private com.o3.bitcoin.ui.component.XScalableLabel lblWallet3;

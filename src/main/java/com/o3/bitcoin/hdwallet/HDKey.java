@@ -16,6 +16,7 @@ import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
 import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.uri.BitcoinURI;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -51,7 +52,6 @@ public class HDKey {
     private byte[] mPubKey;
     private byte[] mPubKeyHash;
     private Address mAddress;
-
     private int mNumTrans;
     private long mBalance;
     private long mAvailable;
@@ -82,13 +82,14 @@ public class HDKey {
         // Derive public key, public hash and address.
         mPubKey = mECKey.getPubKey();
         mPubKeyHash = mECKey.getPubKeyHash();
+        
         mAddress = mECKey.toAddress(mParams);
-
+        
         // Initialize transaction count and balance.
         mNumTrans = 0;
         mBalance = 0;
         mAvailable = 0;
-
+       
         //logger.info("created address " + mPath + ": " + mAddress.toString());
     }
     
@@ -144,6 +145,9 @@ public class HDKey {
         // Derive public key, public hash and address.
         mPubKey = mECKey.getPubKey();
         mPubKeyHash = mECKey.getPubKeyHash();
+
+        
+        //Address is stored in mAddress Variable
         mAddress = mECKey.toAddress(mParams);
 
         // Initialize transaction count and balance.  If we don't have
@@ -280,5 +284,15 @@ public class HDKey {
      */
     public Address getAddress() {
         return mAddress;
+    }
+    
+    /**
+     * function to get ECKey
+     * @return ECkey
+     */
+    
+    public ECKey getKey() {
+        return mECKey;
+        
     }
 }

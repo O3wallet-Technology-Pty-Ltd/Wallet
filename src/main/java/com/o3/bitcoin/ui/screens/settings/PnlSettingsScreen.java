@@ -5,8 +5,6 @@
  */
 package com.o3.bitcoin.ui.screens.settings;
 
-import com.o3.bitcoin.Application;
-import com.o3.bitcoin.exception.ClientRuntimeException;
 import com.o3.bitcoin.hdwallet.HDAccount;
 import com.o3.bitcoin.hdwallet.HDKey;
 import com.o3.bitcoin.model.Config;
@@ -20,14 +18,13 @@ import com.o3.bitcoin.ui.dialogs.screens.BasicScreen;
 import com.o3.bitcoin.model.manager.ConfigManager;
 import com.o3.bitcoin.ui.component.WalletComboBoxUI;
 import com.o3.bitcoin.ui.dialogs.DlgCreateWallet;
-import com.o3.bitcoin.ui.dialogs.DlgCreateWatchOnlyWallet;
 import com.o3.bitcoin.ui.dialogs.DlgManageApplicationPassword;
-import com.o3.bitcoin.ui.dialogs.DlgManageWalletPassphrase;
 import com.o3.bitcoin.ui.dialogs.DlgRenameAccount;
-import com.o3.bitcoin.ui.dialogs.DlgRestoreWallet;
 import com.o3.bitcoin.ui.dialogs.DlgWalletLoadingProgress;
 import com.o3.bitcoin.ui.dialogs.DlgWalletSeedQRCode;
 import com.o3.bitcoin.applications.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.ui.dialogs.DlgImportPublicKey;
+import com.o3.bitcoin.ui.dialogs.DlgXpubKey;
 import com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen;
 import com.o3.bitcoin.util.ResourcesProvider;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
@@ -36,38 +33,50 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import javax.crypto.IllegalBlockSizeException;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.plaf.basic.BasicComboPopup;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.Wallet;
-import org.bitcoinj.params.MainNetParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.HDKeyDerivation;
+
 
 /**
- * Class that implements Settings screen of UI 
+ * Class that implements Settings screen of UI
  */
 public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen {
 
     private static final Logger logger = LoggerFactory.getLogger(PnlSettingsScreen.class);
     private final DefaultComboBoxModel<HDAccount> model = new DefaultComboBoxModel<>();
-    
+
     private boolean loading = true;
     private final DefaultComboBoxModel<String> currencyModel = new DefaultComboBoxModel<>();
     private List<String> currencies = ResourcesProvider.DEFAULT_CURRENCIES;
-    
+
     private final DefaultComboBoxModel<String> feeModel = new DefaultComboBoxModel<>();
     private List<String> feePref = ResourcesProvider.FEE_PREF;
+    private final String randomNode = "Random Node";
+
+    public static String xPublicKey = "";
+    public static String tPublicKey = "";
+    public static boolean payButtonFlag = false;
+    
+    //public static boolean AccountCondition = true;
 
     /**
      * Creates new form PnlSettingsScreen
@@ -75,6 +84,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
     public PnlSettingsScreen() {
         initComponents();
         customizeUI();
+        fillPeerCombo();
         btnDeleteWallet.setEnabled(true);
         btnManagePassphrase.setEnabled(true);
         lblWalletName.setVisible(true);
@@ -89,6 +99,17 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         lblWalletCreationDateValue.setVisible(true);
         btnDeleteWallet.setVisible(true);
         btnManagePassphrase.setVisible(true);
+        jButton1.setVisible(true);
+        jButton2.setVisible(true);
+    }
+
+    /**
+     * Function that will fill the Peer Settings Combo Box with two options.
+     */
+    private void fillPeerCombo() {
+//        cmbPeerSettings.addItem("Trusted Peers");
+        cmbPeerSettings.addItem(randomNode);
+        cmbPeerSettings.setSelectedItem(randomNode);
     }
 
     /**
@@ -99,6 +120,9 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         themeWalletActionButton(btnManagePassphrase, Colors.NAV_MENU_WALLET_COLOR);
         themeWalletActionButton(btnWalletSeed, Colors.NAV_MENU_ABOUT_COLOR);
         themeWalletActionButton(btnRestoreWallet, Colors.NAV_MENU_WALLET_COLOR);
+        themeWalletActionButton(jButton1, Colors.NAV_MENU_WALLET_COLOR);
+        themeWalletActionButton(jButton2, Colors.NAV_MENU_WALLET_COLOR);
+
         cmbWallets.setRenderer(new BasicComboBoxRenderer() {
 
             @Override
@@ -118,8 +142,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         Object child = cmbWallets.getAccessibleContext().getAccessibleChild(0);
         BasicComboPopup popup = (BasicComboPopup) child;
         popup.setBorder(BorderFactory.createLineBorder(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR));
-        
-        
+
         cmbCurrencies.setRenderer(new BasicComboBoxRenderer() {
 
             @Override
@@ -139,8 +162,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         Object child1 = cmbCurrencies.getAccessibleContext().getAccessibleChild(0);
         BasicComboPopup popup1 = (BasicComboPopup) child1;
         popup1.setBorder(BorderFactory.createLineBorder(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR));
-        
-        
+
         // fee pref combo box
         cmbFeePref.setRenderer(new BasicComboBoxRenderer() {
 
@@ -161,7 +183,6 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         Object feePrefChild = cmbFeePref.getAccessibleContext().getAccessibleChild(0);
         BasicComboPopup feePrefPopup = (BasicComboPopup) feePrefChild;
         feePrefPopup.setBorder(BorderFactory.createLineBorder(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR));
-        
 
         themeWalletPropertyHeader(lblAccountName);
         themeWalletPropertyHeader(lblWalletName);
@@ -177,9 +198,10 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
     }
 
     /**
-     * function that apply theme to button 
+     * function that apply theme to button
+     *
      * @param button
-     * @param background 
+     * @param background
      */
     private void themeWalletActionButton(JButton button, Color background) {
         XButtonFactory
@@ -188,10 +210,11 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
                 .background(background)
                 .font(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
     }
-    
+
     /**
      * function that apply theme to header lablel
-     * @param label 
+     *
+     * @param label
      */
     private void themeWalletPropertyHeader(JLabel label) {
         label.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
@@ -200,7 +223,8 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
 
     /**
      * function that apply theme to value label
-     * @param label 
+     *
+     * @param label
      */
     private void themeWalletPropertyValue(JLabel label) {
         label.setFont(ResourcesProvider.Fonts.REGULAR_MEDIUM_FONT);
@@ -212,15 +236,30 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
      */
     @Override
     public void loadData() {
+
         Config config = ConfigManager.config();
         rdoMainNet.setSelected("MAINNET".equals(config.getDefaultNetwork()));
         rdoTestNet.setSelected("TESTNET".equals(config.getDefaultNetwork()));
         chkUseTor.setSelected(config.isUseTor());
         model.removeAllElements();
+
         List<HDAccount> accounts = WalletManager.get().getCurentWalletService().getAllAccounts();
-        for (HDAccount account : accounts) {
-            model.addElement(account);
+
+        //if (AccountCondition == true) {
+            for (HDAccount account : accounts) {
+                model.addElement(account);
+            }
+/*        } else {
+            int i = 0;
+            for (HDAccount account : accounts) {
+                model.addElement(account);
+                i++;
+                if (i == 2) {
+                    break;
+                }
+            }
         }
+*/
         WalletService wService = WalletManager.get().getCurentWalletService();
         if (wService != null) {
             int index = model.getIndexOf(wService.getCurrentAccount());
@@ -229,8 +268,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
             }
             renderServiceProperties(wService);
         }
-        
-        
+
         for (String currency : currencies) {
             currencyModel.addElement(currency.toUpperCase());
         }
@@ -239,10 +277,9 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
             currencyModel.setSelectedItem(currency.toUpperCase());
         }
         ConfigManager.config().setCurrencies(currencies);
-        
+
         // fee pref combobox
-        if(feeModel.getSize() == 0 )
-        {
+        if (feeModel.getSize() == 0) {
             for (String fee : feePref) {
                 feeModel.addElement(fee);
             }
@@ -294,8 +331,11 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         lblWalletCreationDateValue.setText("--");
     }
     
+    
+    
+
     /**
-     * function to apply settings upon network change 
+     * function to apply settings upon network change
      */
     private void changeNetwork() {
         Config config = ConfigManager.config();
@@ -309,12 +349,12 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         YesNoDialog dialog = new YesNoDialog("<html>Wallet will be reloaded to apply network changes.<br/>Do you want to Proceed?</html>");
         dialog.start();
         if (dialog.getSelectedOption() == YesNoDialog.OPTION_YES) {
-            if(!currentNetwork.equals(selectedNetwork)) {
+            if (!currentNetwork.equals(selectedNetwork)) {
                 try {
                     ConfigManager.config().setDefaultNetwork(rdoMainNet.isSelected() ? "MAINNET" : "TESTNET");
                     ConfigManager.get().save();
                     WalletConfig wallet = ConfigManager.get().getFirstWallet();
-                    if( wallet == null ) {
+                    if (wallet == null) {
                         WalletManager.get().getCurentWalletService().closeWallet(true);
                         DlgCreateWallet dlgCreateWallet = new DlgCreateWallet();
                         dlgCreateWallet.centerOnScreen();
@@ -333,8 +373,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
                         ApplicationUI.get().getWalletScreen().loadData();
                         ApplicationUI.get().getWalletScreen().showWalletControls();
                         ApplicationUI.get().getSettingsScreen().loadData();
-                    }
-                    else {
+                    } else {
                         WalletManager.get().getCurentWalletService().reloadApplication();
                         ApplicationUI.get().getWalletScreen().loadData();
                         ApplicationUI.get().getWalletScreen().showWalletControls();
@@ -345,22 +384,21 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
                     logger.error("Error creating wallet: {}", e.getMessage(), e);
                     System.exit(1);
                 }
+            } else {
+                try {
+                    ConfigManager.config().setUseTor(chkUseTor.isSelected());
+                    ConfigManager.get().save();
+                    WalletManager.get().getCurentWalletService().switchTorNetwork();
+                    ApplicationUI.get().getWalletScreen().loadData();
+                    ApplicationUI.get().getWalletScreen().showWalletControls();
+                    ApplicationUI.get().getSettingsScreen().loadData();
+                } catch (Exception e) {
+                    ApplicationUI.get().showError("Error switching Tor network: {}", e.getMessage());
+                    logger.error("Error switching Tor network: {}", e.getMessage(), e);
+                    System.exit(1);
+                }
             }
-            else {
-                    try {
-                        ConfigManager.config().setUseTor(chkUseTor.isSelected());
-                        ConfigManager.get().save();
-                        WalletManager.get().getCurentWalletService().switchTorNetwork();
-                        ApplicationUI.get().getWalletScreen().loadData();
-                        ApplicationUI.get().getWalletScreen().showWalletControls();
-                        ApplicationUI.get().getSettingsScreen().loadData();
-                    } catch(Exception e) {
-                        ApplicationUI.get().showError("Error switching Tor network: {}", e.getMessage());
-                        logger.error("Error switching Tor network: {}", e.getMessage(), e);
-                        System.exit(1);
-                    }
-            }
- 
+
         } else {
             rdoMainNet.setSelected("MAINNET".equals(currentNetwork));
             rdoTestNet.setSelected("TESTNET".equals(currentNetwork));
@@ -388,6 +426,8 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         lblNetworkWarning = new javax.swing.JLabel();
         lblNetworkSettingsDescription = new javax.swing.JLabel();
         chkUseTor = new javax.swing.JCheckBox();
+        lblPeerSettings = new javax.swing.JLabel();
+        cmbPeerSettings = new javax.swing.JComboBox();
         pnlPasswordSettings = new javax.swing.JPanel();
         pnlWalletSettings = new javax.swing.JPanel();
         pnlWalletDetails = new javax.swing.JPanel();
@@ -403,14 +443,16 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         lblCreationDate = new javax.swing.JLabel();
         lblWalletCreationDateValue = new javax.swing.JLabel();
         pnlSpace = new javax.swing.JPanel();
-        pnlWalletControls = new javax.swing.JPanel();
-        btnDeleteWallet = new javax.swing.JButton();
-        btnManagePassphrase = new javax.swing.JButton();
-        btnWalletSeed = new javax.swing.JButton();
+        lblWatchOnlyWallet = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         pnlWalletChooser = new javax.swing.JPanel();
         lblAccountName = new javax.swing.JLabel();
         cmbWallets = new javax.swing.JComboBox();
         btnRestoreWallet = new javax.swing.JButton();
+        btnDeleteWallet = new javax.swing.JButton();
+        btnManagePassphrase = new javax.swing.JButton();
+        btnWalletSeed = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         pnlCurrency = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -436,64 +478,41 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         pnlGeneralSettings.setLayout(new java.awt.BorderLayout());
 
         pnlNetworkSelection.setOpaque(false);
-        pnlNetworkSelection.setLayout(new java.awt.GridBagLayout());
+        pnlNetworkSelection.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         btnGroupNetwork.add(rdoMainNet);
         rdoMainNet.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
         rdoMainNet.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
-        rdoMainNet.setText("Main Net");
+        rdoMainNet.setText("Main Net [Bitcoin Network - Real Bitcoin]");
         rdoMainNet.setOpaque(false);
         rdoMainNet.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rdoMainNetActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
-        pnlNetworkSelection.add(rdoMainNet, gridBagConstraints);
+        pnlNetworkSelection.add(rdoMainNet, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 23, 510, 20));
 
         btnGroupNetwork.add(rdoTestNet);
         rdoTestNet.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
         rdoTestNet.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
-        rdoTestNet.setText("Test Net");
+        rdoTestNet.setText("Test Net [For Testing purpose only - Only works with Testnet coins (Not real bitcoins)]");
         rdoTestNet.setOpaque(false);
         rdoTestNet.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rdoTestNetActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        pnlNetworkSelection.add(rdoTestNet, gridBagConstraints);
+        pnlNetworkSelection.add(rdoTestNet, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 43, 660, 20));
 
         lblNetworkWarning.setFont(ResourcesProvider.Fonts.REGULAR_SMALL_FONT);
         lblNetworkWarning.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
         lblNetworkWarning.setText("(Change in Bitcoin Network settings requires wallet reload to take effect)");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        pnlNetworkSelection.add(lblNetworkWarning, gridBagConstraints);
+        pnlNetworkSelection.add(lblNetworkWarning, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 63, 875, -1));
 
         lblNetworkSettingsDescription.setFont(ResourcesProvider.Fonts.REGULAR_MEDIUM_FONT);
         lblNetworkSettingsDescription.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
         lblNetworkSettingsDescription.setText("Change Bitcoin network");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        pnlNetworkSelection.add(lblNetworkSettingsDescription, gridBagConstraints);
+        pnlNetworkSelection.add(lblNetworkSettingsDescription, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 3, 440, -1));
 
         chkUseTor.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
         chkUseTor.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
@@ -504,12 +523,26 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
                 chkUseTorActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        pnlNetworkSelection.add(chkUseTor, gridBagConstraints);
+        pnlNetworkSelection.add(chkUseTor, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 113, 870, 20));
+
+        lblPeerSettings.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
+        lblPeerSettings.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        lblPeerSettings.setText("Peer Settings:");
+        pnlNetworkSelection.add(lblPeerSettings, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 83, 130, 20));
+
+        cmbPeerSettings.setBackground(ResourcesProvider.Colors.SCREEN_TOP_PANEL_BG_COLOR);
+        cmbPeerSettings.setFont(ResourcesProvider.Fonts.BOLD_LARGE_FONT);
+        cmbPeerSettings.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        cmbPeerSettings.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        cmbPeerSettings.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cmbPeerSettings.setMinimumSize(new java.awt.Dimension(175, 30));
+        cmbPeerSettings.setPreferredSize(new java.awt.Dimension(175, 30));
+        cmbPeerSettings.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmbPeerSettingsItemStateChanged(evt);
+            }
+        });
+        pnlNetworkSelection.add(cmbPeerSettings, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 80, 160, 30));
 
         pnlGeneralSettings.add(pnlNetworkSelection, java.awt.BorderLayout.CENTER);
 
@@ -529,7 +562,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(pnlNetwork, gridBagConstraints);
 
-        pnlWalletSettings.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Wallet Settings", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, ResourcesProvider.Fonts.BOLD_LARGE_FONT, ResourcesProvider.Colors.DEFAULT_HEADING_COLOR));
+        pnlWalletSettings.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Advance Wallet Settings", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, ResourcesProvider.Fonts.BOLD_LARGE_FONT, ResourcesProvider.Colors.DEFAULT_HEADING_COLOR));
         pnlWalletSettings.setOpaque(false);
         pnlWalletSettings.setLayout(new java.awt.BorderLayout());
 
@@ -637,6 +670,32 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         pnlServiceProperties.add(lblWalletCreationDateValue, gridBagConstraints);
 
         pnlSpace.setOpaque(false);
+        pnlSpace.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblWatchOnlyWallet.setFont(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT);
+        lblWatchOnlyWallet.setForeground(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
+        lblWatchOnlyWallet.setText("Watch Only Wallet:");
+        lblWatchOnlyWallet.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        pnlSpace.add(lblWatchOnlyWallet, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+
+        jButton1.setText("Export Xpub key");
+        jButton1.setPreferredSize(XButtonFactory.NORMAL_BUTTON_DIMENSION);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        pnlSpace.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 0, 140, -1));
+
+        jButton2.setText("Import Xpub key");
+        jButton2.setPreferredSize(XButtonFactory.NORMAL_BUTTON_DIMENSION);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        pnlSpace.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 0, 140, -1));
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -657,51 +716,14 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlWalletDetails.add(pnlServiceProperties, gridBagConstraints);
 
-        pnlWalletControls.setOpaque(false);
-
-        btnDeleteWallet.setText("Change Wallet Password");
-        btnDeleteWallet.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetApplicationPasswordActionPerformed(evt);
-            }
-        });
-        pnlWalletControls.add(btnDeleteWallet);
-
-        btnManagePassphrase.setText("Re-synchronize Wallet");
-        btnManagePassphrase.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnReplayChainActionPerformed(evt);
-            }
-        });
-        pnlWalletControls.add(btnManagePassphrase);
-
-        btnWalletSeed.setText("Wallet Seed");
-        btnWalletSeed.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnWalletSeedActionPerformed(evt);
-            }
-        });
-        pnlWalletControls.add(btnWalletSeed);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        pnlWalletDetails.add(pnlWalletControls, gridBagConstraints);
-
         pnlWalletSettings.add(pnlWalletDetails, java.awt.BorderLayout.CENTER);
 
         pnlWalletChooser.setBackground(Colors.SCREEN_TOP_PANEL_BG_COLOR);
         pnlWalletChooser.setOpaque(false);
-        pnlWalletChooser.setLayout(new java.awt.GridBagLayout());
+        pnlWalletChooser.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lblAccountName.setText("Account Name:");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 5);
-        pnlWalletChooser.add(lblAccountName, gridBagConstraints);
+        pnlWalletChooser.add(lblAccountName, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, 23));
 
         cmbWallets.setBackground(ResourcesProvider.Colors.SCREEN_TOP_PANEL_BG_COLOR);
         cmbWallets.setFont(ResourcesProvider.Fonts.BOLD_LARGE_FONT);
@@ -715,13 +737,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
                 cmbWalletsItemStateChanged(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        pnlWalletChooser.add(cmbWallets, gridBagConstraints);
+        pnlWalletChooser.add(cmbWallets, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 10, 120, 23));
         cmbWallets.setUI((ComboBoxUI) WalletComboBoxUI.createUI(cmbWallets));
 
         btnRestoreWallet.setText("Rename Account");
@@ -730,14 +746,31 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
                 btnRestoreWalletActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        pnlWalletChooser.add(btnRestoreWallet, gridBagConstraints);
+        pnlWalletChooser.add(btnRestoreWallet, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 10, 150, -1));
+
+        btnDeleteWallet.setText("Change Password");
+        btnDeleteWallet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetApplicationPasswordActionPerformed(evt);
+            }
+        });
+        pnlWalletChooser.add(btnDeleteWallet, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 10, 150, -1));
+
+        btnManagePassphrase.setText("Re-synchronize");
+        btnManagePassphrase.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReplayChainActionPerformed(evt);
+            }
+        });
+        pnlWalletChooser.add(btnManagePassphrase, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 10, 140, -1));
+
+        btnWalletSeed.setText("Wallet Seed");
+        btnWalletSeed.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnWalletSeedActionPerformed(evt);
+            }
+        });
+        pnlWalletChooser.add(btnWalletSeed, new org.netbeans.lib.awtextra.AbsoluteConstraints(707, 10, 120, -1));
 
         pnlWalletSettings.add(pnlWalletChooser, java.awt.BorderLayout.PAGE_START);
 
@@ -852,18 +885,18 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
 
     private void cmbWalletsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbWalletsItemStateChanged
         /*if (cmbWallets.getSelectedItem() != null) {
-            WalletService service = (WalletService) cmbWallets.getSelectedItem();
-            renderServiceProperties(service);
-        }*/
+         WalletService service = (WalletService) cmbWallets.getSelectedItem();
+         renderServiceProperties(service);
+         }*/
         //if (evt.getStateChange() == ItemEvent.SELECTED) {
-            //if (!(evt.getItem() instanceof HDAccount)) {
-              //  return;
-           // }
-            HDAccount hdacct = (HDAccount) evt.getItem();
-            if (hdacct != null) {
-                lblWalletNameValue.setText(hdacct.getAccountPath());
-            }
-       // }
+        //if (!(evt.getItem() instanceof HDAccount)) {
+        //  return;
+        // }
+        HDAccount hdacct = (HDAccount) evt.getItem();
+        if (hdacct != null) {
+            lblWalletNameValue.setText(hdacct.getAccountPath());
+        }
+        // }
     }//GEN-LAST:event_cmbWalletsItemStateChanged
 
     private void btnResetApplicationPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetApplicationPasswordActionPerformed
@@ -879,12 +912,23 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
             dialog.centerOnScreen();
             dialog.setVisible(true);
             model.removeAllElements();
-            
+
             List<HDAccount> accounts = WalletManager.get().getCurentWalletService().getAllAccounts();
-            for (HDAccount account : accounts) {
-                model.addElement(account);
-            }
-                                
+            /*if (AccountCondition == false) {
+                int i = 0;
+                for (HDAccount account : accounts) {
+                    model.addElement(account);
+                    i++;
+                    if (i == 2) {
+                        break;
+                    }
+                }
+            } else {*/
+                for (HDAccount account : accounts) {
+                    model.addElement(account);
+                }
+            //}
+
             if (wService != null) {
                 int index = model.getIndexOf(wService.getAccount(dialog.getNewAccountName()));
                 if (index >= 0) {
@@ -894,12 +938,8 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         } catch (Exception e) {
             logger.error("Restore Waller Error: {}", e, e);
         }
-        
-    }//GEN-LAST:event_btnRestoreWalletActionPerformed
 
-    private void chkUseTorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkUseTorActionPerformed
-        changeNetwork();
-    }//GEN-LAST:event_chkUseTorActionPerformed
+    }//GEN-LAST:event_btnRestoreWalletActionPerformed
 
     private void btnWalletSeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWalletSeedActionPerformed
         DlgWalletSeedQRCode dlgWsQrCode = new DlgWalletSeedQRCode();
@@ -952,6 +992,83 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
         }
     }//GEN-LAST:event_cmbFeePrefItemStateChanged
 
+    private void chkUseTorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkUseTorActionPerformed
+        changeNetwork();
+    }//GEN-LAST:event_chkUseTorActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+
+        DlgImportPublicKey dlgImportPublicKey = new DlgImportPublicKey();
+        dlgImportPublicKey.centerOnScreen();
+        dlgImportPublicKey.setVisible(true);
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void cmbPeerSettingsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbPeerSettingsItemStateChanged
+        /*if (cmbPeerSettings.getSelectedItem().equals("Trusted Peers")) {
+            AccountCondition = true;
+            model.removeAllElements();
+            try {
+                List<HDAccount> accounts = WalletManager.get().getCurentWalletService().getAllAccounts();
+                for (HDAccount account : accounts) {
+                    model.addElement(account);
+                }
+            } catch (NullPointerException e) {
+                System.out.println("Exception Handled");
+            }
+            WalletService wService = WalletManager.get().getCurentWalletService();
+            if (wService != null) {
+                int index = model.getIndexOf(wService.getCurrentAccount());
+                if (index >= 0) {
+                    cmbWallets.setSelectedIndex(index);
+                }
+            }
+        } else {
+            AccountCondition = false;
+            model.removeAllElements();
+            List<HDAccount> accounts = WalletManager.get().getCurentWalletService().getAllAccounts();
+            int i = 0;
+            for (HDAccount account : accounts) {
+                model.addElement(account);
+                i++;
+                if (i == 2) {
+                    break;
+                }
+            }
+            WalletService wService = WalletManager.get().getCurentWalletService();
+            if (wService != null) {
+                int index = model.getIndexOf(wService.getCurrentAccount());
+                if (index >= 0) {
+                    cmbWallets.setSelectedIndex(index);
+                }
+            }
+        }*/
+    }//GEN-LAST:event_cmbPeerSettingsItemStateChanged
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
+        if (rdoTestNet.isSelected()) 
+        {
+            DeterministicKey dk = HDKeyDerivation.createMasterPubKeyFromBytes(HDAccount.xPub().getPubKey(), HDAccount.xPub().getChainCode());
+            tPublicKey = dk.serializePubB58(NetworkParameters.regTests());
+            DlgXpubKey dlgQrcode = new DlgXpubKey(tPublicKey);
+            dlgQrcode.centerOnScreen();
+            dlgQrcode.setVisible(true);
+            xPublicKey = "";
+        }
+        if (rdoMainNet.isSelected()) {
+            DeterministicKey dk = HDKeyDerivation.createMasterPubKeyFromBytes(HDAccount.xPub().getPubKey(), HDAccount.xPub().getChainCode());
+            xPublicKey = dk.serializePubB58(NetworkParameters.prodNet());
+            DlgXpubKey dlgQrcode = new DlgXpubKey(xPublicKey);
+            dlgQrcode.centerOnScreen();
+            dlgQrcode.setVisible(true);
+            tPublicKey = "";
+        }
+        
+        
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDeleteWallet;
@@ -962,7 +1079,10 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
     private javax.swing.JCheckBox chkUseTor;
     private javax.swing.JComboBox cmbCurrencies;
     private javax.swing.JComboBox cmbFeePref;
+    private javax.swing.JComboBox cmbPeerSettings;
     private javax.swing.JComboBox cmbWallets;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -970,6 +1090,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
     private javax.swing.JLabel lblCreationDate;
     private javax.swing.JLabel lblNetworkSettingsDescription;
     private javax.swing.JLabel lblNetworkWarning;
+    private javax.swing.JLabel lblPeerSettings;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblWalletCreationDateValue;
     private javax.swing.JLabel lblWalletLocation;
@@ -980,6 +1101,7 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
     private javax.swing.JLabel lblWalletPassphraseValue;
     private javax.swing.JLabel lblWalletStatus;
     private javax.swing.JLabel lblWalletStatusValue;
+    private javax.swing.JLabel lblWatchOnlyWallet;
     private javax.swing.JPanel pnlCurrency;
     private javax.swing.JPanel pnlGeneralSettings;
     private javax.swing.JPanel pnlMain;
@@ -992,10 +1114,9 @@ public class PnlSettingsScreen extends javax.swing.JPanel implements BasicScreen
     private javax.swing.JPanel pnlTop;
     private javax.swing.JPanel pnlTopEdge;
     private javax.swing.JPanel pnlWalletChooser;
-    private javax.swing.JPanel pnlWalletControls;
     private javax.swing.JPanel pnlWalletDetails;
     private javax.swing.JPanel pnlWalletSettings;
-    private javax.swing.JRadioButton rdoMainNet;
-    private javax.swing.JRadioButton rdoTestNet;
+    public static javax.swing.JRadioButton rdoMainNet;
+    public static javax.swing.JRadioButton rdoTestNet;
     // End of variables declaration//GEN-END:variables
 }

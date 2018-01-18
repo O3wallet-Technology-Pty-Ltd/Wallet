@@ -13,13 +13,17 @@ import com.o3.bitcoin.ui.component.PlainTableHeaderRenderer;
 import com.o3.bitcoin.ui.component.XScrollbarUI;
 import com.o3.bitcoin.ui.dialogs.screens.BasicScreen;
 import com.o3.bitcoin.applications.PnlShapshiftIOExchangeDividerScreen;
+import com.o3.bitcoin.ui.dialogs.screens.PnlNewPaymentScreen;
 import com.o3.bitcoin.ui.screens.exchange.PnlExchangeScreen;
+import com.o3.bitcoin.ui.screens.wallet.PnlWalletScreen;
 import com.o3.bitcoin.util.BitcoinCurrencyRateApi;
 import com.o3.bitcoin.util.ResourcesProvider.Colors;
 import com.o3.bitcoin.util.ResourcesProvider.Fonts;
 import com.o3.bitcoin.util.Utils;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -27,9 +31,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
@@ -48,10 +56,22 @@ import org.slf4j.LoggerFactory;
 /**
  * Class that implements dashboard screen of ui
  */
-public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScreen {
+public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScreen 
+{
+    
+    private final String statusCompleted = "COMPLETE";
+    private final String statusPending = "PENDING";
+    private final String statusConfirmed = "CONFIRMED";
+    private String status = "";
+    private final int columnStatusNumber = 8; 
 
+    public static String test = "";
+    
     private static final Logger logger = LoggerFactory.getLogger(PnlDashboardStats.class);
 
+    
+    
+ 
     /**
      * Creates new form PnlDashboardScreen
      */
@@ -71,7 +91,7 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
      * function that creates History table
      */
     private void prepareUI() {
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 9; i++) {
             TableColumn column = tblTransactions.getColumnModel().getColumn(i);
             column.setHeaderRenderer(new PlainTableHeaderRenderer());
             if (i == 1 || i == 2) {
@@ -84,6 +104,12 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
         tblTransactions.getTableHeader().setForeground(Color.BLACK);
         tblTransactions.getTableHeader().setBackground(Colors.TABLE_HEADER_BG_COLOR);
         tblTransactions.getTableHeader().setOpaque(true);
+        
+
+        ////////////////////////////////////////////////////////////////////////
+        // To set the font size and style of the contents of table
+        tblTransactions.setFont(new Font("Tahoma", Font.PLAIN, 11));
+            
 
         scrollPane.setColumnHeader(new JViewport() {
             @Override
@@ -157,6 +183,11 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
             }
         }
         pnlDashboardStats.setTotalBalance(MonetaryFormat.BTC.noCode().format(totalBalance).toString());
+        
+        /*******************FARIHA SHAIKH********************************/
+        test = "" + MonetaryFormat.BTC.noCode().format(totalBalance).toString();
+        
+
         //pnlDashboardStats.setTotalDebit(MonetaryFormat.BTC.noCode().format(totalDebit).toString());
         //pnlDashboardStats.setTotalCredit(MonetaryFormat.BTC.noCode().format(totalCredit).toString());
         priceInFiat = Double.valueOf(MonetaryFormat.BTC.noCode().format(totalBalance).toString());
@@ -186,6 +217,27 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
             Address to = transaction.getOutput(0).getAddressFromP2PKHScript(wrapper.getWallet().getNetworkParameters());
             boolean credit = amount.isPositive();
             
+            if (transaction.getConfidence().getDepthInBlocks() < 1)
+            {
+                status = statusPending;
+            }
+            else if (transaction.getConfidence().getDepthInBlocks() >= 1 && transaction.getConfidence().getDepthInBlocks() <= 2)
+            {
+                status = statusConfirmed;
+            }
+            else
+            {
+                status = statusCompleted;
+            }
+            
+                        ///////////////////////////////////////////////////////////////////
+            // To place the text of table at the center
+            DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+            rightRenderer.setHorizontalAlignment(SwingConstants.CENTER);//(JLabel.CENTER);
+            for(int x=0;x<model.getColumnCount();x++){
+            tblTransactions.getColumnModel().getColumn(x).setCellRenderer( rightRenderer );
+        }
+            
             model.addRow(new Object[]{
                 Utils.formatTransactionDate(transaction.getUpdateTime()),
                 from,
@@ -194,8 +246,17 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
                 amountString,
                 feeString,
                 "",
-                confidence});
+                confidence,
+                status,
+            });
         }
+        
+        /////////////////////////////////////////////////////////////////////// 
+        // to set the color of column 8 (Status) as green
+        Color color = null;
+        TableColumn tm = tblTransactions.getColumnModel().getColumn(columnStatusNumber);
+        tm.setCellRenderer((TableCellRenderer) columnCellRenderer(color));
+            
         Coin balanceAfter = Coin.ZERO;
         for (int index = transactions.size() - 1; index >= 0; index--) {
             balanceAfter = balanceAfter.add(Coin.parseCoin((String) model.getValueAt(index, 4)));
@@ -203,11 +264,52 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
         }
     }
     
+    public Component columnCellRenderer(final Color c)
+    {
+        tblTransactions.setDefaultRenderer(Object.class, new DefaultTableCellRenderer()
+            {
+                //@Override
+                public Component getTableCellRendererComponent(JTable table, Object value, 
+                boolean isSelected, boolean hasFocus, int row, int column)
+                {
+                    Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                
+                    if (column == columnStatusNumber)
+                    {
+                        Object columnValue=table.getValueAt(row,columnStatusNumber);
+                        if (columnValue.equals(statusCompleted))
+                        {
+                            setBackground(java.awt.Color.decode("#21C86D"));//"#FFA500"));                        
+                            setForeground(java.awt.Color.WHITE);
+                            setHorizontalAlignment(SwingConstants.CENTER);                        
+                        }
+                        else if (columnValue.equals(statusConfirmed))
+                        {
+                            setBackground(java.awt.Color.decode("#8DF158"));                        
+                            setForeground(java.awt.Color.WHITE);
+                            setHorizontalAlignment(SwingConstants.CENTER);                        
+                        }
+                        else if (columnValue.equals(statusPending))
+                        {
+                            setBackground(java.awt.Color.decode("#FFA500"));
+                            setForeground(java.awt.Color.WHITE);
+                            setHorizontalAlignment(SwingConstants.CENTER);
+                        }
+                        
+                        return cell;
+                    }
+                    return cell;
+                }                
+            });
+        return null;
+    }
+    
     /**
      * function to get reference to dashboard graph
      * @return PnlDashboardGraphs
      */
-    public PnlDashboardGraphs getDashboardGraph() {
+
+        public PnlDashboardGraphs getDashboardGraph() {
         return pnlDashboardGraphs1;
     }
 
@@ -260,7 +362,7 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
             return true;
         }
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -309,11 +411,11 @@ public class PnlDashboardScreen extends javax.swing.JPanel implements BasicScree
 
             },
             new String [] {
-                "Date", "From", "To", "Credit/Debit", "Amount", "Fee", "Total Balance", "Confidence"
+                "Date", "From", "To", "Credit/Debit", "Amount", "Fee", "Total Balance", "Confidence", "Status"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {

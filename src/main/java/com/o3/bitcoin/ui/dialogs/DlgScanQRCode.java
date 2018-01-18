@@ -6,7 +6,6 @@
 package com.o3.bitcoin.ui.dialogs;
 
 import com.o3.bitcoin.ui.component.XButtonFactory;
-import com.o3.bitcoin.ui.dialogs.screens.PnlQRCodeScreen;
 import com.o3.bitcoin.ui.dialogs.screens.PnlScanQRCodeScreen;
 import com.o3.bitcoin.util.ResourcesProvider;
 import java.awt.Color;
@@ -73,6 +72,7 @@ public class DlgScanQRCode extends BasicDialog {
             public void actionPerformed(ActionEvent e) {
                 pnlScanQRCodeScreen.closeCamera();
                 handleCloseDialogControlEvent(e);
+                dispose();            
             }
         });
         return close;

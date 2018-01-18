@@ -5,19 +5,16 @@
  */
 package com.o3.bitcoin.ui.dialogs;
 
-import com.o3.bitcoin.service.WalletService;
-import com.o3.bitcoin.ui.ApplicationUI;
 import com.o3.bitcoin.ui.component.XButtonFactory;
-import com.o3.bitcoin.ui.dialogs.screens.PnlNewAccountScreen;
 import com.o3.bitcoin.ui.dialogs.screens.PnlQRCodeScreen;
+import com.o3.bitcoin.ui.screens.wallet.PnlWalletScreen;
 import com.o3.bitcoin.util.ImageSelection;
 import com.o3.bitcoin.util.ResourcesProvider;
 import java.awt.Color;
-import java.awt.Image;
+import java.awt.Desktop;
 import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -27,7 +24,6 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import org.bitcoinj.core.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +41,9 @@ public class DlgQRCode extends BasicDialog {
     private PnlQRCodeScreen pnlQRCodeScreen;
     private List<JButton> controls = new ArrayList<>();
     private String address = null;
+    private String amount = null;
+    private String description = null;
+    private String btcAmount = null;
     /**
      * Creates new form DlgQRCode
      */
@@ -53,11 +52,20 @@ public class DlgQRCode extends BasicDialog {
         this.address = address;
         setupUI();
     }
+    
+    public DlgQRCode(String address, String description, String amount, String btcAmount) {
+        super(false);
+        this.address = address;
+        this.amount = amount;
+        this.description = description;
+        this.btcAmount = btcAmount;
+        setupUI();
+    }
 
     @Override
     protected JPanel getMainContentPanel() {
         if (pnlQRCodeScreen == null) {
-            pnlQRCodeScreen = new PnlQRCodeScreen(address);
+            pnlQRCodeScreen = new PnlQRCodeScreen(address,description, amount, btcAmount);
         }
         return pnlQRCodeScreen;
     }
@@ -67,6 +75,9 @@ public class DlgQRCode extends BasicDialog {
     protected List<JButton> getControls() {
         controls = super.getControls();
         controls.add(0, getCopyQRCodeButton());
+        controls.add(0, getMailQRCodeButton());
+        controls.add(0, getPrintQRCodeButton());
+        controls.add(0, getUriQRCodeButton());
         return controls;
     }
 
@@ -91,6 +102,88 @@ public class DlgQRCode extends BasicDialog {
         });
         return accountButton;
     }
+    
+    
+    //Mail Button
+    
+     protected JButton getMailQRCodeButton() {
+        JButton accountButton = new JButton("Mail");
+        XButtonFactory.themedButton(accountButton)
+                .background(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR)
+                .color(Color.WHITE)
+                .font(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT)
+                .size(XButtonFactory.NORMAL_BUTTON_DIMENSION);
+
+        accountButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Desktop dt = Desktop.getDesktop();
+                    try {
+                        dt.mail();
+                    } catch (IOException ex) {
+                        //java.util.logging.Logger.getLogger(DlgScanQRCode.class.getName()).log(Level.SEVERE, null, ex);
+                        ex.printStackTrace();
+                    }
+            }
+        });
+        return accountButton;
+    }
+     
+     
+     //Print Button
+     
+        protected JButton getPrintQRCodeButton() {
+        JButton accountButton = new JButton("Print");
+        XButtonFactory.themedButton(accountButton)
+                .background(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR)
+                .color(Color.WHITE)
+                .font(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT)
+                .size(XButtonFactory.NORMAL_BUTTON_DIMENSION);
+
+        accountButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                 try {
+                    Desktop desktop = null;
+                    if (Desktop.isDesktopSupported()) {
+                        desktop = Desktop.getDesktop();
+                    }
+                    desktop.print(new File(pnlQRCodeScreen.qrcodeFilePath));
+
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                    System.out.println("________" + ioe + "___________");
+                }
+            }
+        });
+        return accountButton;
+    }
+    
+    //Uri Button
+        protected JButton getUriQRCodeButton() {
+        JButton accountButton = new JButton("Uri");
+        XButtonFactory.themedButton(accountButton)
+                .background(ResourcesProvider.Colors.NAV_MENU_WALLET_COLOR)
+                .color(Color.WHITE)
+                .font(ResourcesProvider.Fonts.BOLD_MEDIUM_FONT)
+                .size(XButtonFactory.NORMAL_BUTTON_DIMENSION);
+
+        accountButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String value = PnlWalletScreen.LabelAddress;
+                StringSelection selection = new StringSelection(value);
+
+                    Clipboard clipboard = (Clipboard) Toolkit.getDefaultToolkit().getSystemClipboard();
+                    clipboard.setContents(selection, selection);
+            }
+        });
+        return accountButton;
+    }
+    
     
     /**
      * callback function for Copy button event 

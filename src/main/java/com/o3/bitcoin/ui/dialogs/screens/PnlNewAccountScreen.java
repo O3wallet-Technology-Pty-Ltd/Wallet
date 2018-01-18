@@ -9,6 +9,9 @@ import com.o3.bitcoin.model.manager.ConfigManager;
 import com.o3.bitcoin.service.WalletService;
 import com.o3.bitcoin.ui.ApplicationUI;
 import com.o3.bitcoin.ui.dialogs.DlgCreateNewAccount;
+import com.o3.bitcoin.ui.dialogs.DlgCreateWatchOnlyWalletAcount;
+import com.o3.bitcoin.ui.dialogs.DlgImportPublicKey;
+import com.o3.bitcoin.ui.screens.settings.PnlSettingsScreen;
 import com.o3.bitcoin.util.ResourcesProvider;
 import javax.swing.JOptionPane;
 import org.bitcoinj.core.Coin;
@@ -20,15 +23,17 @@ import org.slf4j.LoggerFactory;
  *
  * @author
  */
-
 /**
- * <p>Class that creates UI form for New Account dialog</p>
+ * <p>
+ * Class that creates UI form for New Account dialog</p>
  */
 public class PnlNewAccountScreen extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerFactory.getLogger(PnlLoginScreen.class);
+    //removed final from below both DlgCreateNewAccount,DlgCreateWatchOnlyWalletAcount 
+    private DlgCreateNewAccount dlgNewAccount;
+    private DlgCreateWatchOnlyWalletAcount dlgCreateWatchOnlyWalletAcount;
     
-    private final DlgCreateNewAccount dlgNewAccount;
     private final WalletService service;
 
     /**
@@ -39,6 +44,12 @@ public class PnlNewAccountScreen extends javax.swing.JPanel {
      */
     public PnlNewAccountScreen(DlgCreateNewAccount dlgNewAccount, WalletService service) {
         this.dlgNewAccount = dlgNewAccount;
+        this.service = service;
+        initComponents();
+    }
+    
+    public PnlNewAccountScreen(DlgCreateWatchOnlyWalletAcount dlgWatchOnlyWallet, WalletService service) {
+        this.dlgCreateWatchOnlyWalletAcount = dlgWatchOnlyWallet;
         this.service = service;
         initComponents();
     }
@@ -56,6 +67,7 @@ public class PnlNewAccountScreen extends javax.swing.JPanel {
 
     /**
      * function that creates new account
+     *
      * @return whether account created or not
      */
     public boolean createAccount() {
@@ -63,28 +75,57 @@ public class PnlNewAccountScreen extends javax.swing.JPanel {
             validateData();
             String accountName = new String(txtAccountName.getText());
             Coin balance = service.getWallet().getBalance(Wallet.BalanceType.ESTIMATED);
-            if(balance.value > 0) {
-                if( !service.isAccountExists(txtAccountName.getText()) )
-                {
-                    if( service.getAllAccounts().size() >= 2 ) {
-                       JOptionPane.showMessageDialog(null, "ERROR: You can't create more than 2 accounts", "ERROR", JOptionPane.ERROR_MESSAGE); 
-                       return false;
-                    }
 
-                    service.addAccount(accountName);
-                    return true;
-                }
-                else {
-                     JOptionPane.showMessageDialog(null, "ERROR: " + txtAccountName.getText() + " already exists", "ERROR", JOptionPane.ERROR_MESSAGE);
-                     return false;
-                }
-            }
-            else {
-                    JOptionPane.showMessageDialog(null, "ERROR: You can't create new account with 0 wallet balance", "ERROR", JOptionPane.ERROR_MESSAGE);
+            if (balance.value > 0) {
+                if (!service.isAccountExists(txtAccountName.getText())) {
+                    if (service.getAllAccounts().size() >= 1) {
+                        JOptionPane.showMessageDialog(null, "ERROR: You can't create more than 1 accounts", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        return false;
+                    } else {
+                        service.addAccount(accountName);
+                        return true;
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "ERROR: " + txtAccountName.getText() + " already exists", "ERROR", JOptionPane.ERROR_MESSAGE);
                     return false;
-            }    
-                
-        } catch (Exception e) {
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "ERROR: You can't create new account with 0 wallet balance", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+        }
+        catch (Exception e) {
+            logger.error("Account Creation failed: {}", e.getMessage());
+            ApplicationUI.get().showError(e);
+        }
+        return false;
+    }
+    
+    // For Watch only wallet
+        public boolean createWatchOnlyWalletAccount() {
+        try {
+            validateData();
+            String accountName = new String(txtAccountName.getText() + ".");
+            Coin balance = service.getWallet().getBalance(Wallet.BalanceType.ESTIMATED);
+            //if (balance.value > 0) {
+                if (!service.isAccountExists(txtAccountName.getText())) {
+                    if (service.getAllAccounts().size() >= 2) {
+                        JOptionPane.showMessageDialog(null, "ERROR: You can't create more than 1 account for watch only wallet", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        return false;
+                    } else {
+                        service.addAccount(accountName);
+                        return true;
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "ERROR: " + txtAccountName.getText() + " already exists", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+//            } else {
+//                JOptionPane.showMessageDialog(null, "ERROR: You can't create new account with 0 wallet balance", "ERROR", JOptionPane.ERROR_MESSAGE);
+//                return false;
+//            }
+        }
+        catch (Exception e) {
             logger.error("Account Creation failed: {}", e.getMessage());
             ApplicationUI.get().showError(e);
         }
@@ -92,7 +133,7 @@ public class PnlNewAccountScreen extends javax.swing.JPanel {
     }
 
     @SuppressWarnings("unchecked")
-                         
+
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
@@ -122,10 +163,9 @@ public class PnlNewAccountScreen extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(txtAccountName, gridBagConstraints);
-    }                        
-                  
+    }
+
     private javax.swing.JLabel lblAccountName;
     private javax.swing.JTextField txtAccountName;
 
 }
-

@@ -26,13 +26,27 @@ import javax.swing.JOptionPane;
 public class PnlQRCodeScreen extends javax.swing.JPanel {
 
     private String address;
-    private String qrcodeFilePath = null;
+    public String qrcodeFilePath = null;
     private static int count = 0;
+    
+    private String amount;
+    private String description;
+    private String btcAmount;
     /**
      * Creates new form PnlQRCodeScreen
      */
     public PnlQRCodeScreen(String address) {
         this.address = address;
+        initComponents();
+        loadQRCode();
+    }
+    
+    public PnlQRCodeScreen(String address, String description, String amount, String btcAmount)
+    {
+        this.address = address;
+        this.amount = amount;
+        this.description = description;
+        this.btcAmount = btcAmount;
         initComponents();
         loadQRCode();
     }
@@ -57,7 +71,7 @@ public class PnlQRCodeScreen extends javax.swing.JPanel {
             String charset = "UTF-8";
             Map hintMap = new HashMap();
             hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
-            QRCodeUtil.createQRCode("bitcoin:"+address, qrcodeFilePath, charset, hintMap, 200, 200);
+            QRCodeUtil.createQRCode("bitcoin:"+address + "?" + "amount=" + btcAmount + "&" + "label=label&" + "message=" + description, qrcodeFilePath, charset, hintMap, 200, 200);
             lblQrcode.setIcon(new ImageIcon(qrcodeFilePath));
             count++;
         }catch( Exception e) {

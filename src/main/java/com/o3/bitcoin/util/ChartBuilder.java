@@ -292,6 +292,7 @@ public class ChartBuilder {
 
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setAxisLineVisible(false);
+        rangeAxis.setLowerBound(0d);
         rangeAxis.setTickLabelFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
         rangeAxis.setTickLabelPaint(ResourcesProvider.Colors.DEFAULT_HEADING_COLOR);
 

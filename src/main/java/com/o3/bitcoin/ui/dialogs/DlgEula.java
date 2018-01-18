@@ -33,6 +33,7 @@ public class DlgEula extends BasicDialog {
     private List<JButton> controls = new ArrayList<>();
     public static boolean eulaAccepted = false;
     
+    
     /**
      * Creates new form DlgEula
      */
@@ -72,6 +73,7 @@ public class DlgEula extends BasicDialog {
             
             @Override
             public void actionPerformed(ActionEvent e) {
+                //check = true;
                 handleAcceptButtonClickEvent(e);
             }
         });

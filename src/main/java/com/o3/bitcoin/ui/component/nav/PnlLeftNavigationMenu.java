@@ -67,7 +67,7 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
 
         pnlMain = new javax.swing.JPanel();
         mnuItemDashboard = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("DASHBOARD", "o3", Colors.NAV_MENU_DASHBOARD_COLOR);
-        mnuItemWallet = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("ACCOUNT", "wallet", Colors.NAV_MENU_WALLET_COLOR);
+        mnuItemWallet = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("WALLET", "wallet", Colors.NAV_MENU_WALLET_COLOR);
         mnuItemExchanges = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("EXCHANGES", "exchange", Colors.NAV_MENU_EXCHANGES_COLOR);
         mnuItemApplications = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("APPLICATIONS", "application", Colors.NAV_MENU_APPLICATIONS_COLOR);
         pnlLeftNavMenuItem5 = new com.o3.bitcoin.ui.component.nav.PnlLeftNavMenuItem("SETTINGS", "settings", Colors.NAV_MENU_SETTINGS_COLOR);
@@ -91,7 +91,7 @@ public class PnlLeftNavigationMenu extends javax.swing.JPanel {
         });
         pnlMain.add(mnuItemDashboard);
 
-        mnuItemWallet.setCaption("ACCOUNT");
+        mnuItemWallet.setCaption("WALLET");
         mnuItemWallet.setEdgeColor(Colors.NAV_MENU_WALLET_COLOR);
         mnuItemWallet.setIconKey("wallet");
         mnuItemWallet.addMouseListener(new java.awt.event.MouseAdapter() {

@@ -6,7 +6,6 @@
 
 package com.o3.bitcoin.hdwallet;
 
-import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 import org.bitcoinj.core.Address;
@@ -49,7 +48,7 @@ public class HDAccount {
     private static final Logger logger = LoggerFactory.getLogger(HDAccount.class);
     
     private NetworkParameters mParams;
-    private DeterministicKey mAccountKey;
+    private static DeterministicKey mAccountKey;
     private String mAccountName;
     private int mAccountId;
 
@@ -59,7 +58,7 @@ public class HDAccount {
      /**
      * class constructor 
      * @param params NetworkParameter testnet or main
-     * @param masterkey Master Key of the account
+     * @param masterKey
      * @param accountName  Name of the account
      * @param acctnum   Account number of HD Wallet
      */
@@ -80,7 +79,7 @@ public class HDAccount {
     /**
      * class constructor 
      * @param params NetworkParameter testnet or main
-     * @param masterkey Master Key of the account
+     * @param masterKey
      * @param acctNode  Jason node that contains account information
      */
     public HDAccount(NetworkParameters params,
@@ -225,8 +224,30 @@ public class HDAccount {
     */    
     public DeterministicKey getPublicKey() {
         return mAccountKey.dropPrivateBytes();
-        //return mAccountKey.getPubOnly();
     }
+    
+    
+    public static DeterministicKey xPub() {
+        return mAccountKey.dropPrivateBytes();
+    }
+    
+    /**
+     * function to get first key of the receive chain of account
+     * @return public part of account key
+    */    
+    public ECKey getAccountFirstReceiveKey() {
+        return mReceiveChain.getFirstReceiveKey();
+    }
+    
+    /**
+     * function to get first Address of the receive chain of account
+     * @return public part of account key
+    */    
+    public Address getAccountFirstReceiveAddress() {
+        return mReceiveChain.getFirstReceiveAddress();
+    }
+    
+    
     
     /**
      * function to check whether a public key exists in account or not

@@ -48,7 +48,6 @@ public class Config {
      * @param wallets list of wallets configuration
      */
     public Config(List<WalletConfig> wallets) {
-        System.out.println("Config one argument constructor");// delete it
         this.wallets = wallets;
         if (this.wallets == null) {
             this.wallets = new ArrayList<>();

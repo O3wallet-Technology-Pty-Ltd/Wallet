@@ -23,6 +23,8 @@ public class PnlProgressScreen extends javax.swing.JPanel {
         initComponents();
     }
 
+    
+    
     public static PnlProgressScreen create() {
         return new PnlProgressScreen();
     }
@@ -92,36 +94,31 @@ public class PnlProgressScreen extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         lblStatus = new javax.swing.JLabel();
         progressBar = new javax.swing.JProgressBar();
+        lblMinutesStatus = new javax.swing.JLabel();
 
         setOpaque(false);
         setPreferredSize(new java.awt.Dimension(400, 250));
-        setLayout(new java.awt.GridBagLayout());
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lblStatus.setFont(ResourcesProvider.Fonts.BOLD_SMALL_FONT);
         lblStatus.setText("Loading ...");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        add(lblStatus, gridBagConstraints);
+        add(lblStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 264, -1));
 
         progressBar.setForeground(ResourcesProvider.Colors.NAV_MENU_DASHBOARD_COLOR);
         progressBar.setIndeterminate(true);
         progressBar.setPreferredSize(new java.awt.Dimension(250, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        add(progressBar, gridBagConstraints);
+        add(progressBar, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 370, -1));
+
+        lblMinutesStatus.setText("This can take few seconds to few minutes...");
+        add(lblMinutesStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel lblMinutesStatus;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JProgressBar progressBar;
     // End of variables declaration//GEN-END:variables

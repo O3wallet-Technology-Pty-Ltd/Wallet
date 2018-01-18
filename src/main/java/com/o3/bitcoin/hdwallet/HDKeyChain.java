@@ -257,4 +257,23 @@ public class HDKeyChain {
         }
         throw new RuntimeException("no unused address available");
     }
+    
+    /**
+     * function to get first key on keychain
+     * @return next unused address
+     */
+    public ECKey getFirstReceiveKey() {
+        return mAddrs.get(0).getKey();
+    }
+    
+    /**
+     * function to get first Address on keychain
+     * @return Address
+     */
+    public Address getFirstReceiveAddress() {
+        //System.out.println("_______________________________________" + mAddrs.get(0).getAddress());
+        return mAddrs.get(0).getAddress();
+        
+    }
+    
 }

@@ -45,6 +45,7 @@ public class DlgCreateNewAccount extends BasicDialog {
      *
      * @param service WalletService
      */
+    
     public DlgCreateNewAccount(WalletService service) {
         super(false);
         this.service = service;

@@ -49,8 +49,10 @@ public class ApplicationUI extends javax.swing.JFrame {
     public static final String SCREEN_EXCHANGES = "card8";
 
     private static ApplicationUI instance = null;
+    
     private Dimension minimumDimension = new Dimension(BASE_UI_DIMENSION.width, BASE_UI_DIMENSION.height);
-
+    
+    
     private Map<String, BasicScreen> screens = new HashMap<>();
 
     /**
@@ -63,7 +65,7 @@ public class ApplicationUI extends javax.swing.JFrame {
         prepareCache();
         revalidate();
         repaint();
-
+        //DefaultScreenSize();
     }
 
     private void prepareCache() {
@@ -99,9 +101,21 @@ public class ApplicationUI extends javax.swing.JFrame {
         }
     }
 
+    
+    /*
+    * TASK BAR HIDDEN PROBLEM
+    */
+    private void resize()
+    {
+        setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
+    }
+    
+    
     /**
      * function to resize ApplicationUI form
+     * ORIGINAL METHOD
     */
+    /*
     private void resize() {
         GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
         this.setMaximizedBounds(env.getMaximumWindowBounds());
@@ -112,7 +126,9 @@ public class ApplicationUI extends javax.swing.JFrame {
         minimumDimension = new Dimension(minScreenWidth, minScreenHeight);
         setMinimumSize(minimumDimension);
     }
-
+    */
+    
+    
     private void prepareUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         UIManager.getLookAndFeelDefaults().put("defaultFont", Fonts.DEFAULT_FONT);
@@ -125,7 +141,7 @@ public class ApplicationUI extends javax.swing.JFrame {
         if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
             restore();
         } else {
-            setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
+            setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);            
         }
     }
 
@@ -133,6 +149,13 @@ public class ApplicationUI extends javax.swing.JFrame {
      * function to restore ApplicationUI form from minimize
     */
     public void restore() {
+        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        this.setMaximizedBounds(env.getMaximumWindowBounds());
+        int screenWidth = (int) env.getMaximumWindowBounds().getWidth();
+        int screenHeight = (int) env.getMaximumWindowBounds().getHeight();
+        int minScreenWidth = Math.max(screenWidth/2, BASE_UI_DIMENSION.width);
+        int minScreenHeight = Math.max(screenHeight/2, BASE_UI_DIMENSION.height);
+        minimumDimension = new Dimension(minScreenWidth, minScreenHeight);
         setExtendedState(JFrame.NORMAL);
         setSize(minimumDimension);
     }
@@ -259,7 +282,7 @@ public class ApplicationUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        resize();
+        //resize();
     }//GEN-LAST:event_formComponentResized
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

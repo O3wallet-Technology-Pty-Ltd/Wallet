@@ -339,7 +339,7 @@ public class Utils {
     
     public static boolean isWindows() {
         String OS = System.getProperty("os.name").toLowerCase();
-        return (OS.indexOf("win") >= 0);
+        return (OS.indexOf("windows") >= 0);
     }
 
     public static boolean isMac() {

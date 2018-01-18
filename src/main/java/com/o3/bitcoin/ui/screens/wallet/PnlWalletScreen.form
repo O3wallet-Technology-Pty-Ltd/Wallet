@@ -43,6 +43,13 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
           <SubComponents>
+            <Component class="com.o3.bitcoin.ui.screens.wallet.PnlWalletStats" name="pnlWalletStats">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="North"/>
+                </Constraint>
+              </Constraints>
+            </Component>
             <Component class="com.o3.bitcoin.ui.screens.wallet.PnlWalletGraphs" name="pnlWalletGraphs">
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -54,13 +61,6 @@
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
                   <BorderConstraints direction="Center"/>
-                </Constraint>
-              </Constraints>
-            </Component>
-            <Component class="com.o3.bitcoin.ui.screens.wallet.PnlWalletStats" name="pnlWalletStats">
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                  <BorderConstraints direction="North"/>
                 </Constraint>
               </Constraints>
             </Component>
@@ -109,12 +109,12 @@
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                       <Table columnCount="7" rowCount="0">
                         <Column editable="false" title="Date" type="java.lang.Object"/>
-                        <Column editable="false" title="From" type="java.lang.Object"/>
                         <Column editable="false" title="To" type="java.lang.Object"/>
-                        <Column editable="false" title="Credit/Debit" type="java.lang.Object"/>
+                        <Column editable="false" title="Decription" type="java.lang.Object"/>
                         <Column editable="false" title="Amount" type="java.lang.Object"/>
                         <Column editable="false" title="Fee" type="java.lang.Object"/>
-                        <Column editable="false" title="Balance" type="java.lang.Object"/>
+                        <Column editable="false" title="Status" type="java.lang.Object"/>
+                        <Column editable="false" title="Exchange Rate" type="java.lang.Object"/>
                       </Table>
                     </Property>
                     <Property name="autoResizeMode" type="int" value="4"/>
@@ -476,7 +476,7 @@
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/icons/wallet_16x16.png"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Account"/>
+                    <Property name="text" type="java.lang.String" value="New Account"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                     <Property name="iconTextGap" type="int" value="10"/>
                   </Properties>

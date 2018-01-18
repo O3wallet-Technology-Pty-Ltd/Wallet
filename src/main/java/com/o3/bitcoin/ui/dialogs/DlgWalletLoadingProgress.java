@@ -52,7 +52,8 @@ public class DlgWalletLoadingProgress extends DlgProgress {
 
     @Override
     public String getHeadingText() {
-        return "Loading Wallet (" + service.getWalletConfig().getId() + ")";
+        return "Loading Wallet";
+        //return "Loading Wallet (" + service.getWalletConfig().getId() + ")";
     }
 
     @Override
